@@ -22,18 +22,27 @@
             </ul>
         </nav>
 
+        
         {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
-            </div>
-            
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+        </div>
+        
         {% else %}
-            <ul>
-                <li><a href="{{ path('app_register') }}">S'inscrire</a></li>
-                <li><a href="{{ path('app_login') }}">Se connecter</a></li>
-            </ul>
+        <ul>
+            <li><a href="{{ path('app_register') }}">S'inscrire</a></li>
+            <li><a href="{{ path('app_login') }}">Se connecter</a></li>
+        </ul>
         {% endif %}
-            
+        
+        {% for label, messages in app.flashes(['success', 'warning']) %}
+            {% for message in messages %}
+                <div class="flash-{{ label }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        
         {% block body %}
         {% endblock %}
     </body>
