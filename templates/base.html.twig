@@ -22,6 +22,18 @@
             </ul>
         </nav>
 
+        {% if app.user %}
+            <div class="mb-3">
+                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+            </div>
+            
+        {% else %}
+            <ul>
+                <li><a href="{{ path('app_register') }}">S'inscrire</a></li>
+                <li><a href="{{ path('app_login') }}">Se connecter</a></li>
+            </ul>
+        {% endif %}
+            
         {% block body %}
         {% endblock %}
     </body>
