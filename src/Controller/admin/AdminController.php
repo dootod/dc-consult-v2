@@ -6,13 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class DashboardAdminController extends AbstractController
+final class AdminController extends AbstractController
 {
     #[Route('/admin/dashboard', name: 'app_dashboard_admin')]
-    public function index(): Response
+    public function dashboard(): Response
     {
-        return $this->render('admin/dashboard_admin/index.html.twig', [
-            'controller_name' => 'DashboardAdminController',
-        ]);
+        return $this->render('admin/dashboard.html.twig');
     }
 }
