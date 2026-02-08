@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\UtilisateurRepository;
 use App\Entity\Utilisateur;
+use App\Form\NewUtilisateurType;
 
 final class GestionUtilisateursController extends AbstractController
 {
@@ -29,6 +30,11 @@ final class GestionUtilisateursController extends AbstractController
     #[Route('/admin/gestion-utilisateurs/nouveau', name: 'app_new_utilisateurs')]
     public function new(): Response
     {
-        return $this->render('admin/gestion_utilisateurs/new.html.twig');
+
+        $utilisateur = $this->createForm(NewUtilisateurType::class);
+
+        return $this->render('admin/gestion_utilisateurs/new.html.twig', [
+            'form' => $utilisateur,
+        ]);
     }
 }
