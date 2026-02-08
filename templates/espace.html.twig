@@ -24,6 +24,26 @@
             </ul>
         </nav>
         
+        <section>
+            <ul>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
+                    <li><a href="{{ path('app_gestion_projets') }}">Gestion projets</a></li>
+                    <li><a href="{{ path('app_gestion_documents') }}">Gestion documents</a></li>
+                    <li><a href="{{ path('app_gestion_utilisateurs') }}">Gestion utilsiateurs</a></li>
+
+                {% elseif is_granted('ROLE_USER') %}
+                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
+                {% endif %}
+            </ul>
+        </section>
+        
+        <div>
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Deconnexion</a>
+        </div>
+        
         {% block body %}
         {% endblock %}
     </body>

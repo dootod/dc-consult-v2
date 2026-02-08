@@ -8,9 +8,21 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class UtilisateurController extends AbstractController
 {
-    #[Route('dashboard', name: 'app_dashboard')]
+    #[Route('/mon-espace/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {
         return $this->render('utilisateur/dashboard.html.twig');
+    }
+
+    #[Route('/mon-espace/mon-compte', name: 'app_compte')]
+    public function compte(): Response
+    {
+        return $this->render('utilisateur/compte.html.twig');
+    }
+
+    #[Route('/mon-espace/mes-documents', name: 'app_documents')]
+    public function documents(): Response
+    {
+        return $this->render('utilisateur/documents.html.twig');
     }
 }
