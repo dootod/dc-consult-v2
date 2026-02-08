@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>DC Consult - {% block title %}{% endblock %}</title>
+        <title>Mon espace - {% block title %}{% endblock %}</title>
     </head>
     <body>
         <nav>
@@ -18,11 +18,28 @@
                     {% else %}
                         <li><a href="{{ path('app_dashboard') }}">Dashboard</a></li>
                     {% endif %}
+                    <li><a href="{{ logout_path() }}">Deconnexion</a></li>
                 {% else %}
                     <li><a href="{{ path('app_connexion') }}">Se connecter</a></li>
                 {% endif %}
             </ul>
         </nav>
+        
+        <section>
+            <ul>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
+                    <li><a href="{{ path('app_gestion_projets') }}">Gestion projets</a></li>
+                    <li><a href="{{ path('app_gestion_documents') }}">Gestion documents</a></li>
+                    <li><a href="{{ path('app_gestion_utilisateurs') }}">Gestion utilisateurs</a></li>
+
+                {% elseif is_granted('ROLE_USER') %}
+                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
+                {% endif %}
+            </ul>
+        </section>
         
         {% block body %}
         {% endblock %}
