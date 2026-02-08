@@ -1,5 +1,5 @@
 <?php
-// src/Security/LoginSuccessHandler.php
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
