@@ -143,4 +143,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getMainRole(): string
+    {
+        if (in_array('ROLE_ADMIN', $this->roles, true)) {
+            return 'Admin';
+        }
+
+        return 'Utilisateur';
+    }
 }

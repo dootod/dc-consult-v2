@@ -1,0 +1,32 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}{{ utilisateur.nom }} {{ utilisateur.prenom }}{% endblock %}
+
+{% block body %}
+
+<table>
+    <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ utilisateur.id }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ utilisateur.nom }}</td>
+        </tr>
+        <tr>
+            <th>Prenom</th>
+            <td>{{ utilisateur.prenom }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ utilisateur.email }}</td>
+        </tr>
+        <tr>
+            <th>Rôle</th>
+            <td>{{ utilisateur.mainRole }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}
