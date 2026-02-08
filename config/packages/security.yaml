@@ -23,12 +23,12 @@ security:
             lazy: true
             provider: app_user_provider
             form_login:
-                login_path: app_login
-                check_path: app_login
+                login_path: app_connexion
+                check_path: app_connexion
                 enable_csrf: true
                 success_handler: App\Security\LoginSuccessHandler
             logout:
-                path: app_logout
+                path: app_deconnexion
                 # where to redirect after logout
                 # target: app_any_route
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\auth;
 
 use App\Entity\Utilisateur;
 use App\Form\RegistrationFormType;
@@ -12,10 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-class RegistrationController extends AbstractController
+class InscriptionController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    #[Route('/inscription', name: 'app_inscription')]
+    public function inscription(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -38,10 +38,10 @@ class RegistrationController extends AbstractController
                 'Merci pour votre inscription ! Vous pouvez maintenant vous connecter.'
             );
 
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_connexion');
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('auth/inscription.html.twig', [
             'registrationForm' => $form,
         ]);
     }

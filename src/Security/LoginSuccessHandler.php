@@ -1,5 +1,5 @@
 <?php
-// src/Security/LoginSuccessHandler.php
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,7 +23,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         }
 
         if (in_array('ROLE_USER', $roles, true)) {
-            return new RedirectResponse($this->router->generate('app_dashboard_utilisateur'));
+            return new RedirectResponse($this->router->generate('app_dashboard'));
         }
 
         return new RedirectResponse($this->router->generate('app_home'));
