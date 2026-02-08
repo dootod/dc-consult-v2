@@ -14,6 +14,12 @@ final class HomeController extends AbstractController
         return $this->render('home/index.html.twig');
     }
 
+    #[Route('/projets', name: 'app_projets')]
+    public function projets(): Response
+    {
+        return $this->render('projets/index.html.twig');
+    }
+
     #[Route('/clients', name: 'app_clients')]
     public function clients(): Response
     {
@@ -24,5 +30,11 @@ final class HomeController extends AbstractController
     public function logiciels(): Response
     {
         return $this->render('home/logiciels.html.twig');
+    }
+
+    #[Route('/contact', name: 'app_contact')]
+    public function contact(): Response
+    {
+        return $this->render('contact/index.html.twig');
     }
 }

@@ -13,4 +13,10 @@ final class AdminController extends AbstractController
     {
         return $this->render('admin/dashboard.html.twig');
     }
+
+    #[Route('/admin/gestion-projets', name: 'app_gestion_projets')]
+    public function gestionProjets(): Response
+    {
+        return $this->render('admin/gestion_projets.html.twig');
+    }
 }
