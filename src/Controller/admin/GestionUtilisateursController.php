@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\UtilisateurRepository;
 use App\Entity\Utilisateur;
 use App\Form\NewUtilisateurType;
+use App\Form\EditUtilisateurType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -76,23 +77,29 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/edit/{id<\d+>}', name: 'app_edit_utilisateurs')]
+    #[Route('/admin/gestion-utilisateurs/modifier/{id<\d+>}', name: 'app_edit_utilisateurs')]
     public function edit(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response 
     {
-        $form = $this->createForm(NewUtilisateurType::class, $utilisateur);
+        $form = $this->createForm(EditUtilisateurType::class, $utilisateur);
+
+        $currentRole = in_array('ROLE_ADMIN', $utilisateur->getRoles()) ? 'ROLE_ADMIN' : 'ROLE_USER';
+        $form->get('role_choice')->setData($currentRole);
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             
+            // Si un nouveau mot de passe est fourni, le hasher
             $plainPassword = $form->get('password')->getData();
+            if (!empty($plainPassword)) {
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $utilisateur,
+                    $plainPassword
+                );
+                $utilisateur->setPassword($hashedPassword);
+            }
             
-            $hashedPassword = $passwordHasher->hashPassword(
-                $utilisateur,
-                $plainPassword
-            );
-            $utilisateur->setPassword($hashedPassword);
-            
+            // Récupérer le choix de rôle et définir les rôles appropriés
             $roleChoice = $form->get('role_choice')->getData();
             
             if ($roleChoice === 'ROLE_ADMIN') {
@@ -115,6 +122,27 @@ final class GestionUtilisateursController extends AbstractController
 
         return $this->render('admin/gestion_utilisateurs/edit.html.twig', [
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/admin/gestion-utilisateurs/supprimer/{id<\d+>}', name: 'app_delete_utilisateurs')]
+    public function delete(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager): Response
+    {
+        if($request->isMethod('POST')) {
+            $manager->remove($utilisateur);
+
+            $manager->flush();
+
+            $this->addFlash(
+                'success',
+                'Utilisateur supprimé avec succès !'
+            );
+
+            return $this->redirectToRoute('app_gestion_utilisateurs');
+        }
+
+        return $this->render('admin/gestion_utilisateurs/delete.html.twig', [
+            'id' => $utilisateur->getId(),
         ]);
     }
 }
