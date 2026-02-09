@@ -12,7 +12,7 @@
 
         {% for label, messages in app.flashes(['success', 'warning']) %}
             {% for message in messages %}
-                <div class="flash-{{ label }}">
+                <div>
                     {{ message }}
                 </div>
             {% endfor %}

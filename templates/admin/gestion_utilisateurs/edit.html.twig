@@ -1,0 +1,27 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Modifier utilisateur{% endblock %}
+
+{% block body %}
+
+<h1>Modifier utilisateur</h1>
+
+{{ form_start(form) }}
+
+    {{ form_row(form.nom) }}
+
+    {{ form_row(form.prenom) }}
+
+    {{ form_row(form.email) }}
+
+    {{ form_row(form.password) }}
+
+    {{ form_row(form.role_choice) }}
+
+    {{ form_row(form.modifier) }}
+
+{{ form_end(form) }}
+
+<a href="{{ path('app_gestion_utilisateurs') }}">Retour</a>
+
+{% endblock %}

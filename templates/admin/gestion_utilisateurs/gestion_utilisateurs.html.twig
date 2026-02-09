@@ -1,0 +1,48 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Gestion utilisateurs{% endblock %}
+
+{% block body %}
+
+{% for label, messages in app.flashes(['success', 'warning']) %}
+    {% for message in messages %}
+        <div>
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<h1>Gestion utilisateurs</h1>
+
+<a href="{{ path('app_new_utilisateurs') }}">Ajouter un nouveau utilisateur</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for utilisateur in utilisateurs %}
+            <tr>
+                <td>{{ utilisateur.id }}</td>
+                <td>{{ utilisateur.nom }}</td>
+                <td>{{ utilisateur.prenom }}</td>
+                <td>{{ utilisateur.email }}</td>
+                <td>{{ utilisateur.mainRole }}</td>
+                <td>
+                    <a href="{{ path('app_show_utilisateurs', {'id': utilisateur.id}) }}">
+                        Voir
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

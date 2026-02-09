@@ -1,0 +1,46 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}{{ utilisateur.nom }} {{ utilisateur.prenom }}{% endblock %}
+
+{% block body %}
+
+{% for label, messages in app.flashes(['success', 'warning']) %}
+    {% for message in messages %}
+        <div>
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<h1>{{ utilisateur.nom }} {{ utilisateur.prenom }}</h1>
+
+<table>
+    <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ utilisateur.id }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ utilisateur.nom }}</td>
+        </tr>
+        <tr>
+            <th>Prenom</th>
+            <td>{{ utilisateur.prenom }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ utilisateur.email }}</td>
+        </tr>
+        <tr>
+            <th>Rôle</th>
+            <td>{{ utilisateur.mainRole }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<a href="{{ path('app_edit_utilisateurs', {'id': utilisateur.id}) }}">Modifier l'utilisateur</a>
+<a href="{{ path('app_delete_utilisateurs', {'id': utilisateur.id}) }}">Supprimer l'utilisateur</a>
+<a href="{{ path('app_gestion_utilisateurs') }}">Retour</a>
+
+{% endblock %}
