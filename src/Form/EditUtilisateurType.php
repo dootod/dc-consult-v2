@@ -30,7 +30,6 @@ class EditUtilisateurType extends AbstractType
                 'label' => 'Nouveau mot de passe',
                 'required' => false,
                 'mapped' => false,
-                'help' => 'Laissez vide pour conserver le mot de passe actuel'
             ])
             ->add('role_choice', ChoiceType::class, [
                 'label' => 'Type d\'utilisateur',
