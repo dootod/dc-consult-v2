@@ -40,7 +40,7 @@ final class GestionUtilisateursController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             
             $plainPassword = $form->get('password')->getData();
             
@@ -72,6 +72,48 @@ final class GestionUtilisateursController extends AbstractController
         }
 
         return $this->render('admin/gestion_utilisateurs/new.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/admin/gestion-utilisateurs/edit/{id<\d+>}', name: 'app_edit_utilisateurs')]
+    public function edit(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response 
+    {
+        $form = $this->createForm(NewUtilisateurType::class, $utilisateur);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            
+            $plainPassword = $form->get('password')->getData();
+            
+            $hashedPassword = $passwordHasher->hashPassword(
+                $utilisateur,
+                $plainPassword
+            );
+            $utilisateur->setPassword($hashedPassword);
+            
+            $roleChoice = $form->get('role_choice')->getData();
+            
+            if ($roleChoice === 'ROLE_ADMIN') {
+                $utilisateur->setRoles(['ROLE_ADMIN']);
+            } else {
+                $utilisateur->setRoles([]);
+            }
+            
+            $manager->flush();
+            
+            $this->addFlash(
+                'success',
+                'Utilisateur modifié avec succès !'
+            );
+
+            return $this->redirectToRoute('app_show_utilisateurs', [
+                'id' => $utilisateur->getId(),
+            ]);
+        }
+
+        return $this->render('admin/gestion_utilisateurs/edit.html.twig', [
             'form' => $form,
         ]);
     }
