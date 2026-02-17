@@ -1,0 +1,13 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Modifier document{% endblock %}
+
+{% block body %}
+    <h1>Modifier document</h1>
+
+    <p>Fichier actuel : <strong>{{ document.fichier }}</strong></p>
+
+    {{ include('utilisateur/document/_form.html.twig', {'button_label': 'Enregistrer les modifications'}) }}
+
+    <a href="{{ path('app_mes_documents') }}">Retour</a>
+{% endblock %}

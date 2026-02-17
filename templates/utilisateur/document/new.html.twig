@@ -1,0 +1,11 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Nouveau document{% endblock %}
+
+{% block body %}
+    <h1>Nouveau document</h1>
+
+    {{ include('utilisateur/document/_form.html.twig', {'button_label': 'Ajouter'}) }}
+
+    <a href="{{ path('app_mes_documents') }}">Retour</a>
+{% endblock %}

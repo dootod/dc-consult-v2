@@ -1,0 +1,5 @@
+{{ form_start(form) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.fichierFile) }}
+    <button type="submit">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}
