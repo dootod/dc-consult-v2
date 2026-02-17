@@ -4,7 +4,7 @@
 
 {% block body %}
 
-    {% for label, messages in app.flashes(['success', 'warning']) %}
+    {% for label, messages in app.flashes(['success', 'warning', 'danger']) %}
         {% for message in messages %}
             <div>
                 {{ message }}
@@ -15,23 +15,22 @@
     <h1>Mes documents</h1>
 
     <a href="{{ path('app_new_mes_documents') }}">Ajouter un nouveau document</a>
+
     <table>
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Fichier</th>
                 <th>Nom</th>
+                <th>Fichier</th>
+                <th>Date d'ajout</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for document in documents %}
             <tr>
-                <td>{{ document.id }}</td>
-                <td>{{ document.date ? document.date|date('d-m-Y H:i:s') : '' }}</td>
-                <td>{{ document.fichier }}</td>
                 <td>{{ document.nom }}</td>
+                <td>{{ document.fichier }}</td>
+                <td>{{ document.date ? document.date|date('d/m/Y à H:i') : '' }}</td>
                 <td>
                     <a href="{{ path('app_show_mes_documents', {'id': document.id}) }}">Voir</a>
                     <a href="{{ path('app_edit_mes_documents', {'id': document.id}) }}">Modifier</a>
@@ -39,9 +38,10 @@
             </tr>
         {% else %}
             <tr>
-                <td>Pas de document trouver</td>
+                <td>Vous n'avez pas encore de document.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

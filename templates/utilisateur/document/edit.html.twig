@@ -5,7 +5,9 @@
 {% block body %}
     <h1>Modifier document</h1>
 
-    {{ include('utilisateur/document/_form.html.twig', {'button_label': 'Modifier'}) }}
+    <p>Fichier actuel : <strong>{{ document.fichier }}</strong></p>
+
+    {{ include('utilisateur/document/_form.html.twig', {'button_label': 'Enregistrer les modifications'}) }}
 
     <a href="{{ path('app_mes_documents') }}">Retour</a>
 {% endblock %}

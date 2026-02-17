@@ -40,7 +40,7 @@ class EditUtilisateurType extends AbstractType
                 ],
             ])
             ->add('modifier', SubmitType::class, [
-                'label' => 'Modifier'
+                'label' => 'Enregistrer les modifications'
             ])
         ;
     }
