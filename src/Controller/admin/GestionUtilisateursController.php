@@ -15,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class GestionUtilisateursController extends AbstractController
 {
-    #[Route('/admin/gestion-utilisateurs', name: 'app_gestion_utilisateurs')]
+    #[Route('/admin/gestion-utilisateurs', name: 'app_gestion_utilisateurs', methods: ['GET'])]
     public function gestionUtilisateurs(UtilisateurRepository $utilisateurRepository): Response
     {
         return $this->render('admin/gestion_utilisateurs/gestion_utilisateurs.html.twig', [
@@ -23,7 +23,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/{id<\d+>}', name: 'app_show_utilisateurs')]
+    #[Route('/admin/gestion-utilisateurs/{id<\d+>}', name: 'app_show_utilisateurs', methods: ['GET'])]
     function show(Utilisateur $utilisateur): Response
     {
         return $this->render('admin/gestion_utilisateurs/show.html.twig', [
@@ -31,7 +31,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/nouveau', name: 'app_new_utilisateurs')]
+    #[Route('/admin/gestion-utilisateurs/nouveau', name: 'app_new_utilisateurs', methods: ['GET', 'POST'])]
     public function new(
         Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -77,7 +77,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/modifier/{id<\d+>}', name: 'app_edit_utilisateurs')]
+    #[Route('/admin/gestion-utilisateurs/modifier/{id<\d+>}', name: 'app_edit_utilisateurs', methods: ['GET', 'POST'])]
     public function edit(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response 
     {
         $form = $this->createForm(EditUtilisateurType::class, $utilisateur);
@@ -125,24 +125,19 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/supprimer/{id<\d+>}', name: 'app_delete_utilisateurs')]
-    public function delete(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager): Response
+    #[Route('/admin/gestion-utilisateurs/supprimer/{id<\d+>}', name: 'app_delete_utilisateurs', methods: ['POST'])]
+    public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $manager): Response
     {
-        if($request->isMethod('POST')) {
+        if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
             $manager->remove($utilisateur);
-
             $manager->flush();
 
             $this->addFlash(
                 'success',
                 'Utilisateur supprimé avec succès !'
             );
-
-            return $this->redirectToRoute('app_gestion_utilisateurs');
         }
 
-        return $this->render('admin/gestion_utilisateurs/delete.html.twig', [
-            'id' => $utilisateur->getId(),
-        ]);
+        return $this->redirectToRoute('app_gestion_utilisateurs', [], Response::HTTP_SEE_OTHER);
     }
 }
