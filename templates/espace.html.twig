@@ -28,14 +28,14 @@
         <section>
             <ul>
                 {% if is_granted('ROLE_ADMIN') %}
-                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_mes_documents') }}">Mes documents</a></li>
                     <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
                     <li><a href="{{ path('app_gestion_projets') }}">Gestion projets</a></li>
                     <li><a href="{{ path('app_gestion_documents') }}">Gestion documents</a></li>
                     <li><a href="{{ path('app_gestion_utilisateurs') }}">Gestion utilisateurs</a></li>
 
                 {% elseif is_granted('ROLE_USER') %}
-                    <li><a href="{{ path('app_documents') }}">Mes documents</a></li>
+                    <li><a href="{{ path('app_mes_documents') }}">Mes documents</a></li>
                     <li><a href="{{ path('app_compte') }}">Mon compte</a></li>
                 {% endif %}
             </ul>

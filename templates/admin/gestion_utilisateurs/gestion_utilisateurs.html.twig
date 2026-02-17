@@ -14,7 +14,7 @@
 
 <h1>Gestion utilisateurs</h1>
 
-<a href="{{ path('app_new_utilisateurs') }}">Ajouter un nouveau utilisateur</a>
+<a href="{{ path('app_new_gestion_utilisateurs') }}">Ajouter un nouveau utilisateur</a>
 
 <table>
     <thead>
@@ -36,7 +36,7 @@
                 <td>{{ utilisateur.email }}</td>
                 <td>{{ utilisateur.mainRole }}</td>
                 <td>
-                    <a href="{{ path('app_show_utilisateurs', {'id': utilisateur.id}) }}">
+                    <a href="{{ path('app_show_gestion_utilisateurs', {'id': utilisateur.id}) }}">
                         Voir
                     </a>
                 </td>

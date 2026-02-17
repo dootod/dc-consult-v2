@@ -13,9 +13,10 @@ use App\Form\EditUtilisateurType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+#[Route('/admin/gestion-utilisateurs')]
 final class GestionUtilisateursController extends AbstractController
 {
-    #[Route('/admin/gestion-utilisateurs', name: 'app_gestion_utilisateurs', methods: ['GET'])]
+    #[Route(name: 'app_gestion_utilisateurs', methods: ['GET'])]
     public function gestionUtilisateurs(UtilisateurRepository $utilisateurRepository): Response
     {
         return $this->render('admin/gestion_utilisateurs/gestion_utilisateurs.html.twig', [
@@ -23,7 +24,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/{id<\d+>}', name: 'app_show_utilisateurs', methods: ['GET'])]
+    #[Route('/voir/{id}', name: 'app_show_gestion_utilisateurs', methods: ['GET'])]
     function show(Utilisateur $utilisateur): Response
     {
         return $this->render('admin/gestion_utilisateurs/show.html.twig', [
@@ -31,7 +32,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/nouveau', name: 'app_new_utilisateurs', methods: ['GET', 'POST'])]
+    #[Route('/nouveau', name: 'app_new_gestion_utilisateurs', methods: ['GET', 'POST'])]
     public function new(
         Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -67,7 +68,7 @@ final class GestionUtilisateursController extends AbstractController
                 'Utilisateur ajouté avec succès !'
             );
 
-            return $this->redirectToRoute('app_show_utilisateurs', [
+            return $this->redirectToRoute('app_show_gestion_utilisateurs', [
                 'id' => $utilisateur->getId(),
             ]);
         }
@@ -77,7 +78,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/modifier/{id<\d+>}', name: 'app_edit_utilisateurs', methods: ['GET', 'POST'])]
+    #[Route('/modifier/{id}', name: 'app_edit_gestion_utilisateurs', methods: ['GET', 'POST'])]
     public function edit(Utilisateur $utilisateur, Request $request, EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHasher): Response 
     {
         $form = $this->createForm(EditUtilisateurType::class, $utilisateur);
@@ -89,7 +90,6 @@ final class GestionUtilisateursController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             
-            // Si un nouveau mot de passe est fourni, le hasher
             $plainPassword = $form->get('password')->getData();
             if (!empty($plainPassword)) {
                 $hashedPassword = $passwordHasher->hashPassword(
@@ -99,7 +99,6 @@ final class GestionUtilisateursController extends AbstractController
                 $utilisateur->setPassword($hashedPassword);
             }
             
-            // Récupérer le choix de rôle et définir les rôles appropriés
             $roleChoice = $form->get('role_choice')->getData();
             
             if ($roleChoice === 'ROLE_ADMIN') {
@@ -115,7 +114,7 @@ final class GestionUtilisateursController extends AbstractController
                 'Utilisateur modifié avec succès !'
             );
 
-            return $this->redirectToRoute('app_show_utilisateurs', [
+            return $this->redirectToRoute('app_show_gestion_utilisateurs', [
                 'id' => $utilisateur->getId(),
             ]);
         }
@@ -125,7 +124,7 @@ final class GestionUtilisateursController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/gestion-utilisateurs/supprimer/{id<\d+>}', name: 'app_delete_utilisateurs', methods: ['POST'])]
+    #[Route('/supprimer/{id}', name: 'app_delete_gestion_utilisateurs', methods: ['POST'])]
     public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $manager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
