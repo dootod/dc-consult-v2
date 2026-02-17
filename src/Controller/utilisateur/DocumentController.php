@@ -17,7 +17,7 @@ final class DocumentController extends AbstractController
     #[Route(name: 'app_mes_documents', methods: ['GET'])]
     public function index(DocumentRepository $documentRepository): Response
     {
-        return $this->render('document/index.html.twig', [
+        return $this->render('utilisateur/document/index.html.twig', [
             'documents' => $documentRepository->findAll(),
         ]);
     }
@@ -25,7 +25,7 @@ final class DocumentController extends AbstractController
     #[Route('/voir/{id}', name: 'app_show_mes_documents', methods: ['GET'])]
     public function show(Document $document): Response
     {
-        return $this->render('document/show.html.twig', [
+        return $this->render('utilisateur/document/show.html.twig', [
             'document' => $document,
         ]);
     }
@@ -41,10 +41,15 @@ final class DocumentController extends AbstractController
             $entityManager->persist($document);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_document_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash(
+                'success',
+                'Document ajouté avec succès !'
+            );
+
+            return $this->redirectToRoute('app_mes_documents', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('document/new.html.twig', [
+        return $this->render('utilisateur/document/new.html.twig', [
             'document' => $document,
             'form' => $form,
         ]);
@@ -59,10 +64,10 @@ final class DocumentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_document_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_mes_documents', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('document/edit.html.twig', [
+        return $this->render('utilisateur/document/edit.html.twig', [
             'document' => $document,
             'form' => $form,
         ]);
@@ -76,6 +81,6 @@ final class DocumentController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_document_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_mes_documents', [], Response::HTTP_SEE_OTHER);
     }
 }

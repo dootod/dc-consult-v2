@@ -24,7 +24,7 @@
             <th>Prenom</th>
             <th>Email</th>
             <th>Rôle</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -38,6 +38,9 @@
                 <td>
                     <a href="{{ path('app_show_gestion_utilisateurs', {'id': utilisateur.id}) }}">
                         Voir
+                    </a>
+                    <a href="{{ path('app_edit_gestion_utilisateurs', {'id': utilisateur.id}) }}">
+                        Modifier
                     </a>
                 </td>
             </tr>

@@ -1,13 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'espace.html.twig' %}
 
-{% block title %}Edit Document{% endblock %}
+{% block title %}Modifier document{% endblock %}
 
 {% block body %}
-    <h1>Edit Document</h1>
+    <h1>Modifier document</h1>
 
-    {{ include('document/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('utilisateur/document/_form.html.twig', {'button_label': 'Modifier'}) }}
 
-    <a href="{{ path('app_document_index') }}">back to list</a>
-
-    {{ include('document/_delete_form.html.twig') }}
+    <a href="{{ path('app_mes_documents') }}">Retour</a>
 {% endblock %}
