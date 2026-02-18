@@ -44,7 +44,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Document>
      */
-    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'utilisateur')]
+    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'utilisateur', cascade: ['remove'])]
     private Collection $documents;
 
     public function __construct()
