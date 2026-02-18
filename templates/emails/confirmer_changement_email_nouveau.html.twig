@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Validez votre nouvelle adresse email – Étape 2/2</title>
+</head>
+<body>
+    <p>Bonjour {{ utilisateur.prenom }},</p>
+
+    <p>
+        Votre ancienne adresse email a bien confirmé la demande de changement.
+        Cliquez maintenant sur le lien ci-dessous pour valider et activer votre nouvelle adresse email.
+    </p>
+
+    <p>
+        <a href="{{ lien }}">Valider ma nouvelle adresse email</a>
+    </p>
+
+    <p>Ce lien est valable <strong>1 heure</strong>. Si vous n'êtes pas à l'origine de cette demande, contactez-nous immédiatement.</p>
+
+    <p>Cordialement</p>
+</body>
+</html>

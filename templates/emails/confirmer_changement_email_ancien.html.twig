@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation changement d'adresse email – Étape 1/2</title>
+</head>
+<body>
+    <p>Bonjour {{ utilisateur.prenom }},</p>
+
+    <p>
+        Vous avez demandé à changer votre adresse email vers <strong>{{ nouvelEmail }}</strong>.
+    </p>
+
+    <p>
+        Cliquez sur le lien ci-dessous pour confirmer cette demande depuis votre adresse actuelle.
+        Un second email sera ensuite envoyé à votre nouvelle adresse pour finaliser le changement.
+    </p>
+
+    <p>
+        <a href="{{ lien }}">Confirmer la demande de changement d'email</a>
+    </p>
+
+    <p>Ce lien est valable <strong>1 heure</strong>. Si vous n'avez pas fait cette demande, ignorez cet email, votre adresse ne sera pas modifiée.</p>
+
+    <p>Cordialement</p>
+</body>
+</html>
