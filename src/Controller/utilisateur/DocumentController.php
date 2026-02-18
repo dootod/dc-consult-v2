@@ -5,6 +5,7 @@ namespace App\Controller\utilisateur;
 use App\Entity\Document;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
+use App\Repository\DocumentAdminRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class DocumentController extends AbstractController
 {
     #[Route(name: 'app_mes_documents', methods: ['GET'])]
-    public function index(DocumentRepository $documentRepository): Response
+    public function index(DocumentRepository $documentRepository, DocumentAdminRepository $documentAdminRepository): Response 
     {
         /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
@@ -25,6 +26,10 @@ final class DocumentController extends AbstractController
             'documents' => $documentRepository->findBy(
                 ['utilisateur' => $utilisateur],
                 ['date' => 'DESC']
+            ),
+            'documentsAdmin'  => $documentAdminRepository->findBy(   // ← AJOUTER
+                ['destinataire' => $utilisateur],
+                ['deposeLe' => 'DESC']
             ),
         ]);
     }
