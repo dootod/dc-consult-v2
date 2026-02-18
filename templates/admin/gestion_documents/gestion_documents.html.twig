@@ -1,0 +1,87 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Gestion des documents{% endblock %}
+
+{% block body %}
+
+<h1>Gestion des documents</h1>
+
+{# ── Formulaire de dépôt ────────────────────────────────────────────────── #}
+<section>
+    <h2>Déposer un document</h2>
+
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+
+        <div>
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom) }}
+            {{ form_errors(form.nom) }}
+        </div>
+
+        <div>
+            {{ form_label(form.destinataire) }}
+            {{ form_widget(form.destinataire) }}
+            {{ form_errors(form.destinataire) }}
+        </div>
+
+        <div>
+            {{ form_label(form.fichierFile) }}
+            {{ form_widget(form.fichierFile) }}
+            {{ form_errors(form.fichierFile) }}
+            <small>Taille maximale : 10 Mo</small>
+        </div>
+
+        <button type="submit">Déposer le document</button>
+
+    {{ form_end(form) }}
+</section>
+
+{# ── Logs des dépôts ────────────────────────────────────────────────────── #}
+<section>
+    <h2>Historique des dépôts</h2>
+
+    {% if logs is empty %}
+        <p>Aucun document n'a encore été déposé.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Document</th>
+                    <th>Destinataire</th>
+                    <th>Déposé par</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>{{ log.deposeLe|date('d/m/Y à H:i') }}</td>
+                        <td>
+                            <a href="{{ asset('uploads/documents/' ~ log.fichier) }}" target="_blank">
+                                {{ log.nom }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ log.destinataire.prenom }} {{ log.destinataire.nom }}
+                            <br>
+                            <small>{{ log.destinataire.email }}</small>
+                        </td>
+                        <td>
+                            {{ log.deposePar.prenom }} {{ log.deposePar.nom }}
+                        </td>
+                        <td>
+                            <form method="post" action="{{ path('app_annuler_gestion_documents', {'id': log.id}) }}"
+                                  onsubmit="return confirm('Annuler ce dépôt ? Le fichier sera définitivement supprimé.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ log.id) }}">
+                                <button type="submit">Annuler le dépôt</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</section>
+
+{% endblock %}

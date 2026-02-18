@@ -44,4 +44,32 @@
         </tbody>
     </table>
 
+    {% if documentsAdmin is not empty %}
+        <section>
+            <h2>Documents mis à disposition par l'administration</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date de mise à disposition</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documentsAdmin %}
+                        <tr>
+                            <td>{{ doc.nom }}</td>
+                            <td>{{ doc.deposeLe|date('d/m/Y à H:i') }}</td>
+                            <td>
+                                <a href="{{ asset('uploads/documents/' ~ doc.fichier) }}" target="_blank">
+                                    Télécharger / Ouvrir
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+
 {% endblock %}
