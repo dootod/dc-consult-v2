@@ -20,10 +20,4 @@ final class UtilisateurController extends AbstractController
             'prenom' => $utilisateur?->getPrenom(),
         ]);
     }
-
-    #[Route('/mon-espace/mon-compte', name: 'app_compte')]
-    public function compte(): Response
-    {
-        return $this->render('utilisateur/compte.html.twig');
-    }
 }

@@ -1,0 +1,44 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Nouveau mot de passe{% endblock %}
+
+{% block body %}
+
+<h1>Choisir un nouveau mot de passe</h1>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<form method="post" action="{{ path('app_compte_confirmer_mdp', {token: token}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('nouveau_mdp') }}">
+
+    <div>
+        <label for="nouveau_mdp">Nouveau mot de passe</label>
+        <input
+            type="password"
+            id="nouveau_mdp"
+            name="nouveau_mdp"
+            required
+            minlength="8"
+            placeholder="Minimum 8 caractères"
+        >
+    </div>
+
+    <div>
+        <label for="confirmation_mdp">Confirmer le mot de passe</label>
+        <input
+            type="password"
+            id="confirmation_mdp"
+            name="confirmation_mdp"
+            required
+            minlength="8"
+        >
+    </div>
+
+    <button type="submit">Enregistrer le nouveau mot de passe</button>
+</form>
+
+{% endblock %}

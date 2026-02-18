@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation changement de mot de passe</title>
+</head>
+<body>
+    <p>Bonjour {{ utilisateur.prenom }},</p>
+
+    <p>
+        Vous avez demandé à changer votre mot de passe sur votre espace.
+        Cliquez sur le lien ci-dessous pour définir votre nouveau mot de passe.
+    </p>
+
+    <p>
+        <a href="{{ lien }}">Changer mon mot de passe</a>
+    </p>
+
+    <p>Ce lien est valable <strong>1 heure</strong>. Si vous n'avez pas fait cette demande, ignorez cet email.</p>
+
+    <p>Cordialement</p>
+</body>
+</html>

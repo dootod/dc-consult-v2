@@ -1,0 +1,100 @@
+{% extends 'espace.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+
+<h1>Mon compte</h1>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div>{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+<section>
+    <h2>Mes informations</h2>
+
+    <form method="post" action="{{ path('app_compte') }}">
+        <input type="hidden" name="_action_identite" value="1">
+        <input type="hidden" name="_token" value="{{ csrf_token('identite') }}">
+
+        <div>
+            <label for="nom">Nom</label>
+            <input
+                type="text"
+                id="nom"
+                name="nom"
+                value="{{ utilisateur.nom }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="prenom">Prénom</label>
+            <input
+                type="text"
+                id="prenom"
+                name="prenom"
+                value="{{ utilisateur.prenom }}"
+                required
+            >
+        </div>
+
+        <button type="submit">Enregistrer les modifications</button>
+    </form>
+</section>
+
+<section>
+    <h2>Changer mon mot de passe</h2>
+
+    <p>
+        Un email de confirmation vous sera envoyé à <strong>{{ utilisateur.email }}</strong>.
+        Vous devrez cliquer sur le lien reçu pour accéder au formulaire de changement de mot de passe.
+    </p>
+
+    <form method="post" action="{{ path('app_compte_demande_mdp') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('demande_mdp') }}">
+        <button type="submit">Recevoir un lien pour changer mon mot de passe</button>
+    </form>
+</section>
+
+<section>
+    <h2>Changer mon adresse email</h2>
+
+    <p>Email actuel : <strong>{{ utilisateur.email }}</strong></p>
+
+    {% if utilisateur.pendingEmail %}
+        <p>
+            <em>
+                Changement en attente vers <strong>{{ utilisateur.pendingEmail }}</strong>.
+                Vérifiez vos emails (ancien et nouveau) pour finaliser le changement.
+            </em>
+        </p>
+    {% endif %}
+
+    <p>
+        Le processus en deux étapes :
+        vous recevrez d'abord un email sur votre <strong>adresse actuelle</strong> pour confirmer la demande,
+        puis un second email sur votre <strong>nouvelle adresse</strong> pour valider le changement.
+    </p>
+
+    <form method="post" action="{{ path('app_compte_demande_email') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('demande_email') }}">
+
+        <div>
+            <label for="nouvel_email">Nouvelle adresse email</label>
+            <input
+                type="email"
+                id="nouvel_email"
+                name="nouvel_email"
+                required
+                placeholder="nouvelle@email.com"
+            >
+        </div>
+
+        <button type="submit">Initier le changement d'email</button>
+    </form>
+</section>
+
+{% endblock %}

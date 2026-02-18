@@ -41,6 +41,21 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $passwordChangeToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $passwordChangeTokenExpiresAt = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $pendingEmail = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $emailChangeToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $emailChangeTokenExpiresAt = null;
+
     /**
      * @var Collection<int, Document>
      */
@@ -193,6 +208,61 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    public function getPasswordChangeToken(): ?string
+    {
+        return $this->passwordChangeToken;
+    }
+
+    public function setPasswordChangeToken(?string $passwordChangeToken): static
+    {
+        $this->passwordChangeToken = $passwordChangeToken;
+        return $this;
+    }
+
+    public function getPasswordChangeTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->passwordChangeTokenExpiresAt;
+    }
+
+    public function setPasswordChangeTokenExpiresAt(?\DateTimeImmutable $passwordChangeTokenExpiresAt): static
+    {
+        $this->passwordChangeTokenExpiresAt = $passwordChangeTokenExpiresAt;
+        return $this;
+    }
+
+    public function getPendingEmail(): ?string
+    {
+        return $this->pendingEmail;
+    }
+
+    public function setPendingEmail(?string $pendingEmail): static
+    {
+        $this->pendingEmail = $pendingEmail;
+        return $this;
+    }
+
+    public function getEmailChangeToken(): ?string
+    {
+        return $this->emailChangeToken;
+    }
+
+    public function setEmailChangeToken(?string $emailChangeToken): static
+    {
+        $this->emailChangeToken = $emailChangeToken;
+        return $this;
+    }
+
+    public function getEmailChangeTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->emailChangeTokenExpiresAt;
+    }
+
+    public function setEmailChangeTokenExpiresAt(?\DateTimeImmutable $emailChangeTokenExpiresAt): static
+    {
+        $this->emailChangeTokenExpiresAt = $emailChangeTokenExpiresAt;
         return $this;
     }
 }
