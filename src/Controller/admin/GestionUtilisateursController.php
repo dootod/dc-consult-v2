@@ -12,6 +12,9 @@ use App\Form\NewUtilisateurType;
 use App\Form\EditUtilisateurType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[Route('/admin/gestion-utilisateurs')]
 final class GestionUtilisateursController extends AbstractController
@@ -25,7 +28,7 @@ final class GestionUtilisateursController extends AbstractController
     }
 
     #[Route('/voir/{id}', name: 'app_show_gestion_utilisateurs', methods: ['GET'])]
-    function show(Utilisateur $utilisateur): Response
+    public function show(Utilisateur $utilisateur): Response
     {
         return $this->render('admin/gestion_utilisateurs/show.html.twig', [
             'utilisateur' => $utilisateur,
@@ -125,9 +128,23 @@ final class GestionUtilisateursController extends AbstractController
     }
 
     #[Route('/supprimer/{id}', name: 'app_delete_gestion_utilisateurs', methods: ['POST'])]
-    public function delete(Request $request, Utilisateur $utilisateur, EntityManagerInterface $manager): Response
+    public function delete(
+        Request $request, 
+        Utilisateur $utilisateur, 
+        EntityManagerInterface $manager,
+        TokenStorageInterface $tokenStorage,
+        EventDispatcherInterface $dispatcher
+    ): Response
     {
         if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
+            $currentUser = $this->getUser();
+            
+            // Si l'utilisateur supprimé est l'utilisateur actuellement connecté, le déconnecter
+            if ($currentUser instanceof Utilisateur && $currentUser->getId() === $utilisateur->getId()) {
+                $tokenStorage->setToken(null);
+                $dispatcher->dispatch(new LogoutEvent($request, $tokenStorage->getToken()));
+            }
+            
             $manager->remove($utilisateur);
             $manager->flush();
 
