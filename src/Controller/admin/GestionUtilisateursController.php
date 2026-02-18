@@ -42,7 +42,7 @@ final class GestionUtilisateursController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             
             $plainPassword = $form->get('password')->getData();
             

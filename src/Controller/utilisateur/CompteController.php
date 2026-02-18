@@ -72,14 +72,22 @@ final class CompteController extends AbstractController
             return $this->redirectToRoute('app_compte');
         }
 
-        $token     = bin2hex(random_bytes(32));
+        // On génère le token brut (envoyé dans l'email)
+        // On stocke uniquement son hash SHA-256 en BDD
+        // Ainsi même si la BDD est compromise, le token brut est inutilisable
+        $tokenBrut = bin2hex(random_bytes(32));
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
-        $utilisateur->setPasswordChangeToken($token);
+        $utilisateur->setPasswordChangeToken(hash('sha256', $tokenBrut));
         $utilisateur->setPasswordChangeTokenExpiresAt($expiresAt);
         $em->flush();
 
-        $lien = $this->generateUrl('app_compte_confirmer_mdp', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+        // Le lien contient le token BRUT (pas le hash)
+        $lien = $this->generateUrl(
+            'app_compte_confirmer_mdp',
+            ['token' => $tokenBrut],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $email = (new Email())
             ->to($utilisateur->getEmail())
@@ -105,8 +113,9 @@ final class CompteController extends AbstractController
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
     ): Response {
-        /** @var Utilisateur|null $utilisateur */
-        $utilisateur = $em->getRepository(Utilisateur::class)->findOneBy(['passwordChangeToken' => $token]);
+        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        $utilisateur = $em->getRepository(Utilisateur::class)
+            ->findOneBy(['passwordChangeToken' => hash('sha256', $token)]);
 
         if (
             !$utilisateur
@@ -123,7 +132,7 @@ final class CompteController extends AbstractController
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            $nouveauMdp    = $request->request->get('nouveau_mdp', '');
+            $nouveauMdp      = $request->request->get('nouveau_mdp', '');
             $confirmationMdp = $request->request->get('confirmation_mdp', '');
 
             if (strlen($nouveauMdp) < 8) {
@@ -179,23 +188,26 @@ final class CompteController extends AbstractController
             return $this->redirectToRoute('app_compte');
         }
 
-        // Vérifier que l'email n'est pas déjà utilisé
         $existant = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $nouvelEmail]);
         if ($existant) {
             $this->addFlash('danger', 'Cet email est déjà utilisé par un autre compte.');
             return $this->redirectToRoute('app_compte');
         }
 
-        $token     = bin2hex(random_bytes(32));
+        // Token brut dans l'email, hash SHA-256 en BDD
+        $tokenBrut = bin2hex(random_bytes(32));
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
         $utilisateur->setPendingEmail($nouvelEmail);
-        $utilisateur->setEmailChangeToken($token);
+        $utilisateur->setEmailChangeToken(hash('sha256', $tokenBrut));
         $utilisateur->setEmailChangeTokenExpiresAt($expiresAt);
         $em->flush();
 
-        // Email envoyé à l'ANCIEN email pour confirmer la demande
-        $lien = $this->generateUrl('app_compte_confirmer_email_ancien', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+        $lien = $this->generateUrl(
+            'app_compte_confirmer_email_ancien',
+            ['token' => $tokenBrut],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $email = (new Email())
             ->to($utilisateur->getEmail())
@@ -222,8 +234,9 @@ final class CompteController extends AbstractController
         EntityManagerInterface $em,
         MailerInterface $mailer,
     ): Response {
-        /** @var Utilisateur|null $utilisateur */
-        $utilisateur = $em->getRepository(Utilisateur::class)->findOneBy(['emailChangeToken' => $token]);
+        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        $utilisateur = $em->getRepository(Utilisateur::class)
+            ->findOneBy(['emailChangeToken' => hash('sha256', $token)]);
 
         if (
             !$utilisateur
@@ -235,16 +248,19 @@ final class CompteController extends AbstractController
             return $this->redirectToRoute('app_compte');
         }
 
-        // Générer un nouveau token pour valider le nouvel email
-        $nouveauToken = bin2hex(random_bytes(32));
-        $expiresAt    = new \DateTimeImmutable('+1 hour');
+        // Nouveau token brut pour l'étape 2, hash en BDD
+        $nouveauTokenBrut = bin2hex(random_bytes(32));
+        $expiresAt        = new \DateTimeImmutable('+1 hour');
 
-        $utilisateur->setEmailChangeToken($nouveauToken);
+        $utilisateur->setEmailChangeToken(hash('sha256', $nouveauTokenBrut));
         $utilisateur->setEmailChangeTokenExpiresAt($expiresAt);
         $em->flush();
 
-        // Email envoyé au NOUVEL email
-        $lien = $this->generateUrl('app_compte_confirmer_email_nouveau', ['token' => $nouveauToken], UrlGeneratorInterface::ABSOLUTE_URL);
+        $lien = $this->generateUrl(
+            'app_compte_confirmer_email_nouveau',
+            ['token' => $nouveauTokenBrut],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $email = (new Email())
             ->to($utilisateur->getPendingEmail())
@@ -269,8 +285,9 @@ final class CompteController extends AbstractController
         string $token,
         EntityManagerInterface $em,
     ): Response {
-        /** @var Utilisateur|null $utilisateur */
-        $utilisateur = $em->getRepository(Utilisateur::class)->findOneBy(['emailChangeToken' => $token]);
+        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        $utilisateur = $em->getRepository(Utilisateur::class)
+            ->findOneBy(['emailChangeToken' => hash('sha256', $token)]);
 
         if (
             !$utilisateur

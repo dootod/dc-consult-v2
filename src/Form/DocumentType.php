@@ -19,16 +19,25 @@ class DocumentType extends AbstractType
                 'label' => 'Nom du document',
             ])
             ->add('fichierFile', FileType::class, [
-                'label'       => 'Fichier',
-                'mapped'      => false, 
-                'required'    => $options['is_new'],
-                'constraints' => $options['is_new'] ? [
+                'label' => 'Fichier',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
                     new File([
-                        'maxSize'          => '10M',
-                        'mimeTypesMessage' => 'Veuillez téléverser un fichier valide.',
-                    ]),
-                ] : [],
-                'attr' => $options['is_new'] ? [] : ['placeholder' => 'Laisser vide pour ne pas changer le fichier'],
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'application/pdf',
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        ],
+                        'mimeTypesMessage' => 'Format non autorisé. Formats acceptés : PDF, images, Word, Excel.',
+                    ])
+                ],
             ])
         ;
     }
