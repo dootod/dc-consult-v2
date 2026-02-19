@@ -56,23 +56,26 @@ final class GestionDocumentsController extends AbstractController
             $em->persist($documentAdmin);
             $em->flush();
 
-            $this->addFlash('success', 'Document déposé avec succès pour ' . $documentAdmin->getDestinataire()->getPrenom() . ' ' . $documentAdmin->getDestinataire()->getNom() . ' !');
+            $destinataire = $documentAdmin->getDestinataire();
+            $this->addFlash(
+                'success',
+                sprintf(
+                    'Document « %s » déposé pour %s %s.',
+                    $documentAdmin->getNom(),
+                    $destinataire->getPrenom(),
+                    $destinataire->getNom()
+                )
+            );
 
             return $this->redirectToRoute('app_gestion_documents');
         }
 
-        // Logs : tous les dépôts, triés du plus récent au plus ancien
-        $logs = $documentAdminRepository->findBy([], ['deposeLe' => 'DESC']);
-
         return $this->render('admin/gestion_documents/gestion_documents.html.twig', [
             'form' => $form,
-            'logs' => $logs,
+            'logs' => $documentAdminRepository->findBy([], ['deposeLe' => 'DESC']),
         ]);
     }
 
-    /**
-     * Annuler un dépôt (supprimer le document admin) — protégé CSRF
-     */
     #[Route('/annuler/{id}', name: 'app_annuler_gestion_documents', methods: ['POST'])]
     public function annuler(
         Request $request,
@@ -81,19 +84,11 @@ final class GestionDocumentsController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        if ($this->isCsrfTokenValid('annuler' . $documentAdmin->getId(), $request->getPayload()->getString('_token'))) {
-            // Suppression du fichier physique
-            $cheminFichier = $this->getParameter('documents_directory') . '/' . $documentAdmin->getFichier();
-            if (file_exists($cheminFichier)) {
-                unlink($cheminFichier);
-            }
-
+        if ($this->isCsrfTokenValid('annuler' . $documentAdmin->getId(), $request->request->get('_token'))) {
             $em->remove($documentAdmin);
             $em->flush();
 
-            $this->addFlash('success', 'Dépôt annulé avec succès.');
-        } else {
-            $this->addFlash('error', 'Token CSRF invalide.');
+            $this->addFlash('success', 'Document supprimé avec succès.');
         }
 
         return $this->redirectToRoute('app_gestion_documents');

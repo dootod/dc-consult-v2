@@ -4,17 +4,23 @@
 
 {% block body %}
 
-{% for message in app.flashes('success') %}
-    <div class="dc-alert dc-alert--success">
-        <i class="fa-solid fa-circle-check"></i>
-        {{ message }}
-    </div>
-{% endfor %}
-{% for message in app.flashes('error') %}
-    <div class="dc-alert dc-alert--danger">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        {{ message }}
-    </div>
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        {% set alertClass =
+            label == 'success' ? 'dc-alert--success' :
+            (label == 'danger'  ? 'dc-alert--danger'  :
+            (label == 'warning' ? 'dc-alert--warning'  : 'dc-alert--info'))
+        %}
+        {% set iconClass =
+            label == 'success' ? 'fa-circle-check' :
+            (label == 'danger'  ? 'fa-triangle-exclamation' :
+            (label == 'warning' ? 'fa-triangle-exclamation'  : 'fa-circle-info'))
+        %}
+        <div class="dc-alert {{ alertClass }}">
+            <i class="fa-solid {{ iconClass }}"></i>
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
 {% endfor %}
 
 {# ── En-tête ── #}
@@ -90,121 +96,56 @@
                 </span>
             </div>
             <div class="dc-card__body">
-                <div>
-                    <p class="dc-form-label mb-2">Rôle actuel</p>
-                    {% if 'ROLE_ADMIN' in utilisateur.roles %}
-                        <span class="dc-badge dc-badge--blue">
-                            <i class="fa-solid fa-shield-halved"></i> Administrateur
-                        </span>
-                    {% else %}
-                        <span class="dc-badge dc-badge--green">
-                            <i class="fa-solid fa-user"></i> Utilisateur standard
-                        </span>
-                    {% endif %}
-                </div>
+                <p class="dc-form-label">Rôle actuel</p>
+                {% if 'ROLE_ADMIN' in utilisateur.roles %}
+                    <span class="dc-badge dc-badge--blue">Administrateur</span>
+                {% else %}
+                    <span class="dc-badge dc-badge--gray">Utilisateur</span>
+                {% endif %}
             </div>
         </div>
 
     </div>
 
-    {# Colonne droite : Résumé et documents ── #}
+    {# Colonne droite : Documents ── #}
     <div class="col-12 col-lg-4">
-
-        {# ── Card Documents déposés par l'utilisateur ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-file-lines"></i>
-                    Documents personnels
-                </span>
-            </div>
-            <div class="dc-card__body">
-                <div class="stat-card__value">{{ utilisateur.documents|length }}</div>
-                <div class="stat-card__label">Document{{ utilisateur.documents|length != 1 ? 's' : '' }} déposé{{ utilisateur.documents|length != 1 ? 's' : '' }}</div>
-            </div>
-        </div>
-
-        {# ── Card Documents déposés par les admins ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-file-import"></i>
-                    Documents reçus
-                </span>
-            </div>
-            <div class="dc-card__body">
-                <div class="stat-card__value">{{ documentsAdmin|length }}</div>
-                <div class="stat-card__label">Document{{ documentsAdmin|length != 1 ? 's' : '' }} reçu{{ documentsAdmin|length != 1 ? 's' : '' }}</div>
-            </div>
-        </div>
-
-        {# ── Card Total documents ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-folder"></i>
-                    Total
-                </span>
-            </div>
-            <div class="dc-card__body">
-                {% set total = utilisateur.documents|length + documentsAdmin|length %}
-                <div class="stat-card__value">{{ total }}</div>
-                <div class="stat-card__label">Document{{ total != 1 ? 's' : '' }} au total</div>
-            </div>
-        </div>
-
-        {# ── Card Profil ── #}
         <div class="dc-card">
             <div class="dc-card__head">
                 <span class="dc-card__title">
-                    <i class="fa-solid fa-user-circle"></i>
-                    Profil
+                    <i class="fa-solid fa-file-lines"></i>
+                    Documents reçus
                 </span>
             </div>
-            <div class="dc-card__body">
-                <div class="text-center mb-3">
-                    <span class="dc-avatar" style="width: 64px; height: 64px; font-size: 1.4rem;">
-                        {{ utilisateur.prenom|slice(0,1)|upper }}{{ utilisateur.nom|slice(0,1)|upper }}
-                    </span>
-                </div>
-                <div class="text-center">
-                    <p class="mb-1" style="font-weight: 600;">{{ utilisateur.prenom }} {{ utilisateur.nom }}</p>
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ utilisateur.email }}</p>
-                </div>
+            <div class="dc-card__body p-0">
+                {% if documentsAdmin is empty %}
+                    <div class="dc-empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Aucun document déposé.</p>
+                    </div>
+                {% else %}
+                    <table class="dc-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documentsAdmin %}
+                            <tr>
+                                <td>{{ doc.nom }}</td>
+                                <td class="dc-table__muted">
+                                    {{ doc.deposeLe ? doc.deposeLe|date('d/m/Y') : '—' }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
         </div>
-
     </div>
 
-</div>
-
-{# ── Zone de danger : suppression ── #}
-<div class="mt-5 pt-4 border-top">
-    <h3 class="admin-page-header__title mb-3">
-        <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-danger);"></i>
-        Zone de danger
-    </h3>
-    
-    <div class="dc-card" style="border-color: rgba(192, 57, 43, 0.2);">
-        <div class="dc-card__body">
-            <p class="mb-3" style="color: var(--color-danger); font-weight: 600;">
-                Supprimer ce compte
-            </p>
-            <p class="mb-3" style="font-size: 0.875rem; color: var(--color-text-muted);">
-                Cette action est irréversible. Le compte et toutes ses données seront supprimées définitivement.
-            </p>
-            
-            <form method="post"
-                  action="{{ path('app_delete_gestion_utilisateurs', {id: utilisateur.id}) }}"
-                  onsubmit="return confirm('Êtes-vous sûr ? Cet utilisateur sera supprimé de manière irréversible.')">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
-                <button type="submit" class="dc-btn dc-btn--danger">
-                    <i class="fa-solid fa-trash"></i>
-                    Supprimer ce compte
-                </button>
-            </form>
-        </div>
-    </div>
 </div>
 
 {% endblock %}

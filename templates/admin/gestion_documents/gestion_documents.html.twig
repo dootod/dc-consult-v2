@@ -4,17 +4,23 @@
 
 {% block body %}
 
-{% for message in app.flashes('success') %}
-    <div class="dc-alert dc-alert--success">
-        <i class="fa-solid fa-circle-check"></i>
-        {{ message }}
-    </div>
-{% endfor %}
-{% for message in app.flashes('error') %}
-    <div class="dc-alert dc-alert--danger">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        {{ message }}
-    </div>
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        {% set alertClass =
+            label == 'success' ? 'dc-alert--success' :
+            (label == 'danger'  ? 'dc-alert--danger'  :
+            (label == 'warning' ? 'dc-alert--warning'  : 'dc-alert--info'))
+        %}
+        {% set iconClass =
+            label == 'success' ? 'fa-circle-check' :
+            (label == 'danger'  ? 'fa-triangle-exclamation' :
+            (label == 'warning' ? 'fa-triangle-exclamation'  : 'fa-circle-info'))
+        %}
+        <div class="dc-alert {{ alertClass }}">
+            <i class="fa-solid {{ iconClass }}"></i>
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
 {% endfor %}
 
 {# ── En-tête ── #}
@@ -72,8 +78,8 @@
                                 <tr>
                                     <td>
                                         <div class="file-cell">
-                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : (ext in ['jpg','jpeg','png','gif','webp'] ? 'img' : 'other'))) }}">
-                                                <i class="fa-solid fa-{{ ext == 'pdf' ? 'file-pdf' : (ext in ['doc','docx'] ? 'file-word' : (ext in ['xls','xlsx'] ? 'file-excel' : (ext in ['jpg','jpeg','png','gif','webp'] ? 'file-image' : 'file'))) }}"></i>
+                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : 'other')) }}">
+                                                <i class="fa-solid {{ ext == 'pdf' ? 'fa-file-pdf' : (ext in ['doc','docx'] ? 'fa-file-word' : (ext in ['xls','xlsx'] ? 'fa-file-excel' : 'fa-file')) }}"></i>
                                             </span>
                                             <div>
                                                 <div class="file-cell__name">{{ doc.nom }}</div>
@@ -84,34 +90,35 @@
                                     <td class="d-none d-md-table-cell">
                                         <div class="user-cell">
                                             <span class="dc-avatar dc-avatar--sm">
-                                                {{ doc.destinataire.prenom|slice(0,1)|upper }}{{ doc.destinataire.nom|slice(0,1)|upper }}
+                                                {{ doc.destinataire.prenom|first|upper }}{{ doc.destinataire.nom|first|upper }}
                                             </span>
-                                            {{ doc.destinataire.prenom }} {{ doc.destinataire.nom }}
+                                            <div>
+                                                <div class="user-cell__name">{{ doc.destinataire.prenom }} {{ doc.destinataire.nom }}</div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="d-none d-lg-table-cell dc-table__muted">
-                                        <div class="user-cell">
-                                            <span class="dc-avatar dc-avatar--sm">
-                                                {{ doc.deposePar.prenom|slice(0,1)|upper }}{{ doc.deposePar.nom|slice(0,1)|upper }}
-                                            </span>
-                                            {{ doc.deposePar.prenom }} {{ doc.deposePar.nom }}
-                                        </div>
+                                        {{ doc.deposePar ? doc.deposePar.prenom ~ ' ' ~ doc.deposePar.nom : '—' }}
                                     </td>
                                     <td class="d-none d-lg-table-cell dc-table__muted">
-                                        {{ doc.deposeLe|date('d/m/Y') }}
+                                        {{ doc.deposeLe ? doc.deposeLe|date('d/m/Y') : '—' }}
                                     </td>
                                     <td>
                                         <div class="dc-actions">
-                                            {% if doc.deposePar.id == app.user.id %}
-                                                <form method="post"
-                                                      action="{{ path('app_annuler_gestion_documents', {id: doc.id}) }}"
-                                                      onsubmit="return confirm('Annuler ce dépôt ?')">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ doc.id) }}">
-                                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Annuler">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            {% endif %}
+                                            <a href="{{ asset('uploads/documents/' ~ doc.fichier) }}"
+                                               target="_blank"
+                                               class="dc-btn dc-btn--outline dc-btn--sm"
+                                               title="Télécharger">
+                                                <i class="fa-solid fa-download"></i>
+                                            </a>
+                                            <form method="post"
+                                                  action="{{ path('app_annuler_gestion_documents', {id: doc.id}) }}"
+                                                  onsubmit="return confirm('Supprimer ce document ? Cette action est irréversible.')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ doc.id) }}">
+                                                <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -174,7 +181,4 @@
 
 </div>
 
-{% endblock %}
-
-{% block javascripts %}
 {% endblock %}
