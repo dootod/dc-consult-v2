@@ -4,97 +4,161 @@
 
 {% block body %}
 
-<h1>Mon compte</h1>
+<div class="mb-4">
+    <h1 class="mb-1">Mon compte</h1>
+    <p class="text-muted small mb-0">
+        Gérez vos informations personnelles et la sécurité de votre accès à DC&nbsp;Consult.
+    </p>
+</div>
 
+{# Flash messages stylés #}
 {% for label, messages in app.flashes %}
     {% for message in messages %}
-        <div>{{ message }}</div>
+        {% set alertClass =
+            label == 'success' ? 'dc-alert--success' :
+            (label == 'danger' ? 'dc-alert--danger' : 'dc-alert--info')
+        %}
+        {% set iconClass =
+            label == 'success' ? 'fa-circle-check' :
+            (label == 'danger' ? 'fa-triangle-exclamation' : 'fa-info-circle')
+        %}
+        <div class="dc-alert {{ alertClass }}">
+            <i class="fa-solid {{ iconClass }}"></i>
+            <span>{{ message }}</span>
+        </div>
     {% endfor %}
 {% endfor %}
 
-<section>
-    <h2>Mes informations</h2>
+<div class="row g-3">
 
-    <form method="post" action="{{ path('app_compte') }}">
-        <input type="hidden" name="_action_identite" value="1">
-        <input type="hidden" name="_token" value="{{ csrf_token('identite') }}">
+    <div class="col-12 col-lg-6">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-id-card"></i>
+                    Mes informations
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <form method="post" action="{{ path('app_compte') }}" class="vstack gap-3">
+                    <input type="hidden" name="_action_identite" value="1">
+                    <input type="hidden" name="_token" value="{{ csrf_token('identite') }}">
 
-        <div>
-            <label for="nom">Nom</label>
-            <input
-                type="text"
-                id="nom"
-                name="nom"
-                value="{{ utilisateur.nom }}"
-                required
-            >
+                    <div>
+                        <label for="nom" class="dc-form-label">Nom</label>
+                        <input
+                            type="text"
+                            id="nom"
+                            name="nom"
+                            class="dc-form-control"
+                            value="{{ utilisateur.nom }}"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="prenom" class="dc-form-label">Prénom</label>
+                        <input
+                            type="text"
+                            id="prenom"
+                            name="prenom"
+                            class="dc-form-control"
+                            value="{{ utilisateur.prenom }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="dc-btn dc-btn--primary">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="dc-card mb-3">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-lock"></i>
+                    Changer mon mot de passe
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <p class="small text-muted mb-3">
+                    Un email de confirmation vous sera envoyé à
+                    <strong>{{ utilisateur.email }}</strong>.
+                    Vous devrez cliquer sur le lien reçu pour accéder au formulaire de changement de mot de passe.
+                </p>
+
+                <form method="post" action="{{ path('app_compte_demande_mdp') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('demande_mdp') }}">
+                    <button type="submit" class="dc-btn dc-btn--outline">
+                        <i class="fa-solid fa-envelope"></i>
+                        Recevoir un lien pour changer mon mot de passe
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div>
-            <label for="prenom">Prénom</label>
-            <input
-                type="text"
-                id="prenom"
-                name="prenom"
-                value="{{ utilisateur.prenom }}"
-                required
-            >
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-at"></i>
+                    Changer mon adresse email
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <p class="small text-muted mb-2">
+                    Email actuel :
+                    <strong>{{ utilisateur.email }}</strong>
+                </p>
+
+                {% if utilisateur.pendingEmail %}
+                    <p class="small mb-3">
+                        <em>
+                            Changement en attente vers
+                            <strong>{{ utilisateur.pendingEmail }}</strong>.
+                            Vérifiez vos emails (ancien et nouveau) pour finaliser le changement.
+                        </em>
+                    </p>
+                {% endif %}
+
+                <p class="small text-muted mb-3">
+                    Le processus se fait en deux étapes :
+                    d'abord une confirmation sur votre <strong>adresse actuelle</strong>,
+                    puis une validation sur votre <strong>nouvelle adresse</strong>.
+                </p>
+
+                <form method="post" action="{{ path('app_compte_demande_email') }}" class="vstack gap-3">
+                    <input type="hidden" name="_token" value="{{ csrf_token('demande_email') }}">
+
+                    <div>
+                        <label for="nouvel_email" class="dc-form-label">Nouvelle adresse email</label>
+                        <input
+                            type="email"
+                            id="nouvel_email"
+                            name="nouvel_email"
+                            class="dc-form-control"
+                            required
+                            placeholder="nouvelle@email.com"
+                        >
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="dc-btn dc-btn--primary">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Initier le changement d'email
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
 
-        <button type="submit">Enregistrer les modifications</button>
-    </form>
-</section>
-
-<section>
-    <h2>Changer mon mot de passe</h2>
-
-    <p>
-        Un email de confirmation vous sera envoyé à <strong>{{ utilisateur.email }}</strong>.
-        Vous devrez cliquer sur le lien reçu pour accéder au formulaire de changement de mot de passe.
-    </p>
-
-    <form method="post" action="{{ path('app_compte_demande_mdp') }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('demande_mdp') }}">
-        <button type="submit">Recevoir un lien pour changer mon mot de passe</button>
-    </form>
-</section>
-
-<section>
-    <h2>Changer mon adresse email</h2>
-
-    <p>Email actuel : <strong>{{ utilisateur.email }}</strong></p>
-
-    {% if utilisateur.pendingEmail %}
-        <p>
-            <em>
-                Changement en attente vers <strong>{{ utilisateur.pendingEmail }}</strong>.
-                Vérifiez vos emails (ancien et nouveau) pour finaliser le changement.
-            </em>
-        </p>
-    {% endif %}
-
-    <p>
-        Le processus en deux étapes :
-        vous recevrez d'abord un email sur votre <strong>adresse actuelle</strong> pour confirmer la demande,
-        puis un second email sur votre <strong>nouvelle adresse</strong> pour valider le changement.
-    </p>
-
-    <form method="post" action="{{ path('app_compte_demande_email') }}">
-        <input type="hidden" name="_token" value="{{ csrf_token('demande_email') }}">
-
-        <div>
-            <label for="nouvel_email">Nouvelle adresse email</label>
-            <input
-                type="email"
-                id="nouvel_email"
-                name="nouvel_email"
-                required
-                placeholder="nouvelle@email.com"
-            >
-        </div>
-
-        <button type="submit">Initier le changement d'email</button>
-    </form>
-</section>
+</div>
 
 {% endblock %}

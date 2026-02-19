@@ -608,6 +608,157 @@ a {
     pointer-events: auto;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   COMPOSANTS GÉNÉRIQUES (cartes, formulaires, boutons, alertes)
+   Partagés entre espace utilisateur et administration
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Cards génériques ─────────────────────────────────────────── */
+.dc-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.08);
+    overflow: hidden;
+}
+
+.dc-card__head {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dc-card__title {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.dc-card__title i {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+}
+
+.dc-card__body {
+    padding: 1.25rem;
+}
+
+/* ── Formulaires ──────────────────────────────────────────────── */
+.dc-form-label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.dc-form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    border: 1.5px solid rgba(var(--color-primary-rgb), 0.18);
+    border-radius: var(--radius-md);
+    background: var(--color-light);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.dc-form-control:focus {
+    border-color: var(--color-primary);
+    background: var(--color-white);
+}
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.dc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1.1rem;
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    text-decoration: none;
+}
+
+.dc-btn--primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-btn);
+}
+
+.dc-btn--primary:hover {
+    background: var(--color-primary-dark);
+    color: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.38);
+}
+
+.dc-btn--outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid rgba(var(--color-primary-rgb), 0.3);
+}
+
+.dc-btn--outline:hover {
+    background: rgba(var(--color-primary-rgb), 0.07);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.dc-btn--sm {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+}
+
+/* ── Alertes flash ───────────────────────────────────────────── */
+.dc-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.dc-alert--success {
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(22, 163, 74, 0.25);
+    color: #14532d;
+}
+
+.dc-alert--danger {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.2);
+    color: #7f1d1d;
+}
+
+.dc-alert--info {
+    background: rgba(var(--color-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+    color: var(--color-primary-dark);
+}
+
+.dc-alert i {
+    font-size: 0.9rem;
+}
+
 /* ── Bouton para sidebar mobile ── */
 #sidebarToggler {
     transition: all var(--transition-fast) !important;
