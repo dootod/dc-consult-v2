@@ -78,6 +78,7 @@ final class GestionUtilisateursController extends AbstractController
 
         return $this->render('admin/gestion_utilisateurs/new.html.twig', [
             'form' => $form,
+            'utilisateur' => $utilisateur,
         ]);
     }
 
@@ -124,6 +125,7 @@ final class GestionUtilisateursController extends AbstractController
 
         return $this->render('admin/gestion_utilisateurs/edit.html.twig', [
             'form' => $form,
+            'utilisateur' => $utilisateur,
         ]);
     }
 

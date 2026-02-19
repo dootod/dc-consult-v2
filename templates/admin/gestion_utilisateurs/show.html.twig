@@ -1,47 +1,181 @@
-{% extends 'espace.html.twig' %}
+{% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}{{ utilisateur.nom }} {{ utilisateur.prenom }}{% endblock %}
+{% block title %}{{ utilisateur.prenom }} {{ utilisateur.nom }}{% endblock %}
 
 {% block body %}
 
-{% for label, messages in app.flashes(['success', 'warning']) %}
-    {% for message in messages %}
-        <div>
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in app.flashes('success') %}
+    <div class="dc-alert dc-alert--success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="dc-alert dc-alert--danger">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ message }}
+    </div>
 {% endfor %}
 
-<h1>{{ utilisateur.nom }} {{ utilisateur.prenom }}</h1>
+{# ── En-tête ── #}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="admin-page-header__title">
+            {{ utilisateur.prenom }} {{ utilisateur.nom }}
+        </h1>
+        <p class="admin-page-header__sub">Consultez et gérez les informations de cet utilisateur.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('app_edit_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--primary">
+            <i class="fa-solid fa-pen"></i>
+            Modifier
+        </a>
+        <a href="{{ path('app_gestion_utilisateurs') }}" class="dc-btn dc-btn--outline">
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour
+        </a>
+    </div>
+</div>
 
-<table>
-    <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ utilisateur.id }}</td>
-        </tr>
-        <tr>
-            <th>Nom</th>
-            <td>{{ utilisateur.nom }}</td>
-        </tr>
-        <tr>
-            <th>Prenom</th>
-            <td>{{ utilisateur.prenom }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ utilisateur.email }}</td>
-        </tr>
-        <tr>
-            <th>Rôle</th>
-            <td>{{ utilisateur.mainRole }}</td>
-        </tr>
-    </tbody>
-</table>
+{# ── Layout 2 colonnes ── #}
+<div class="row g-4">
 
-{{ include('admin/gestion_utilisateurs/_delete_form.html.twig') }}
+    {# Colonne gauche : Infos utilisateur ── #}
+    <div class="col-12 col-lg-8">
 
-<a href="{{ path('app_edit_gestion_utilisateurs', {'id': utilisateur.id}) }}">Modifier l'utilisateur</a>
-<a href="{{ path('app_gestion_utilisateurs') }}">Retour</a>
+        {# ── Card Informations générales ── #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Informations générales
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-4">
+                        <div>
+                            <p class="dc-form-label">ID</p>
+                            <p>{{ utilisateur.id }}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4">
+                        <div>
+                            <p class="dc-form-label">Nom</p>
+                            <p>{{ utilisateur.nom }}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4">
+                        <div>
+                            <p class="dc-form-label">Prénom</p>
+                            <p>{{ utilisateur.prenom }}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4">
+                        <div>
+                            <p class="dc-form-label">Email</p>
+                            <p><a href="mailto:{{ utilisateur.email }}">{{ utilisateur.email }}</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ── Card Rôle et permissions ── #}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Rôle et permissions
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div>
+                    <p class="dc-form-label mb-2">Rôle actuel</p>
+                    {% if 'ROLE_ADMIN' in utilisateur.roles %}
+                        <span class="dc-badge dc-badge--blue">
+                            <i class="fa-solid fa-shield-halved"></i> Administrateur
+                        </span>
+                    {% else %}
+                        <span class="dc-badge dc-badge--green">
+                            <i class="fa-solid fa-user"></i> Utilisateur standard
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# Colonne droite : Résumé et documents ── #}
+    <div class="col-12 col-lg-4">
+
+        {# ── Card Résumé utile ── #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Documents
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="stat-card__value">{{ utilisateur.documents|length }}</div>
+                <div class="stat-card__label">Document{{ utilisateur.documents|length != 1 ? 's' : '' }}</div>
+            </div>
+        </div>
+
+        {# ── Card Profil ── #}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-user-circle"></i>
+                    Profil
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="text-center mb-3">
+                    <span class="dc-avatar" style="width: 64px; height: 64px; font-size: 1.4rem;">
+                        {{ utilisateur.prenom|slice(0,1)|upper }}{{ utilisateur.nom|slice(0,1)|upper }}
+                    </span>
+                </div>
+                <div class="text-center">
+                    <p class="mb-1" style="font-weight: 600;">{{ utilisateur.prenom }} {{ utilisateur.nom }}</p>
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ utilisateur.email }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{# ── Zone de danger : suppression ── #}
+<div class="mt-5 pt-4 border-top">
+    <h3 class="admin-page-header__title mb-3">
+        <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-danger);"></i>
+        Zone de danger
+    </h3>
+    
+    <div class="dc-card" style="border-color: rgba(192, 57, 43, 0.2);">
+        <div class="dc-card__body">
+            <p class="mb-3" style="color: var(--color-danger); font-weight: 600;">
+                Supprimer ce compte
+            </p>
+            <p class="mb-3" style="font-size: 0.875rem; color: var(--color-text-muted);">
+                Cette action est irréversible. Le compte et toutes ses données seront supprimées définitivement.
+            </p>
+            
+            <form method="post"
+                  action="{{ path('app_delete_gestion_utilisateurs', {id: utilisateur.id}) }}"
+                  onsubmit="return confirm('Êtes-vous sûr ? Cet utilisateur sera supprimé de manière irréversible.')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                <button type="submit" class="dc-btn dc-btn--danger">
+                    <i class="fa-solid fa-trash"></i>
+                    Supprimer ce compte
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

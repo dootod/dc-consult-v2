@@ -6,7 +6,6 @@ use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -37,9 +36,6 @@ class NewUtilisateurType extends AbstractType
                     'Admin' => 'ROLE_ADMIN',
                 ],
                 'placeholder' => 'Choisir un rôle',
-            ])
-            ->add('ajouter', SubmitType::class, [
-                'label' => 'Ajouter'
             ])
         ;
     }

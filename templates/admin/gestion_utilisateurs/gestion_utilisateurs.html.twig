@@ -22,7 +22,9 @@
     <div>
         <h1 class="admin-page-header__title">
             Gestion des utilisateurs
-            <span class="dc-count-badge">{{ utilisateurs|length }}</span>
+            {% if utilisateurs is defined %}
+                <span class="dc-count-badge">{{ utilisateurs|length }}</span>
+            {% endif %}
         </h1>
         <p class="admin-page-header__sub">Créez, modifiez et supprimez les comptes utilisateurs.</p>
     </div>
@@ -32,20 +34,20 @@
     </a>
 </div>
 
-{# ── Barre de filtres ── #}
+{# ── Barre de recherche et filtres ── #}
 <div class="dc-toolbar mb-3">
     <div class="dc-search">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher un utilisateur…">
+        <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher par nom, prénom ou email…">
     </div>
     <select id="roleFilter" class="dc-select">
         <option value="">Tous les rôles</option>
         <option value="admin">Administrateurs</option>
-        <option value="user">Utilisateurs</option>
+        <option value="user">Utilisateurs standards</option>
     </select>
 </div>
 
-{# ── Tableau ── #}
+{# ── Tableau utilisateurs ── #}
 <div class="dc-table-wrap">
     {% if utilisateurs is empty %}
         <div class="dc-empty-state">
