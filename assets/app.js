@@ -1,4 +1,5 @@
 import './stimulus_bootstrap.js';
+
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -7,4 +8,18 @@ import './stimulus_bootstrap.js';
  */
 import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+// ── Effet shadow sur la navbar au scroll ──────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const navbar = document.getElementById('mainNavbar');
+
+    if (!navbar) return;
+
+    const onScroll = () => {
+        navbar.classList.toggle('is-scrolled', window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Appel initial au cas où la page est déjà scrollée
+    onScroll();
+});
