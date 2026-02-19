@@ -700,8 +700,9 @@ a {
     box-shadow: var(--shadow-btn);
 }
 
-.dc-btn--primary i {
-    color: var(--color-white);
+.dc-btn--primary i,
+.dc-btn--primary i::before {
+    color: var(--color-white) !important;
 }
 
 .dc-btn--primary:hover {
@@ -724,20 +725,24 @@ a {
 }
 
 .dc-btn--danger {
-    background: transparent;
-    color: var(--color-danger);
-    border: 1.5px solid rgba(192, 57, 43, 0.3);
+    background: var(--color-danger);
+    color: var(--color-white);
+    border: 1.5px solid var(--color-danger);
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.35);
 }
 
 .dc-btn--danger:hover {
-    background: rgba(192, 57, 43, 0.06);
-    border-color: var(--color-danger);
+    background: #a83223;
+    border-color: #a83223;
+    color: var(--color-white);
+    transform: translateY(-1px);
 }
 
 .dc-btn i {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    line-height: 1;
 }
 
 .dc-btn--sm {
