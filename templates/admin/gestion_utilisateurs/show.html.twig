@@ -110,17 +110,46 @@
     {# Colonne droite : Résumé et documents ── #}
     <div class="col-12 col-lg-4">
 
-        {# ── Card Résumé utile ── #}
+        {# ── Card Documents déposés par l'utilisateur ── #}
         <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-file-lines"></i>
-                    Documents
+                    Documents personnels
                 </span>
             </div>
             <div class="dc-card__body">
                 <div class="stat-card__value">{{ utilisateur.documents|length }}</div>
-                <div class="stat-card__label">Document{{ utilisateur.documents|length != 1 ? 's' : '' }}</div>
+                <div class="stat-card__label">Document{{ utilisateur.documents|length != 1 ? 's' : '' }} déposé{{ utilisateur.documents|length != 1 ? 's' : '' }}</div>
+            </div>
+        </div>
+
+        {# ── Card Documents déposés par les admins ── #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-import"></i>
+                    Documents reçus
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="stat-card__value">{{ documentsAdmin|length }}</div>
+                <div class="stat-card__label">Document{{ documentsAdmin|length != 1 ? 's' : '' }} reçu{{ documentsAdmin|length != 1 ? 's' : '' }}</div>
+            </div>
+        </div>
+
+        {# ── Card Total documents ── #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-folder"></i>
+                    Total
+                </span>
+            </div>
+            <div class="dc-card__body">
+                {% set total = utilisateur.documents|length + documentsAdmin|length %}
+                <div class="stat-card__value">{{ total }}</div>
+                <div class="stat-card__label">Document{{ total != 1 ? 's' : '' }} au total</div>
             </div>
         </div>
 

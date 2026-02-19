@@ -95,8 +95,11 @@
                             {% endif %}
                         </td>
                         <td class="d-none d-md-table-cell">
+                            {% set docsUser = utilisateur.documents|length %}
+                            {% set docsAdmin = documentsAdmin|filter((doc) => doc.destinataire.id == utilisateur.id)|length %}
+                            {% set totalDocs = docsUser + docsAdmin %}
                             <span class="dc-table__muted">
-                                {{ utilisateur.documents|length }} doc{{ utilisateur.documents|length > 1 ? 's' : '' }}
+                                {{ totalDocs }} doc{{ totalDocs > 1 ? 's' : '' }}
                             </span>
                         </td>
                         <td>
