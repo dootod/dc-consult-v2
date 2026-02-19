@@ -21,8 +21,8 @@
 <div class="mb-4">
     <h1 class="admin-page-header__title">
         Gestion des documents
-        {% if documents is defined %}
-            <span class="dc-count-badge">{{ documents|length }}</span>
+        {% if logs is defined %}
+            <span class="dc-count-badge">{{ logs|length }}</span>
         {% endif %}
     </h1>
     <p class="admin-page-header__sub">Déposez et gérez les documents pour les utilisateurs.</p>
@@ -49,7 +49,7 @@
                 </span>
             </div>
             <div class="dc-card__body p-0">
-                {% if documents is not defined or documents is empty %}
+                {% if logs is not defined or logs is empty %}
                     <div class="dc-empty-state">
                         <i class="fa-solid fa-inbox"></i>
                         <p>Aucun document déposé pour le moment.</p>
@@ -61,12 +61,13 @@
                                 <tr>
                                     <th>Document</th>
                                     <th class="d-none d-md-table-cell">Destinataire</th>
+                                    <th class="d-none d-lg-table-cell">Déposé par</th>
                                     <th class="d-none d-lg-table-cell">Déposé le</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for doc in documents %}
+                                {% for doc in logs %}
                                 {% set ext = doc.fichier|split('.')|last|lower %}
                                 <tr>
                                     <td>
@@ -89,23 +90,28 @@
                                         </div>
                                     </td>
                                     <td class="d-none d-lg-table-cell dc-table__muted">
+                                        <div class="user-cell">
+                                            <span class="dc-avatar dc-avatar--sm">
+                                                {{ doc.deposePar.prenom|slice(0,1)|upper }}{{ doc.deposePar.nom|slice(0,1)|upper }}
+                                            </span>
+                                            {{ doc.deposePar.prenom }} {{ doc.deposePar.nom }}
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell dc-table__muted">
                                         {{ doc.deposeLe|date('d/m/Y') }}
                                     </td>
                                     <td>
                                         <div class="dc-actions">
-                                            <a href="{{ path('app_download_gestion_documents', {id: doc.id}) }}"
-                                               class="dc-btn dc-btn--outline dc-btn--sm"
-                                               title="Télécharger">
-                                                <i class="fa-solid fa-download"></i>
-                                            </a>
-                                            <form method="post"
-                                                  action="{{ path('app_delete_gestion_documents', {id: doc.id}) }}"
-                                                  onsubmit="return confirm('Supprimer ce document ?')">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ doc.id) }}">
-                                                <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            {% if doc.deposePar.id == app.user.id %}
+                                                <form method="post"
+                                                      action="{{ path('app_annuler_gestion_documents', {id: doc.id}) }}"
+                                                      onsubmit="return confirm('Annuler ce dépôt ?')">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ doc.id) }}">
+                                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Annuler">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
