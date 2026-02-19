@@ -1,5 +1,26 @@
 {{ form_start(form) }}
-    {{ form_row(form.nom) }}
-    {{ form_row(form.fichierFile) }}
-    <button type="submit">{{ button_label|default('Enregistrer') }}</button>
+    <div class="vstack gap-3">
+        <div>
+            <label for="{{ form.nom.vars.id }}" class="dc-form-label">Nom du document</label>
+            {{ form_widget(form.nom, {'attr': {'class': 'dc-form-control'}}) }}
+            {{ form_errors(form.nom) }}
+        </div>
+
+        <div>
+            <label for="{{ form.fichierFile.vars.id }}" class="dc-form-label">Fichier</label>
+            {{ form_widget(form.fichierFile, {'attr': {'class': 'dc-form-control'}}) }}
+            {{ form_errors(form.fichierFile) }}
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-2">
+            <a href="{{ path('app_mes_documents') }}" class="dc-btn dc-btn--outline">
+                <i class="fa-solid fa-arrow-left"></i>
+                Annuler
+            </a>
+            <button type="submit" class="dc-btn dc-btn--primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                {{ button_label|default('Enregistrer') }}
+            </button>
+        </div>
+    </div>
 {{ form_end(form) }}

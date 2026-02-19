@@ -700,6 +700,10 @@ a {
     box-shadow: var(--shadow-btn);
 }
 
+.dc-btn--primary i {
+    color: var(--color-white);
+}
+
 .dc-btn--primary:hover {
     background: var(--color-primary-dark);
     color: var(--color-white);
@@ -717,6 +721,23 @@ a {
     background: rgba(var(--color-primary-rgb), 0.07);
     border-color: var(--color-primary);
     color: var(--color-primary);
+}
+
+.dc-btn--danger {
+    background: transparent;
+    color: var(--color-danger);
+    border: 1.5px solid rgba(192, 57, 43, 0.3);
+}
+
+.dc-btn--danger:hover {
+    background: rgba(192, 57, 43, 0.06);
+    border-color: var(--color-danger);
+}
+
+.dc-btn i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dc-btn--sm {
@@ -757,6 +778,83 @@ a {
 
 .dc-alert i {
     font-size: 0.9rem;
+}
+
+/* ── Tableaux simples (espace utilisateur) ───────────────────── */
+.dc-table-wrap {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.08);
+    overflow: hidden;
+}
+
+.dc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.dc-table thead tr {
+    background: rgba(var(--color-primary-rgb), 0.04);
+    border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.1);
+}
+
+.dc-table th {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 0.8rem 1.25rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dc-table td {
+    padding: 0.85rem 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.06);
+    vertical-align: middle;
+}
+
+.dc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.dc-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.dc-table tbody tr:hover {
+    background: rgba(var(--color-primary-rgb), 0.025);
+}
+
+.dc-table__muted {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+}
+
+.dc-empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--color-text-muted);
+}
+
+.dc-empty-state i {
+    font-size: 2rem;
+    color: var(--color-text-faint);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.dc-empty-state p {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    margin: 0 0 0.25rem;
 }
 
 /* ── Bouton para sidebar mobile ── */

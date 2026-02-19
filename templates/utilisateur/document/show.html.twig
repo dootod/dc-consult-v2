@@ -3,31 +3,89 @@
 {% block title %}{{ document.nom }}{% endblock %}
 
 {% block body %}
-    <h1>{{ document.nom }}</h1>
+<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 class="mb-1">{{ document.nom }}</h1>
+        <p class="text-muted small mb-0">
+            Détail du document déposé et accès au fichier.
+        </p>
+    </div>
+    <a href="{{ path('app_mes_documents') }}" class="dc-btn dc-btn--outline">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour à la liste
+    </a>
+</div>
 
-    <table>
-        <tbody>
-            <tr>
-                <th>Nom</th>
-                <td>{{ document.nom }}</td>
-            </tr>
-            <tr>
-                <th>Fichier</th>
-                <td>
-                    <a href="{{ asset('uploads/documents/' ~ document.fichier) }}" target="_blank">
-                        Télécharger / Ouvrir
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <th>Date d'ajout</th>
-                <td>{{ document.date ? document.date|date('d/m/Y à H:i') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="row g-3">
+    <div class="col-12 col-lg-8 d-flex flex-column gap-3">
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Informations du document
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 small text-muted">Nom</dt>
+                    <dd class="col-sm-8">
+                        <strong>{{ document.nom }}</strong>
+                    </dd>
 
-    {{ include('utilisateur/document/_delete_form.html.twig') }}
+                    <dt class="col-sm-4 small text-muted mt-3">Fichier</dt>
+                    <dd class="col-sm-8 mt-3">
+                        <a href="{{ asset('uploads/documents/' ~ document.fichier) }}"
+                           target="_blank"
+                           class="dc-btn dc-btn--outline dc-btn--sm">
+                            <i class="fa-solid fa-download"></i>
+                            Télécharger / Ouvrir
+                        </a>
+                        <div class="dc-table__muted small mt-1">
+                            {{ document.fichier }}
+                        </div>
+                    </dd>
 
-    <a href="{{ path('app_edit_mes_documents', {'id': document.id}) }}">Modifier le document</a>
-    <a href="{{ path('app_mes_documents') }}">Retour</a>
+                    <dt class="col-sm-4 small text-muted mt-3">Date d'ajout</dt>
+                    <dd class="col-sm-8 mt-3 dc-table__muted">
+                        {{ document.date ? document.date|date('d/m/Y à H:i') : '' }}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="dc-card" style="border-color: rgba(192, 57, 43, 0.2);">
+            <div class="dc-card__body">
+                <h3 class="h6 mb-2">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-danger);"></i>
+                    Zone de danger
+                </h3>
+                <p class="mb-2" style="color: var(--color-danger); font-weight: 600;">
+                    Supprimer ce document
+                </p>
+                <p class="mb-3 small" style="color: var(--color-text-muted);">
+                    Cette action est irréversible. Le document sera définitivement supprimé de votre espace.
+                </p>
+                {{ include('utilisateur/document/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-gear"></i>
+                    Actions
+                </span>
+            </div>
+            <div class="dc-card__body d-flex flex-column gap-2 h-100 justify-content-start">
+                <a href="{{ path('app_edit_mes_documents', {'id': document.id}) }}"
+                   class="dc-btn dc-btn--outline">
+                    <i class="fa-solid fa-pen"></i>
+                    Modifier le document
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
