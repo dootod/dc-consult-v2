@@ -11,23 +11,8 @@
     </p>
 </div>
 
-{# Flash messages stylés #}
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        {% set alertClass =
-            label == 'success' ? 'dc-alert--success' :
-            (label == 'danger' ? 'dc-alert--danger' : 'dc-alert--info')
-        %}
-        {% set iconClass =
-            label == 'success' ? 'fa-circle-check' :
-            (label == 'danger' ? 'fa-triangle-exclamation' : 'fa-info-circle')
-        %}
-        <div class="dc-alert {{ alertClass }}">
-            <i class="fa-solid {{ iconClass }}"></i>
-            <span>{{ message }}</span>
-        </div>
-    {% endfor %}
-{% endfor %}
+{# ✅ CORRECTIF : Partial centralisé (warning et info désormais correctement stylés) #}
+{% include 'components/_flash_messages.html.twig' %}
 
 <div class="row g-3">
 

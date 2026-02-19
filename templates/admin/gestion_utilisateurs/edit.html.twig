@@ -4,24 +4,8 @@
 
 {% block body %}
 
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        {% set alertClass =
-            label == 'success' ? 'dc-alert--success' :
-            (label == 'danger'  ? 'dc-alert--danger'  :
-            (label == 'warning' ? 'dc-alert--warning'  : 'dc-alert--info'))
-        %}
-        {% set iconClass =
-            label == 'success' ? 'fa-circle-check' :
-            (label == 'danger'  ? 'fa-triangle-exclamation' :
-            (label == 'warning' ? 'fa-triangle-exclamation'  : 'fa-circle-info'))
-        %}
-        <div class="dc-alert {{ alertClass }}">
-            <i class="fa-solid {{ iconClass }}"></i>
-            <span>{{ message }}</span>
-        </div>
-    {% endfor %}
-{% endfor %}
+{# ✅ CORRECTIF : Partial centralisé #}
+{% include 'components/_flash_messages.html.twig' %}
 
 {# ── En-tête ── #}
 <div class="mb-4">
@@ -66,25 +50,25 @@
                     <div class="mb-3">
                         <label class="dc-form-label" for="{{ form.password.vars.id }}">Nouveau mot de passe</label>
                         <small class="text-muted d-block mb-2">Laissez vide pour conserver le mot de passe actuel</small>
-                        {{ form_widget(form.password, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_widget(form.password, {attr: {class: 'dc-form-control', placeholder: '••••••••'}}) }}
                         {{ form_errors(form.password) }}
                     </div>
 
                     <div class="mb-4">
-                        <label class="dc-form-label" for="{{ form.role_choice.vars.id }}">Rôle <span class="text-danger">*</span></label>
+                        <label class="dc-form-label" for="{{ form.role_choice.vars.id }}">Type d'utilisateur <span class="text-danger">*</span></label>
                         {{ form_widget(form.role_choice, {attr: {class: 'dc-form-control'}}) }}
                         {{ form_errors(form.role_choice) }}
                     </div>
 
-                    <div class="d-flex justify-content-between gap-2">
-                        <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline">
-                            <i class="fa-solid fa-arrow-left"></i>
-                            Retour
-                        </a>
-                        <button type="submit" class="dc-btn dc-btn--primary">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="dc-btn dc-btn--primary flex-grow-1 justify-content-center">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Enregistrer les modifications
                         </button>
+                        <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline flex-grow-1 justify-content-center">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Annuler
+                        </a>
                     </div>
 
                 {{ form_end(form) }}

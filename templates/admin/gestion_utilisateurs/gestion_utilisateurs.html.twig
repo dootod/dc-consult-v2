@@ -4,24 +4,8 @@
 
 {% block body %}
 
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        {% set alertClass =
-            label == 'success' ? 'dc-alert--success' :
-            (label == 'danger'  ? 'dc-alert--danger'  :
-            (label == 'warning' ? 'dc-alert--warning'  : 'dc-alert--info'))
-        %}
-        {% set iconClass =
-            label == 'success' ? 'fa-circle-check' :
-            (label == 'danger'  ? 'fa-triangle-exclamation' :
-            (label == 'warning' ? 'fa-triangle-exclamation'  : 'fa-circle-info'))
-        %}
-        <div class="dc-alert {{ alertClass }}">
-            <i class="fa-solid {{ iconClass }}"></i>
-            <span>{{ message }}</span>
-        </div>
-    {% endfor %}
-{% endfor %}
+{# ✅ CORRECTIF : Partial centralisé #}
+{% include 'components/_flash_messages.html.twig' %}
 
 {# ── En-tête ── #}
 <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">

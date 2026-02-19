@@ -43,10 +43,13 @@
                 <p class="auth-form__sub">Remplissez le formulaire ci-dessous pour accéder à votre espace client.</p>
             </div>
 
+            {# ✅ CORRECTIF : Flash messages ajoutés (absents avant) #}
+            {% include 'components/_flash_messages.html.twig' %}
+
             {# Erreurs globales du formulaire #}
             {% if registrationForm.vars.errors|length > 0 %}
-                <div class="dc-alert dc-alert--danger">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                <div class="dc-alert dc-alert--danger" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                     <span>{{ form_errors(registrationForm) }}</span>
                 </div>
             {% endif %}

@@ -27,7 +27,7 @@ final class DocumentController extends AbstractController
                 ['utilisateur' => $utilisateur],
                 ['date' => 'DESC']
             ),
-            'documentsAdmin'  => $documentAdminRepository->findBy(   // ← AJOUTER
+            'documentsAdmin' => $documentAdminRepository->findBy(
                 ['destinataire' => $utilisateur],
                 ['deposeLe' => 'DESC']
             ),
@@ -58,7 +58,6 @@ final class DocumentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Fichier uploadé
             $fichierFile = $form->get('fichierFile')->getData();
 
             if ($fichierFile) {
@@ -75,7 +74,6 @@ final class DocumentController extends AbstractController
             }
 
             $document->setDate(new \DateTime());
-
             $document->setUtilisateur($utilisateur);
 
             $entityManager->persist($document);
@@ -153,6 +151,9 @@ final class DocumentController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Document supprimé avec succès !');
+        } else {
+            // ✅ CORRECTIF : Flash d'erreur si le token CSRF est invalide (était silencieux avant)
+            $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
         }
 
         return $this->redirectToRoute('app_mes_documents', [], Response::HTTP_SEE_OTHER);
