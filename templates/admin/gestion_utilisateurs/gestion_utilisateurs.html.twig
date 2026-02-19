@@ -1,51 +1,138 @@
-{% extends 'espace.html.twig' %}
+{% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Gestion utilisateurs{% endblock %}
+{% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
 
-{% for label, messages in app.flashes(['success', 'warning']) %}
-    {% for message in messages %}
-        <div>
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in app.flashes('success') %}
+    <div class="dc-alert dc-alert--success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="dc-alert dc-alert--danger">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ message }}
+    </div>
 {% endfor %}
 
-<h1>Gestion utilisateurs</h1>
+{# ── En-tête ── #}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="admin-page-header__title">
+            Gestion des utilisateurs
+            {% if utilisateurs is defined %}
+                <span class="dc-count-badge">{{ utilisateurs|length }}</span>
+            {% endif %}
+        </h1>
+        <p class="admin-page-header__sub">Créez, modifiez et supprimez les comptes utilisateurs.</p>
+    </div>
+    <a href="{{ path('app_new_gestion_utilisateurs') }}" class="dc-btn dc-btn--primary">
+        <i class="fa-solid fa-user-plus"></i>
+        Nouvel utilisateur
+    </a>
+</div>
 
-<a href="{{ path('app_new_gestion_utilisateurs') }}">Ajouter un nouveau utilisateur</a>
+{# ── Barre de recherche et filtres ── #}
+<div class="dc-toolbar mb-3">
+    <div class="dc-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher par nom, prénom ou email…">
+    </div>
+    <select id="roleFilter" class="dc-select">
+        <option value="">Tous les rôles</option>
+        <option value="admin">Administrateurs</option>
+        <option value="user">Utilisateurs standards</option>
+    </select>
+</div>
 
-<table>
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nom</th>
-            <th>Prenom</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for utilisateur in utilisateurs %}
-            <tr>
-                <td>{{ utilisateur.id }}</td>
-                <td>{{ utilisateur.nom }}</td>
-                <td>{{ utilisateur.prenom }}</td>
-                <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.mainRole }}</td>
-                <td>
-                    <a href="{{ path('app_show_gestion_utilisateurs', {'id': utilisateur.id}) }}">
-                        Voir
-                    </a>
-                    <a href="{{ path('app_edit_gestion_utilisateurs', {'id': utilisateur.id}) }}">
-                        Modifier
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{# ── Tableau utilisateurs ── #}
+<div class="dc-table-wrap">
+    {% if utilisateurs is empty %}
+        <div class="dc-empty-state">
+            <i class="fa-solid fa-users-slash"></i>
+            <p>Aucun utilisateur trouvé.</p>
+            <a href="{{ path('app_new_gestion_utilisateurs') }}" class="dc-btn dc-btn--primary">
+                <i class="fa-solid fa-user-plus"></i>
+                Créer le premier utilisateur
+            </a>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="dc-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Rôle</th>
+                        <th class="d-none d-md-table-cell">Documents</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for utilisateur in utilisateurs %}
+                    <tr data-role="{{ 'ROLE_ADMIN' in utilisateur.roles ? 'admin' : 'user' }}">
+                        <td>
+                            <div class="user-cell">
+                                <span class="dc-avatar">
+                                    {{ utilisateur.prenom|slice(0,1)|upper }}{{ utilisateur.nom|slice(0,1)|upper }}
+                                </span>
+                                <div>
+                                    <div class="user-cell__name">{{ utilisateur.prenom }} {{ utilisateur.nom }}</div>
+                                    <div class="user-cell__email">{{ utilisateur.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if 'ROLE_ADMIN' in utilisateur.roles %}
+                                <span class="dc-badge dc-badge--blue">
+                                    <i class="fa-solid fa-shield-halved"></i> Admin
+                                </span>
+                            {% else %}
+                                <span class="dc-badge dc-badge--green">
+                                    <i class="fa-solid fa-user"></i> Utilisateur
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            {% set docsUser = utilisateur.documents|length %}
+                            {% set docsAdmin = documentsAdmin|filter((doc) => doc.destinataire.id == utilisateur.id)|length %}
+                            {% set totalDocs = docsUser + docsAdmin %}
+                            <span class="dc-table__muted">
+                                {{ totalDocs }} doc{{ totalDocs > 1 ? 's' : '' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="dc-actions">
+                                <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}"
+                                   class="dc-btn dc-btn--outline dc-btn--sm"
+                                   title="Voir">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_edit_gestion_utilisateurs', {id: utilisateur.id}) }}"
+                                   class="dc-btn dc-btn--outline dc-btn--sm"
+                                   title="Modifier">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form method="post"
+                                      action="{{ path('app_delete_gestion_utilisateurs', {id: utilisateur.id}) }}"
+                                      onsubmit="return confirm('Supprimer {{ utilisateur.prenom }} {{ utilisateur.nom }} ? Cette action est irréversible.')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
 
+{% endblock %}
+
+{% block javascripts %}
 {% endblock %}

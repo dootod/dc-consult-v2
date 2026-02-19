@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\UtilisateurRepository;
+use App\Repository\DocumentAdminRepository;
 use App\Entity\Utilisateur;
 use App\Form\NewUtilisateurType;
 use App\Form\EditUtilisateurType;
@@ -20,18 +21,26 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class GestionUtilisateursController extends AbstractController
 {
     #[Route(name: 'app_gestion_utilisateurs', methods: ['GET'])]
-    public function gestionUtilisateurs(UtilisateurRepository $utilisateurRepository): Response
+    public function gestionUtilisateurs(UtilisateurRepository $utilisateurRepository, DocumentAdminRepository $documentAdminRepository): Response
     {
+        $utilisateurs = $utilisateurRepository->findAll();
+        $documentsAdmin = $documentAdminRepository->findAll();
+        
         return $this->render('admin/gestion_utilisateurs/gestion_utilisateurs.html.twig', [
-            'utilisateurs' => $utilisateurRepository->findAll(),
+            'utilisateurs' => $utilisateurs,
+            'documentsAdmin' => $documentsAdmin,
         ]);
     }
 
     #[Route('/voir/{id}', name: 'app_show_gestion_utilisateurs', methods: ['GET'])]
-    public function show(Utilisateur $utilisateur): Response
+    public function show(Utilisateur $utilisateur, DocumentAdminRepository $documentAdminRepository): Response
     {
+        // Documents déposés par les admins pour cet utilisateur
+        $documentsAdmin = $documentAdminRepository->findBy(['destinataire' => $utilisateur]);
+        
         return $this->render('admin/gestion_utilisateurs/show.html.twig', [
             'utilisateur' => $utilisateur,
+            'documentsAdmin' => $documentsAdmin,
         ]);
     }
 
@@ -78,6 +87,7 @@ final class GestionUtilisateursController extends AbstractController
 
         return $this->render('admin/gestion_utilisateurs/new.html.twig', [
             'form' => $form,
+            'utilisateur' => $utilisateur,
         ]);
     }
 
@@ -124,6 +134,7 @@ final class GestionUtilisateursController extends AbstractController
 
         return $this->render('admin/gestion_utilisateurs/edit.html.twig', [
             'form' => $form,
+            'utilisateur' => $utilisateur,
         ]);
     }
 

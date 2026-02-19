@@ -4,41 +4,81 @@
 
 {% block body %}
 
-<h1>Choisir un nouveau mot de passe</h1>
+<div class="mb-4">
+    <h1 class="mb-1">Choisir un nouveau mot de passe</h1>
+    <p class="text-muted small mb-0">
+        Pour des raisons de sécurité, votre nouveau mot de passe doit contenir au minimum 8 caractères.
+    </p>
+</div>
 
+{# Flash messages stylés #}
 {% for label, messages in app.flashes %}
     {% for message in messages %}
-        <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% set alertClass =
+            label == 'success' ? 'dc-alert--success' :
+            (label == 'danger' ? 'dc-alert--danger' : 'dc-alert--info')
+        %}
+        {% set iconClass =
+            label == 'success' ? 'fa-circle-check' :
+            (label == 'danger' ? 'fa-triangle-exclamation' : 'fa-info-circle')
+        %}
+        <div class="dc-alert {{ alertClass }}">
+            <i class="fa-solid {{ iconClass }}"></i>
+            <span>{{ message }}</span>
+        </div>
     {% endfor %}
 {% endfor %}
 
-<form method="post" action="{{ path('app_compte_confirmer_mdp', {token: token}) }}">
-    <input type="hidden" name="_token" value="{{ csrf_token('nouveau_mdp') }}">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-key"></i>
+                    Nouveau mot de passe
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <form method="post"
+                      action="{{ path('app_compte_confirmer_mdp', {token: token}) }}"
+                      class="vstack gap-3">
+                    <input type="hidden" name="_token" value="{{ csrf_token('nouveau_mdp') }}">
 
-    <div>
-        <label for="nouveau_mdp">Nouveau mot de passe</label>
-        <input
-            type="password"
-            id="nouveau_mdp"
-            name="nouveau_mdp"
-            required
-            minlength="8"
-            placeholder="Minimum 8 caractères"
-        >
+                    <div>
+                        <label for="nouveau_mdp" class="dc-form-label">Nouveau mot de passe</label>
+                        <input
+                            type="password"
+                            id="nouveau_mdp"
+                            name="nouveau_mdp"
+                            class="dc-form-control"
+                            required
+                            minlength="8"
+                            placeholder="Minimum 8 caractères"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="confirmation_mdp" class="dc-form-label">Confirmer le mot de passe</label>
+                        <input
+                            type="password"
+                            id="confirmation_mdp"
+                            name="confirmation_mdp"
+                            class="dc-form-control"
+                            required
+                            minlength="8"
+                        >
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="dc-btn dc-btn--primary">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Enregistrer le nouveau mot de passe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <label for="confirmation_mdp">Confirmer le mot de passe</label>
-        <input
-            type="password"
-            id="confirmation_mdp"
-            name="confirmation_mdp"
-            required
-            minlength="8"
-        >
-    </div>
-
-    <button type="submit">Enregistrer le nouveau mot de passe</button>
-</form>
+</div>
 
 {% endblock %}

@@ -1,85 +1,180 @@
-{% extends 'espace.html.twig' %}
+{% extends 'admin/admin_base.html.twig' %}
 
 {% block title %}Gestion des documents{% endblock %}
 
 {% block body %}
 
-<h1>Gestion des documents</h1>
+{% for message in app.flashes('success') %}
+    <div class="dc-alert dc-alert--success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="dc-alert dc-alert--danger">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ message }}
+    </div>
+{% endfor %}
 
-<section>
-    <h2>Déposer un document</h2>
+{# ── En-tête ── #}
+<div class="mb-4">
+    <h1 class="admin-page-header__title">
+        Gestion des documents
+        {% if logs is defined %}
+            <span class="dc-count-badge">{{ logs|length }}</span>
+        {% endif %}
+    </h1>
+    <p class="admin-page-header__sub">Déposez et gérez les documents pour les utilisateurs.</p>
+</div>
 
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+{# ── Layout 2 colonnes ── #}
+<div class="row g-4 align-items-start">
 
-        <div>
-            {{ form_label(form.nom) }}
-            {{ form_widget(form.nom) }}
-            {{ form_errors(form.nom) }}
+    {# Colonne gauche : liste des dépôts #}
+    <div class="col-12 col-xl-8">
+
+        <div class="dc-toolbar mb-3">
+            <div class="dc-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher un document ou destinataire…">
+            </div>
         </div>
 
-        <div>
-            {{ form_label(form.destinataire) }}
-            {{ form_widget(form.destinataire) }}
-            {{ form_errors(form.destinataire) }}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-export"></i>
+                    Tous les dépôts
+                </span>
+            </div>
+            <div class="dc-card__body p-0">
+                {% if logs is not defined or logs is empty %}
+                    <div class="dc-empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Aucun document déposé pour le moment.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="dc-table" id="docsTable">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th class="d-none d-md-table-cell">Destinataire</th>
+                                    <th class="d-none d-lg-table-cell">Déposé par</th>
+                                    <th class="d-none d-lg-table-cell">Déposé le</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in logs %}
+                                {% set ext = doc.fichier|split('.')|last|lower %}
+                                <tr>
+                                    <td>
+                                        <div class="file-cell">
+                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : (ext in ['jpg','jpeg','png','gif','webp'] ? 'img' : 'other'))) }}">
+                                                <i class="fa-solid fa-{{ ext == 'pdf' ? 'file-pdf' : (ext in ['doc','docx'] ? 'file-word' : (ext in ['xls','xlsx'] ? 'file-excel' : (ext in ['jpg','jpeg','png','gif','webp'] ? 'file-image' : 'file'))) }}"></i>
+                                            </span>
+                                            <div>
+                                                <div class="file-cell__name">{{ doc.nom }}</div>
+                                                <div class="file-cell__ext">{{ ext|upper }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <div class="user-cell">
+                                            <span class="dc-avatar dc-avatar--sm">
+                                                {{ doc.destinataire.prenom|slice(0,1)|upper }}{{ doc.destinataire.nom|slice(0,1)|upper }}
+                                            </span>
+                                            {{ doc.destinataire.prenom }} {{ doc.destinataire.nom }}
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell dc-table__muted">
+                                        <div class="user-cell">
+                                            <span class="dc-avatar dc-avatar--sm">
+                                                {{ doc.deposePar.prenom|slice(0,1)|upper }}{{ doc.deposePar.nom|slice(0,1)|upper }}
+                                            </span>
+                                            {{ doc.deposePar.prenom }} {{ doc.deposePar.nom }}
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell dc-table__muted">
+                                        {{ doc.deposeLe|date('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        <div class="dc-actions">
+                                            {% if doc.deposePar.id == app.user.id %}
+                                                <form method="post"
+                                                      action="{{ path('app_annuler_gestion_documents', {id: doc.id}) }}"
+                                                      onsubmit="return confirm('Annuler ce dépôt ?')">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ doc.id) }}">
+                                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Annuler">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <div>
-            {{ form_label(form.fichierFile) }}
-            {{ form_widget(form.fichierFile) }}
-            {{ form_errors(form.fichierFile) }}
-            <small>Taille maximale : 10 Mo</small>
+    </div>
+
+    {# Colonne droite : formulaire dépôt #}
+    <div class="col-12 col-xl-4">
+        <div class="dc-card depot-form-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    Déposer un document
+                </span>
+            </div>
+            <div class="dc-card__body">
+
+                {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.nom.vars.id }}">Nom du document</label>
+                        {{ form_widget(form.nom, {attr: {class: 'dc-form-control', placeholder: 'Ex : Rapport mensuel…'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.destinataire.vars.id }}">Destinataire</label>
+                        {{ form_widget(form.destinataire, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.destinataire) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="dc-form-label">Fichier <span class="text-danger">*</span></label>
+                        <div class="drop-zone" id="dropZone">
+                            {{ form_widget(form.fichierFile, {attr: {id: 'fileInput', class: 'drop-zone__input'}}) }}
+                            <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
+                            <p class="drop-zone__text" id="dropZoneText">Glissez votre fichier ici ou cliquez</p>
+                            <p class="drop-zone__hint">PDF, Word, Excel, images — 10 Mo max</p>
+                        </div>
+                        {{ form_errors(form.fichierFile) }}
+                    </div>
+
+                    <button type="submit" class="dc-btn dc-btn--primary w-100 justify-content-center">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Déposer le document
+                    </button>
+
+                {{ form_end(form) }}
+
+            </div>
         </div>
+    </div>
 
-        <button type="submit">Déposer le document</button>
+</div>
 
-    {{ form_end(form) }}
-</section>
+{% endblock %}
 
-<section>
-    <h2>Historique des dépôts</h2>
-
-    {% if logs is empty %}
-        <p>Aucun document n'a encore été déposé.</p>
-    {% else %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Document</th>
-                    <th>Destinataire</th>
-                    <th>Déposé par</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                    <tr>
-                        <td>{{ log.deposeLe|date('d/m/Y à H:i') }}</td>
-                        <td>
-                            <a href="{{ asset('uploads/documents/' ~ log.fichier) }}" target="_blank">
-                                {{ log.nom }}
-                            </a>
-                        </td>
-                        <td>
-                            {{ log.destinataire.prenom }} {{ log.destinataire.nom }}
-                            <br>
-                            <small>{{ log.destinataire.email }}</small>
-                        </td>
-                        <td>
-                            {{ log.deposePar.prenom }} {{ log.deposePar.nom }}
-                        </td>
-                        <td>
-                            <form method="post" action="{{ path('app_annuler_gestion_documents', {'id': log.id}) }}"
-                                  onsubmit="return confirm('Annuler ce dépôt ? Le fichier sera définitivement supprimé.');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ log.id) }}">
-                                <button type="submit">Annuler le dépôt</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</section>
-
+{% block javascripts %}
 {% endblock %}

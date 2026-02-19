@@ -1,27 +1,91 @@
-{% extends 'espace.html.twig' %}
+{% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Modifier utilisateur{% endblock %}
+{% block title %}Modifier {{ utilisateur.prenom }} {{ utilisateur.nom }}{% endblock %}
 
 {% block body %}
 
-<h1>Modifier utilisateur</h1>
+{% for message in app.flashes('success') %}
+    <div class="dc-alert dc-alert--success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="dc-alert dc-alert--danger">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ message }}
+    </div>
+{% endfor %}
 
-{{ form_start(form) }}
+{# ── En-tête ── #}
+<div class="mb-4">
+    <h1 class="admin-page-header__title">
+        Modifier {{ utilisateur.prenom }} {{ utilisateur.nom }}
+    </h1>
+    <p class="admin-page-header__sub">Mettez à jour les informations de l'utilisateur.</p>
+</div>
 
-    {{ form_row(form.nom) }}
+{# ── Layout centré ── #}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-6">
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-pen"></i>
+                    Modification de l'utilisateur
+                </span>
+            </div>
+            <div class="dc-card__body">
 
-    {{ form_row(form.prenom) }}
+                {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
 
-    {{ form_row(form.email) }}
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.nom.vars.id }}">Nom <span class="text-danger">*</span></label>
+                        {{ form_widget(form.nom, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
 
-    {{ form_row(form.password) }}
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.prenom.vars.id }}">Prénom <span class="text-danger">*</span></label>
+                        {{ form_widget(form.prenom, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.prenom) }}
+                    </div>
 
-    {{ form_row(form.role_choice) }}
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.email.vars.id }}">Email <span class="text-danger">*</span></label>
+                        {{ form_widget(form.email, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.email) }}
+                    </div>
 
-    {{ form_row(form.modifier) }}
+                    <div class="mb-3">
+                        <label class="dc-form-label" for="{{ form.password.vars.id }}">Nouveau mot de passe</label>
+                        <small class="text-muted d-block mb-2">Laissez vide pour conserver le mot de passe actuel</small>
+                        {{ form_widget(form.password, {attr: {class: 'dc-form-control', placeholder: '••••••••'}}) }}
+                        {{ form_errors(form.password) }}
+                    </div>
 
-{{ form_end(form) }}
+                    <div class="mb-4">
+                        <label class="dc-form-label" for="{{ form.role_choice.vars.id }}">Type d'utilisateur <span class="text-danger">*</span></label>
+                        {{ form_widget(form.role_choice, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.role_choice) }}
+                    </div>
 
-<a href="{{ path('app_gestion_utilisateurs') }}">Retour</a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="dc-btn dc-btn--primary flex-grow-1 justify-content-center">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline flex-grow-1 justify-content-center">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            Annuler
+                        </a>
+                    </div>
+
+                {{ form_end(form) }}
+
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

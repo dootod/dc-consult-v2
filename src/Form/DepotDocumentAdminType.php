@@ -22,7 +22,7 @@ class DepotDocumentAdminType extends AbstractType
             ->add('nom', TextType::class, [
                 'label' => 'Nom du document',
                 'constraints' => [
-                    new NotBlank(['message' => 'Le nom du document est obligatoire.']),
+                    new NotBlank(message: 'Le nom du document est obligatoire.'),
                 ],
             ])
             ->add('destinataire', EntityType::class, [
@@ -31,7 +31,7 @@ class DepotDocumentAdminType extends AbstractType
                 'choice_label' => fn(Utilisateur $u) => $u->getPrenom() . ' ' . $u->getNom() . ' (' . $u->getEmail() . ')',
                 'placeholder'  => '-- Sélectionner un utilisateur --',
                 'constraints'  => [
-                    new NotBlank(['message' => 'Veuillez sélectionner un destinataire.']),
+                    new NotBlank(message: 'Veuillez sélectionner un destinataire.'),
                 ],
                 // On exclut les admins : seuls les ROLE_USER sont destinataires
                 'query_builder' => fn(UtilisateurRepository $repo) => $repo
@@ -43,12 +43,12 @@ class DepotDocumentAdminType extends AbstractType
                 'mapped'   => false,
                 'required' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez sélectionner un fichier.']),
-                    new File([
-                        'maxSize'          => '10M',
-                        'maxSizeMessage'   => 'Le fichier ne doit pas dépasser 10 Mo.',
-                        'mimeTypesMessage' => 'Format de fichier non autorisé.',
-                    ]),
+                    new NotBlank(message: 'Veuillez sélectionner un fichier.'),
+                    new File(
+                        maxSize: '10M',
+                        maxSizeMessage: 'Le fichier ne doit pas dépasser 10 Mo.',
+                        mimeTypesMessage: 'Format de fichier non autorisé.',
+                    ),
                 ],
             ]);
     }
