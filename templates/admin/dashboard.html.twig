@@ -1,9 +1,135 @@
-{% extends 'espace.html.twig' %}
+{% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Dashboard admin{% endblock %}
+{% block title %}Dashboard Admin{% endblock %}
 
 {% block body %}
 
-<h1>Dashboard admin - Bienvenue {{ prenom }}</h1>
+<div class="admin-page-header mb-4">
+    <h1 class="admin-page-header__title">
+        Bonjour, <span class="text-primary">{{ prenom }}</span> 👋
+    </h1>
+    <p class="admin-page-header__sub">Voici un aperçu de l'activité de la plateforme DC Consult.</p>
+</div>
+
+{# ── Statistiques ── #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--blue">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.utilisateurs ?? '—' }}</div>
+                <div class="stat-card__label">Utilisateurs</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--green">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.projets ?? '—' }}</div>
+                <div class="stat-card__label">Projets</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--orange">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.documents ?? '—' }}</div>
+                <div class="stat-card__label">Documents</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--purple">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.admins ?? '—' }}</div>
+                <div class="stat-card__label">Administrateurs</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── Blocs inférieurs ── #}
+<div class="row g-3">
+
+    {# Activité récente #}
+    <div class="col-12 col-lg-7">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Activité récente
+                </span>
+                <span class="dc-badge dc-badge--blue">Aujourd'hui</span>
+            </div>
+            <div class="dc-card__body">
+                {% if activites is defined and activites is not empty %}
+                    {% for activite in activites %}
+                        <div class="activity-item">
+                            <span class="activity-dot activity-dot--{{ activite.type ?? 'blue' }}"></span>
+                            <div>
+                                <div class="activity-item__text">{{ activite.message }}</div>
+                                <div class="activity-item__time">{{ activite.date|date('d/m/Y H:i') }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted small mb-0">Aucune activité récente à afficher.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Accès rapides #}
+    <div class="col-12 col-lg-5">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-bolt"></i>
+                    Accès rapides
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a href="{{ path('app_new_gestion_utilisateurs') }}" class="quick-link">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Nouvel utilisateur
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_gestion_utilisateurs') }}" class="quick-link">
+                            <i class="fa-solid fa-users"></i>
+                            Voir utilisateurs
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_gestion_projets') }}" class="quick-link">
+                            <i class="fa-solid fa-folder-plus"></i>
+                            Gérer projets
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_gestion_documents') }}" class="quick-link">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            Déposer document
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 {% endblock %}
