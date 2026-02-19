@@ -12,20 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── Drop zone fichier ──
+    // ── Drop zone fichier ── (utilise event delegation pour être robuste)
     const dropZone  = document.getElementById('dropZone');
     if (dropZone) {
-        // Cherche l'input file dans la drop-zone
-        let fileInput = document.getElementById('fileInput');
-        if (!fileInput) {
-            fileInput = dropZone.querySelector('input[type="file"]');
-        }
-        
         const dropText = document.getElementById('dropZoneText');
         
         // Fonction pour mettre à jour l'affichage du fichier
         const updateFileDisplay = () => {
-            if (fileInput?.files?.[0]) {
+            const fileInput = dropZone.querySelector('input[type="file"]');
+            if (fileInput?.files?.length > 0) {
                 const fileName = fileInput.files[0].name;
                 if (dropText) {
                     dropText.textContent = fileName;
@@ -34,28 +29,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
         
-        // Listener sur le changement de fichier
-        fileInput?.addEventListener('change', updateFileDisplay);
+        // Event delegation: Écoute les changements sur tout input file dans dropZone
+        dropZone.addEventListener('change', (e) => {
+            if (e.target.type === 'file') {
+                updateFileDisplay();
+            }
+        }, true); // Capture phase pour être sûr de capter l'événement
+        
+        // Click sur drop-zone pour ouvrir le sélecteur de fichier
+        dropZone.addEventListener('click', (e) => {
+            const fileInput = dropZone.querySelector('input[type="file"]');
+            if (e.target !== fileInput && !e.target.closest('input')) {
+                fileInput?.click();
+            }
+        });
         
         // Drag and drop
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             dropZone.classList.add('is-dragover');
         });
         
-        dropZone.addEventListener('dragleave', () => {
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             dropZone.classList.remove('is-dragover');
         });
         
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             dropZone.classList.remove('is-dragover');
             
+            const fileInput = dropZone.querySelector('input[type="file"]');
             if (!fileInput) return;
             
             const files = e.dataTransfer.files;
             if (files?.length > 0) {
-                // Assigne les fichiers à l'input
                 fileInput.files = files;
                 updateFileDisplay();
             }
