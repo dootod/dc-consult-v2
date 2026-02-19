@@ -343,7 +343,7 @@ a {
 
 /* ── Collapse mobile - moderne ── */
 @media (max-width: 991.98px) {
-    .dc-navbar .navbar-collapse {
+    .dc-navbar .navbar-collapse.show {
         background: linear-gradient(135deg, 
             var(--color-primary-dark) 0%, 
             rgba(0, 0, 0, 0.5) 100%);
@@ -352,10 +352,6 @@ a {
         margin: 0.75rem 1rem 0;
         border-radius: var(--radius-lg);
         animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    .navbar-collapse.collapse:not(.show) {
-        display: none;
     }
 
     @keyframes slideDown {

@@ -28,28 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const navbarToggler = document.getElementById('navbarToggler');
 
     if (navbarCollapse && navbarToggler) {
-        const bsCollapseObj = new bootstrap.Collapse(navbarCollapse, { toggle: false });
         const navLinks = navbarCollapse.querySelectorAll('a');
-        
-        // Update aria-expanded de l'animation burger quand le collapse change
+
+        // Update aria-expanded pour l'animation burger CSS
         navbarCollapse.addEventListener('show.bs.collapse', () => {
             navbarToggler.setAttribute('aria-expanded', 'true');
         });
-        
+
         navbarCollapse.addEventListener('hide.bs.collapse', () => {
             navbarToggler.setAttribute('aria-expanded', 'false');
         });
-        
-        // Clic sur le burger menu pour fermer si ouvert
-        navbarToggler.addEventListener('click', () => {
-            // Bootstrap gère déjà le toggle via data-bs-toggle, mais on peut ajouter logique
-            // La synchronisation d'aria-expanded se fera via les événements ci-dessus
-        });
-        
-        // Ferme quand on clique sur un lien
+
+        // Ferme le menu quand on clique sur un lien
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                bsCollapseObj.hide();
+                const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                if (bsCollapse) bsCollapse.hide();
             });
         });
     }
