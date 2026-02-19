@@ -1,5 +1,5 @@
 // ── Gestion documents — Recherche + drop zone ────────────────
-document.addEventListener('DOMContentLoaded', () => {
+const initAdminDocuments = () => {
 
     // ── Recherche dans le tableau ──
     const searchInput = document.getElementById('searchInput');
@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Event delegation: Écoute les changements sur tout input file dans dropZone
         dropZone.addEventListener('change', (e) => {
-            if (e.target.type === 'file') {
+            const target = e.target instanceof Element
+                ? e.target.closest('input[type="file"]')
+                : null;
+            if (target) {
                 updateFileDisplay();
             }
         }, true); // Capture phase pour être sûr de capter l'événement
@@ -72,5 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+};
 
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminDocuments);
+} else {
+    initAdminDocuments();
+}

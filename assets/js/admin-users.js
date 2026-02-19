@@ -1,5 +1,5 @@
 // ── Gestion utilisateurs — Recherche + filtre rôle ───────────
-document.addEventListener('DOMContentLoaded', () => {
+const initAdminUsers = () => {
     const searchInput = document.getElementById('searchInput');
     const roleFilter  = document.getElementById('roleFilter');
     const rows        = document.querySelectorAll('#usersTable tbody tr');
@@ -20,4 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput?.addEventListener('input', filterTable);
     roleFilter?.addEventListener('change', filterTable);
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminUsers);
+} else {
+    initAdminUsers();
+}

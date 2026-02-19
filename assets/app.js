@@ -8,8 +8,8 @@ import './stimulus_bootstrap.js';
  */
 import './styles/app.css';
 
-// ── Effet shadow sur la navbar au scroll ──────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+const initAppUi = () => {
+    // ── Effet shadow sur la navbar au scroll ──────────────────────
     const navbar = document.getElementById('mainNavbar');
 
     if (!navbar) return;
@@ -42,8 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ferme le menu quand on clique sur un lien
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
-                if (bsCollapse) bsCollapse.hide();
+                const bsCollapse = bootstrap?.Collapse?.getOrCreateInstance
+                    ? bootstrap.Collapse.getOrCreateInstance(navbarCollapse)
+                    : bootstrap?.Collapse?.getInstance?.(navbarCollapse);
+                bsCollapse?.hide?.();
             });
         });
     }
@@ -78,4 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', closeSidebar);
         });
     }
-});
+};
+
+// DOM classique (premier chargement)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAppUi);
+} else {
+    initAppUi();
+}
