@@ -90,7 +90,7 @@ const initAppUi = () => {
     }
 };
 
-// DOM classique (premier chargement)
+// ── Initialiser l'UI dès que le DOM est prêt ──
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAppUi);
 } else {
