@@ -14,16 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Drop zone fichier ──
     const dropZone  = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
+    const fileInput = document.getElementById('fileInput') || dropZone?.querySelector('input[type="file"]');
     const dropText  = document.getElementById('dropZoneText');
 
-    fileInput?.addEventListener('change', () => {
-        const name = fileInput.files[0]?.name;
+    const updateFileInput = () => {
+        const name = fileInput?.files?.[0]?.name;
         if (name && dropText) {
             dropText.textContent = name;
             dropZone?.classList.add('has-file');
         }
-    });
+    };
+
+    fileInput?.addEventListener('change', updateFileInput);
 
     dropZone?.addEventListener('dragover', e => {
         e.preventDefault();
