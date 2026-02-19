@@ -41,13 +41,19 @@ const initAppUi = () => {
             navbarToggler.setAttribute('aria-expanded', 'false');
         });
 
-        // Ferme le menu quand on clique sur un lien
+        // Ferme le menu uniquement pour les liens "internes" (ancres),
+        // afin d'éviter l'effet de rétractation juste avant un changement de page
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                const bsCollapse = bootstrap?.Collapse?.getOrCreateInstance
-                    ? bootstrap.Collapse.getOrCreateInstance(navbarCollapse)
-                    : bootstrap?.Collapse?.getInstance?.(navbarCollapse);
-                bsCollapse?.hide?.();
+                const href = link.getAttribute('href') || '';
+
+                // Si le lien pointe vers une ancre de la page actuelle, on ferme le menu
+                if (href.startsWith('#')) {
+                    const bsCollapse = bootstrap?.Collapse?.getOrCreateInstance
+                        ? bootstrap.Collapse.getOrCreateInstance(navbarCollapse)
+                        : bootstrap?.Collapse?.getInstance?.(navbarCollapse);
+                    bsCollapse?.hide?.();
+                }
             });
         });
     }

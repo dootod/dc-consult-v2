@@ -23,9 +23,9 @@ class DocumentType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
-                    new File([
-                        'maxSize' => '10M',
-                        'mimeTypes' => [
+                    new File(
+                        maxSize: '10M',
+                        mimeTypes: [
                             'application/pdf',
                             'image/jpeg',
                             'image/png',
@@ -35,8 +35,8 @@ class DocumentType extends AbstractType
                             'application/vnd.ms-excel',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         ],
-                        'mimeTypesMessage' => 'Format non autorisé. Formats acceptés : PDF, images, Word, Excel.',
-                    ])
+                        mimeTypesMessage: 'Format non autorisé. Formats acceptés : PDF, images, Word, Excel.',
+                    )
                 ],
             ])
         ;

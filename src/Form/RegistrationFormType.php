@@ -22,26 +22,18 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Entrez un nom',
-                    ]),
+                    new NotBlank(message: 'Entrez un nom'),
                 ]
             ])
             ->add('prenom', TextType::class, [
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Entrez un prenom',
-                    ]),
+                    new NotBlank(message: 'Entrez un prenom'),
                 ]
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Entrez une adresse mail',
-                    ]),
-                    new Email([
-                        'message' => 'Entrez une adresse mail valide',
-                    ]),
+                    new NotBlank(message: 'Entrez une adresse mail'),
+                    new Email(message: 'Entrez une adresse mail valide'),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
@@ -50,15 +42,13 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Entrez un mot de passe',
-                    ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit avoir au moins {{ limit }} charactères',
+                    new NotBlank(message: 'Entrez un mot de passe'),
+                    new Length(
+                        min: 6,
+                        minMessage: 'Votre mot de passe doit avoir au moins {{ limit }} charactères',
                         // max length allowed by Symfony for security reasons
-                        'max' => 4096,
-                    ]),
+                        max: 4096,
+                    ),
                 ],
             ])
         ;
