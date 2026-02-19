@@ -4,18 +4,8 @@
 
 {% block body %}
 
-{% for message in app.flashes('success') %}
-    <div class="dc-alert dc-alert--success">
-        <i class="fa-solid fa-circle-check"></i>
-        {{ message }}
-    </div>
-{% endfor %}
-{% for message in app.flashes('error') %}
-    <div class="dc-alert dc-alert--danger">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        {{ message }}
-    </div>
-{% endfor %}
+{# ✅ CORRECTIF : Partial centralisé #}
+{% include 'components/_flash_messages.html.twig' %}
 
 {# ── En-tête ── #}
 <div class="mb-4">

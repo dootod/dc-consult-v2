@@ -225,6 +225,24 @@
     color: #7f1d1d;
 }
 
+.dc-alert--warning {
+    background: rgba(217, 119, 6, 0.08);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    color: #78350f;
+}
+
+.dc-alert--info {
+    background: rgba(var(--color-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+    color: var(--color-primary-dark);
+}
+
+.dc-alert--warning {
+    background: rgba(217, 119, 6, 0.08);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    color: #78350f;
+}
+
 /* ── Barre toolbar (recherche + filtres) ──────────────────── */
 .dc-toolbar {
     background: var(--color-white);

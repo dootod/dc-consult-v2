@@ -3,45 +3,113 @@
 {% block title %}Se connecter{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div>
-                {{ error.messageKey|trans(error.messageData, 'security') }}*
-            </div>
-        {% endif %}
 
-        {% for label, messages in app.flashes(['success', 'warning']) %}
-            {% for message in messages %}
-                <div>
-                    {{ message }}
+<div class="auth-page">
+
+    {# ── Panneau gauche décoratif ── #}
+    <div class="auth-panel auth-panel--deco" aria-hidden="true">
+        <div class="auth-panel__bg"></div>
+        <div class="auth-panel__content">
+
+            <div class="auth-panel__logo-wrap">
+                <img src="{{ asset('images/logo.png') }}" alt="DC Consult" class="auth-panel__logo">
+            </div>
+
+            <div class="auth-panel__tagline">
+                <h2 class="auth-panel__title">Bienvenue sur<br>votre espace client</h2>
+                <p class="auth-panel__sub">Accédez à vos documents et gérez votre compte en toute sécurité.</p>
+            </div>
+
+            <ul class="auth-panel__features">
+                <li><i class="fa-solid fa-shield-halved"></i> Connexion sécurisée</li>
+                <li><i class="fa-solid fa-folder-open"></i> Documents accessibles 24h/24</li>
+                <li><i class="fa-solid fa-chart-line"></i> Activité de votre compte en temps réel</li>
+            </ul>
+
+        </div>
+    </div>
+
+    {# ── Panneau droit formulaire ── #}
+    <div class="auth-panel auth-panel--form">
+        <div class="auth-form-wrap">
+
+            {# Logo mobile #}
+            <div class="auth-form__logo-mobile">
+                <img src="{{ asset('images/logo.png') }}" alt="DC Consult">
+            </div>
+
+            <div class="auth-form__header">
+                <h1 class="auth-form__title">Connexion</h1>
+                <p class="auth-form__sub">Entrez vos identifiants pour accéder à votre espace.</p>
+            </div>
+
+            {# ✅ CORRECTIF : Partial centralisé (tous les types y compris 'info') #}
+            {% include 'components/_flash_messages.html.twig' %}
+
+            {# Erreur d'authentification Symfony Security #}
+            {% if error %}
+                <div class="dc-alert dc-alert--danger" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
                 </div>
-            {% endfor %}
-        {% endfor %}
+            {% endif %}
 
-        <h1>Se connecter</h1>
+            <form method="post" class="auth-form" novalidate>
 
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" autocomplete="email" required autofocus>
+                <div class="auth-form__field">
+                    <label for="username" class="dc-form-label">
+                        <i class="fa-solid fa-at"></i> Adresse email
+                    </label>
+                    <input
+                        type="email"
+                        id="username"
+                        name="_username"
+                        class="dc-form-control auth-form__input"
+                        value="{{ last_username }}"
+                        autocomplete="email"
+                        required
+                        autofocus
+                        placeholder="votre@email.com"
+                    >
+                </div>
 
-        <label for="password">Mot de passe</label>
-        <input type="password" name="_password" id="password" autocomplete="current-password" required>
+                <div class="auth-form__field">
+                    <label for="password" class="dc-form-label">
+                        <i class="fa-solid fa-lock"></i> Mot de passe
+                    </label>
+                    <div class="auth-input-wrap">
+                        <input
+                            type="password"
+                            id="password"
+                            name="_password"
+                            class="dc-form-control auth-form__input"
+                            autocomplete="current-password"
+                            required
+                            placeholder="••••••••"
+                        >
+                        <button type="button" class="auth-toggle-pw" aria-label="Afficher le mot de passe" tabindex="-1">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+                <button type="submit" class="dc-btn dc-btn--primary auth-form__submit">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Se connecter
+                </button>
 
-            <div>
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
+            </form>
 
-        <button type="submit">
-            Se connecter
-        </button>
-    </form>
+            <p class="auth-form__switch">
+                Pas encore de compte ?
+                <a href="{{ path('app_inscription') }}" class="auth-form__switch-link">Créer un compte</a>
+            </p>
 
-    <p>Pas de compte ? <a href="{{ path('app_inscription') }}">S'inscrire</a></p>
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

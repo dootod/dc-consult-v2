@@ -1,25 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}S'inscrire{% endblock %}
+{% block title %}Créer un compte{% endblock %}
 
 {% block body %}
-    <h1>S'inscrire</h1>
 
-    {{ form_errors(registrationForm) }}
+<div class="auth-page">
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.nom) }}
+    {# ── Panneau gauche décoratif ── #}
+    <div class="auth-panel auth-panel--deco" aria-hidden="true">
+        <div class="auth-panel__bg"></div>
+        <div class="auth-panel__content">
 
-        {{ form_row(registrationForm.prenom) }}
+            <div class="auth-panel__logo-wrap">
+                <img src="{{ asset('images/logo.png') }}" alt="DC Consult" class="auth-panel__logo">
+            </div>
 
-        {{ form_row(registrationForm.email) }}
+            <div class="auth-panel__tagline">
+                <h2 class="auth-panel__title">Rejoignez<br>DC Consult</h2>
+                <p class="auth-panel__sub">Créez votre espace client et bénéficiez d'un accès centralisé à tous vos documents.</p>
+            </div>
 
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Mot de passe'
-        }) }}
+            <ul class="auth-panel__features">
+                <li><i class="fa-solid fa-user-check"></i> Inscription simple et rapide</li>
+                <li><i class="fa-solid fa-file-shield"></i> Vos données en sécurité</li>
+                <li><i class="fa-solid fa-headset"></i> Support dédié à votre service</li>
+            </ul>
 
-        <button type="submit">S'inscrire</button>
-    {{ form_end(registrationForm) }}
+        </div>
+    </div>
 
-    <p>Déjà un compte ? <a href="{{ path('app_connexion') }}">Se connecter</a></p>
+    {# ── Panneau droit formulaire ── #}
+    <div class="auth-panel auth-panel--form">
+        <div class="auth-form-wrap">
+
+            {# Logo mobile #}
+            <div class="auth-form__logo-mobile">
+                <img src="{{ asset('images/logo.png') }}" alt="DC Consult">
+            </div>
+
+            <div class="auth-form__header">
+                <h1 class="auth-form__title">Créer un compte</h1>
+                <p class="auth-form__sub">Remplissez le formulaire ci-dessous pour accéder à votre espace client.</p>
+            </div>
+
+            {# ✅ CORRECTIF : Flash messages ajoutés (absents avant) #}
+            {% include 'components/_flash_messages.html.twig' %}
+
+            {# Erreurs globales du formulaire #}
+            {% if registrationForm.vars.errors|length > 0 %}
+                <div class="dc-alert dc-alert--danger" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    <span>{{ form_errors(registrationForm) }}</span>
+                </div>
+            {% endif %}
+
+            {{ form_start(registrationForm, {attr: {class: 'auth-form', novalidate: 'novalidate'}}) }}
+
+                {# Nom & Prénom côte à côte #}
+                <div class="auth-form__row">
+
+                    <div class="auth-form__field">
+                        <label for="{{ registrationForm.nom.vars.id }}" class="dc-form-label">
+                            <i class="fa-solid fa-user"></i> Nom
+                        </label>
+                        {{ form_widget(registrationForm.nom, {
+                            attr: { class: 'dc-form-control auth-form__input', placeholder: 'Dupont' }
+                        }) }}
+                        {% if registrationForm.nom.vars.errors|length > 0 %}
+                            <span class="auth-form__error">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                {{ form_errors(registrationForm.nom) }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="auth-form__field">
+                        <label for="{{ registrationForm.prenom.vars.id }}" class="dc-form-label">
+                            <i class="fa-solid fa-user"></i> Prénom
+                        </label>
+                        {{ form_widget(registrationForm.prenom, {
+                            attr: { class: 'dc-form-control auth-form__input', placeholder: 'Jean' }
+                        }) }}
+                        {% if registrationForm.prenom.vars.errors|length > 0 %}
+                            <span class="auth-form__error">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                {{ form_errors(registrationForm.prenom) }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                {# Email #}
+                <div class="auth-form__field">
+                    <label for="{{ registrationForm.email.vars.id }}" class="dc-form-label">
+                        <i class="fa-solid fa-at"></i> Adresse email
+                    </label>
+                    {{ form_widget(registrationForm.email, {
+                        attr: { class: 'dc-form-control auth-form__input', placeholder: 'votre@email.com' }
+                    }) }}
+                    {% if registrationForm.email.vars.errors|length > 0 %}
+                        <span class="auth-form__error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form_errors(registrationForm.email) }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                {# Mot de passe #}
+                <div class="auth-form__field">
+                    <label for="{{ registrationForm.plainPassword.vars.id }}" class="dc-form-label">
+                        <i class="fa-solid fa-lock"></i> Mot de passe
+                    </label>
+                    <div class="auth-input-wrap">
+                        {{ form_widget(registrationForm.plainPassword, {
+                            attr: { class: 'dc-form-control auth-form__input', placeholder: 'Minimum 6 caractères' }
+                        }) }}
+                        <button type="button" class="auth-toggle-pw" aria-label="Afficher le mot de passe" tabindex="-1">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="auth-form__hint">Au moins 6 caractères.</span>
+                    {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                        <span class="auth-form__error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="dc-btn dc-btn--primary auth-form__submit">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Créer mon compte
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+            <p class="auth-form__switch">
+                Déjà un compte ?
+                <a href="{{ path('app_connexion') }}" class="auth-form__switch-link">Se connecter</a>
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

@@ -1,0 +1,314 @@
+/* =============================================================
+   DC Consult — Styles pages Authentification
+   Chargé globalement via app.js → assets/styles/auth.css
+   ============================================================= */
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH PAGE LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Sur les pages auth, le body passe sur fond blanc */
+body.page-auth {
+    background: var(--color-white);
+}
+
+.auth-page {
+    display: flex;
+    min-height: calc(100vh - var(--navbar-height));
+}
+
+/* ── Panneau gauche décoratif ─────────────────────────────── */
+.auth-panel--deco {
+    position: relative;
+    flex: 0 0 45%;
+    display: none; /* caché sur mobile */
+    overflow: hidden;
+}
+
+@media (min-width: 992px) {
+    .auth-panel--deco {
+        display: flex;
+    }
+}
+
+.auth-panel__bg {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(145deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 60%,
+            #001f3f 100%);
+    z-index: 0;
+}
+
+/* Motif lumineux subtil */
+.auth-panel__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(255,255,255,0.04) 0%, transparent 40%);
+    z-index: 1;
+}
+
+.auth-panel__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5rem 2.5rem 3rem;
+    width: 100%;
+}
+
+/* ── Logo panneau décoratif ── */
+.auth-panel__logo-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.auth-panel__logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
+}
+
+/* ── Tagline ── */
+.auth-panel__tagline {
+    margin: auto 0;
+    padding: 1.5rem 0;
+}
+
+.auth-panel__title {
+    font-family: var(--font-title);
+    font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.25;
+    margin: 0 0 0.85rem;
+}
+
+.auth-panel__sub {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── Liste features ── */
+.auth-panel__features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.auth-panel__features li {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.80);
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.auth-panel__features li i {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.85rem;
+    width: 16px;
+    text-align: center;
+}
+
+/* ── Panneau droit formulaire ─────────────────────────────── */
+.auth-panel--form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    padding: 2rem 1.25rem;
+}
+
+.auth-form-wrap {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* ── Logo mobile (affiché uniquement < lg) ── */
+.auth-form__logo-mobile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+}
+
+.auth-form__logo-mobile img {
+    height: 36px;
+    width: auto;
+}
+
+@media (min-width: 992px) {
+    .auth-form__logo-mobile {
+        display: none;
+    }
+}
+
+/* ── En-tête du formulaire ── */
+.auth-form__header {
+    margin-bottom: 1.75rem;
+}
+
+.auth-form__title {
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.35rem;
+}
+
+.auth-form__sub {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORMULAIRE AUTH
+   ═══════════════════════════════════════════════════════════════ */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+/* Ligne double nom + prénom (inscription) */
+.auth-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .auth-form__row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Champ individuel */
+.auth-form__field {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Label avec icône */
+.auth-form__field .dc-form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.79rem;
+    margin-bottom: 0.45rem;
+}
+
+.auth-form__field .dc-form-label i {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+}
+
+/* Input — surcharge légère de dc-form-control */
+.auth-form__input {
+    padding: 0.65rem 0.95rem;
+    font-size: 0.9rem;
+}
+
+.auth-form__input:focus {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.10);
+}
+
+/* Wrapper input + bouton œil */
+.auth-input-wrap {
+    position: relative;
+}
+
+.auth-input-wrap .auth-form__input {
+    padding-right: 2.8rem;
+}
+
+/* Bouton toggle afficher/masquer mot de passe */
+.auth-toggle-pw {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.auth-toggle-pw:hover {
+    color: var(--color-primary);
+}
+
+/* Indication sous champ */
+.auth-form__hint {
+    font-family: var(--font-body);
+    font-size: 0.74rem;
+    color: var(--color-text-faint);
+    margin-top: 0.3rem;
+}
+
+/* Message d'erreur inline par champ */
+.auth-form__error {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    color: var(--color-danger);
+    margin-top: 0.3rem;
+}
+
+.auth-form__error i {
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
+
+/* Bouton submit pleine largeur */
+.auth-form__submit {
+    width: 100%;
+    justify-content: center;
+    padding: 0.7rem 1.25rem;
+    font-size: 0.9rem;
+    margin-top: 0.35rem;
+}
+
+/* ── Lien switch connexion ↔ inscription ── */
+.auth-form__switch {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: 1.25rem 0 0;
+}
+
+.auth-form__switch-link {
+    color: var(--color-primary);
+    font-weight: 600;
+    transition: color var(--transition-fast);
+}
+
+.auth-form__switch-link:hover {
+    color: var(--color-primary-dark);
+}

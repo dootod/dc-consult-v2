@@ -35,7 +35,6 @@ final class GestionUtilisateursController extends AbstractController
     #[Route('/voir/{id}', name: 'app_show_gestion_utilisateurs', methods: ['GET'])]
     public function show(Utilisateur $utilisateur, DocumentAdminRepository $documentAdminRepository): Response
     {
-        // Documents déposés par les admins pour cet utilisateur
         $documentsAdmin = $documentAdminRepository->findBy(['destinataire' => $utilisateur]);
         
         return $this->render('admin/gestion_utilisateurs/show.html.twig', [
@@ -51,7 +50,6 @@ final class GestionUtilisateursController extends AbstractController
         $utilisateur = new Utilisateur();
 
         $form = $this->createForm(NewUtilisateurType::class, $utilisateur);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -75,10 +73,7 @@ final class GestionUtilisateursController extends AbstractController
             $manager->persist($utilisateur);
             $manager->flush();
             
-            $this->addFlash(
-                'success',
-                'Utilisateur ajouté avec succès !'
-            );
+            $this->addFlash('success', 'Utilisateur ajouté avec succès !');
 
             return $this->redirectToRoute('app_show_gestion_utilisateurs', [
                 'id' => $utilisateur->getId(),
@@ -122,10 +117,7 @@ final class GestionUtilisateursController extends AbstractController
             
             $manager->flush();
             
-            $this->addFlash(
-                'success',
-                'Utilisateur modifié avec succès !'
-            );
+            $this->addFlash('success', 'Utilisateur modifié avec succès !');
 
             return $this->redirectToRoute('app_show_gestion_utilisateurs', [
                 'id' => $utilisateur->getId(),
@@ -149,20 +141,21 @@ final class GestionUtilisateursController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$utilisateur->getId(), $request->getPayload()->getString('_token'))) {
             $currentUser = $this->getUser();
-            
-            // Si l'utilisateur supprimé est l'utilisateur actuellement connecté, le déconnecter
-            if ($currentUser instanceof Utilisateur && $currentUser->getId() === $utilisateur->getId()) {
-                $tokenStorage->setToken(null);
-                $dispatcher->dispatch(new LogoutEvent($request, $tokenStorage->getToken()));
-            }
+            $isSelfDelete = $currentUser instanceof Utilisateur && $currentUser->getId() === $utilisateur->getId();
             
             $manager->remove($utilisateur);
             $manager->flush();
 
-            $this->addFlash(
-                'success',
-                'Utilisateur supprimé avec succès !'
-            );
+            // ✅ CORRECTIF : Si l'admin supprime son propre compte, on le déconnecte
+            // SANS ajouter de flash (le flash apparaîtrait de façon incohérente sur la page de connexion).
+            // À la place on redirige directement vers la page de connexion sans message parasite.
+            if ($isSelfDelete) {
+                $tokenStorage->setToken(null);
+                $dispatcher->dispatch(new LogoutEvent($request, null));
+                return $this->redirectToRoute('app_connexion');
+            }
+
+            $this->addFlash('success', 'Utilisateur supprimé avec succès !');
         }
 
         return $this->redirectToRoute('app_gestion_utilisateurs', [], Response::HTTP_SEE_OTHER);
