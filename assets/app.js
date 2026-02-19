@@ -7,8 +7,10 @@ import './stimulus_bootstrap.js';
  * which should already be in your base.html.twig.
  */
 import './styles/app.css';
+import './styles/auth.css';
 import './js/admin-documents.js';
 import './js/admin-users.js';
+import './js/auth.js';
 
 const initAppUi = () => {
     // ── Effet shadow sur la navbar au scroll ──────────────────────
@@ -57,40 +59,8 @@ const initAppUi = () => {
             });
         });
     }
-
-    // ── Gestion du drawer sidebar mobile ──
-    const sidebar = document.querySelector('.dc-sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const sidebarToggler = document.getElementById('sidebarToggler');
-    
-    if (sidebar && sidebarOverlay && sidebarToggler) {
-        const sidebarLinks = sidebar.querySelectorAll('a');
-        
-        // Fonction pour fermer la sidebar
-        const closeSidebar = () => {
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        };
-        
-        // Ouvrir/fermer quand on clique le bouton
-        sidebarToggler.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            sidebar.classList.toggle('show');
-            sidebarOverlay.classList.toggle('show');
-        });
-        
-        // Fermer via l'overlay
-        sidebarOverlay.addEventListener('click', closeSidebar);
-        
-        // Fermer quand on clique sur un lien de la sidebar
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', closeSidebar);
-        });
-    }
 };
 
-// ── Initialiser l'UI dès que le DOM est prêt ──
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAppUi);
 } else {
