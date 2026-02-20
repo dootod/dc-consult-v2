@@ -48,8 +48,8 @@ final class DocumentController extends AbstractController
     }
 
     /**
-     * Téléchargement sécurisé d'un document personnel (déposé par l'utilisateur lui-même).
-     * Vérifié via le DocumentVoter — seul le propriétaire y a accès.
+     * Téléchargement sécurisé d'un document personnel.
+     * Vérifié via le DocumentVoter — seul le propriétaire (ou admin) y a accès.
      */
     #[Route('/telecharger/{id}', name: 'app_download_mes_documents', methods: ['GET'])]
     public function download(Document $document): BinaryFileResponse
@@ -71,7 +71,7 @@ final class DocumentController extends AbstractController
 
     /**
      * Téléchargement sécurisé d'un document reçu de l'admin (DocumentAdmin).
-     * Vérifié manuellement : l'utilisateur connecté doit être le destinataire.
+     * Seul le destinataire peut y accéder.
      */
     #[Route('/telecharger-admin/{id}', name: 'app_download_document_admin', methods: ['GET'])]
     public function downloadAdmin(DocumentAdmin $documentAdmin): BinaryFileResponse
@@ -79,8 +79,10 @@ final class DocumentController extends AbstractController
         /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        // Vérification stricte : seul le destinataire peut accéder à ce document
-        if ($documentAdmin->getDestinataire() !== $utilisateur) {
+        // ✅ FIX CRITIQUE : comparaison par ID et non par référence PHP
+        // La comparaison !== sur des objets Doctrine peut échouer si les objets
+        // sont chargés depuis des contextes d'EntityManager différents
+        if ($documentAdmin->getDestinataire()?->getId() !== $utilisateur->getId()) {
             throw $this->createAccessDeniedException('Accès refusé à ce document.');
         }
 
@@ -116,7 +118,9 @@ final class DocumentController extends AbstractController
             if ($fichierFile) {
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                // ✅ FIX : bin2hex(random_bytes(8)) est cryptographiquement aléatoire
+                // contrairement à uniqid() qui est basé sur le timestamp microsecondes
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -166,7 +170,8 @@ final class DocumentController extends AbstractController
 
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                // ✅ FIX : bin2hex(random_bytes(8)) cryptographiquement aléatoire
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),

@@ -21,62 +21,47 @@ final class AdminController extends AbstractController
         $utilisateur = $utilisateurRepository->findOneBy(['email' => $email]);
 
         // ── Statistiques ──
-        $allUtilisateurs = $utilisateurRepository->findAll();
+        $allUtilisateurs   = $utilisateurRepository->findAll();
         $totalUtilisateurs = count($allUtilisateurs);
-        
-        // Compte les admins (utilisateurs avec ROLE_ADMIN)
-        $admins = array_filter($allUtilisateurs, fn($u) => in_array('ROLE_ADMIN', $u->getRoles()));
-        $totalAdmins = count($admins);
-        
-        // Compte les documents (perso + admin)
-        $documentsPerso = $documentRepository->findAll();
-        $documentsAdmin = $documentAdminRepository->findAll();
-        $totalDocuments = count($documentsPerso) + count($documentsAdmin);
-        
+
+        // Compte les admins en PHP (liste déjà chargée pour l'affichage)
+        $totalAdmins = count(array_filter($allUtilisateurs, fn($u) => in_array('ROLE_ADMIN', $u->getRoles())));
+
+        // ✅ FIX : COUNT SQL au lieu de findAll() + count() — évite de charger tous les documents en mémoire
+        $totalDocuments = $documentRepository->count([]) + $documentAdminRepository->count([]);
+
         $stats = [
             'utilisateurs' => $totalUtilisateurs,
-            'projets' => 0, // À implémenter plus tard
-            'documents' => $totalDocuments,
-            'admins' => $totalAdmins,
+            'projets'      => 0,
+            'documents'    => $totalDocuments,
+            'admins'       => $totalAdmins,
         ];
 
         // ── Activité récente ──
-        // Récupère les 5 derniers documents déposés par les admins
+        // ✅ FIX : requête paginée directement en BDD (findRecentOrderedByDate)
+        // au lieu de findAll() + usort() + array_slice() en PHP
+        $recentDocs = $documentAdminRepository->findRecentOrderedByDate(5);
+
         $activites = [];
-        
-        if (!empty($documentsAdmin)) {
-            // Trier les documents admin par date décroissante
-            usort($documentsAdmin, function($a, $b) {
-                $dateA = $a->getDeposeLe();
-                $dateB = $b->getDeposeLe();
-                if ($dateA === null || $dateB === null) {
-                    return 0;
-                }
-                return $dateB <=> $dateA;
-            });
-            
-            // Garder seulement les 5 premiers
-            $recentDocs = array_slice($documentsAdmin, 0, 5);
-            
-            foreach ($recentDocs as $doc) {
-                $date = $doc->getDeposeLe();
-                $activites[] = [
-                    'type' => 'blue',
-                    'message' => sprintf(
-                        'Document "%s" déposé pour %s %s',
-                        $doc->getNom(),
-                        $doc->getDestinataire()->getPrenom(),
-                        $doc->getDestinataire()->getNom()
-                    ),
-                    'date' => $date ? $date->format('d/m/Y H:i') : 'N/A',
-                ];
-            }
+        foreach ($recentDocs as $doc) {
+            $date = $doc->getDeposeLe();
+            $activites[] = [
+                'type'    => 'blue',
+                'message' => sprintf(
+                    'Document "%s" déposé pour %s %s',
+                    $doc->getNom(),
+                    $doc->getDestinataire()->getPrenom(),
+                    $doc->getDestinataire()->getNom()
+                ),
+                'date' => $date ? $date->format('d/m/Y à H:i') : '',
+            ];
         }
 
         return $this->render('admin/dashboard.html.twig', [
-            'prenom' => $utilisateur?->getPrenom(),
-            'stats' => $stats,
-            'activites' => $activites,
+            'utilisateur' => $utilisateur,
+            'prenom'      => $utilisateur?->getPrenom() ?? 'Admin',
+            'stats'       => $stats,
+            'activites'   => $activites,
         ]);
     }
 }

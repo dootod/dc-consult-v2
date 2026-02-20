@@ -19,6 +19,9 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/admin/gestion-documents')]
 final class GestionDocumentsController extends AbstractController
 {
+    /**
+     * Page principale : formulaire de dépôt + documents admins + documents utilisateurs
+     */
     #[Route('', name: 'app_gestion_documents', methods: ['GET', 'POST'])]
     public function gestionDocuments(
         Request $request,
@@ -39,7 +42,8 @@ final class GestionDocumentsController extends AbstractController
             if ($fichierFile) {
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                // ✅ FIX : bin2hex(random_bytes(8)) cryptographiquement aléatoire
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
