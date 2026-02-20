@@ -4,10 +4,8 @@
 
 {% block body %}
 
-{# ✅ CORRECTIF : Partial centralisé #}
 {% include 'components/_flash_messages.html.twig' %}
 
-{# ── En-tête ── #}
 <div class="mb-4">
     <h1 class="admin-page-header__title">
         Gestion des documents
@@ -18,31 +16,32 @@
     <p class="admin-page-header__sub">Déposez et gérez les documents pour les utilisateurs.</p>
 </div>
 
-{# ── Layout 2 colonnes ── #}
 <div class="row g-4 align-items-start">
 
-    {# Colonne gauche : liste des dépôts #}
+    {# Colonne gauche : listes #}
     <div class="col-12 col-xl-8">
 
         <div class="dc-toolbar mb-3">
             <div class="dc-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher un document ou destinataire…">
+                <input type="text" id="searchInput" class="dc-search__input" placeholder="Rechercher un document, un utilisateur…">
             </div>
         </div>
 
-        <div class="dc-card">
+        {# ── Section 1 : Documents envoyés par les admins → utilisateurs ── #}
+        <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-file-export"></i>
-                    Tous les dépôts
+                    Documents envoyés aux utilisateurs
+                    <span class="dc-count-badge ms-2">{{ logs|length }}</span>
                 </span>
             </div>
             <div class="dc-card__body p-0">
                 {% if logs is not defined or logs is empty %}
                     <div class="dc-empty-state">
                         <i class="fa-solid fa-inbox"></i>
-                        <p>Aucun document déposé pour le moment.</p>
+                        <p>Aucun document envoyé pour le moment.</p>
                     </div>
                 {% else %}
                     <div class="table-responsive">
@@ -88,9 +87,8 @@
                                         {{ doc.deposeLe ? doc.deposeLe|date('d/m/Y') : '—' }}
                                     </td>
                                     <td>
-                                        <div class="dc-actions">
-                                            <a href="{{ asset('uploads/documents/' ~ doc.fichier) }}"
-                                               target="_blank"
+                                        <div class="dc-actions justify-content-end">
+                                            <a href="{{ path('app_download_gestion_documents', {id: doc.id}) }}"
                                                class="dc-btn dc-btn--outline dc-btn--sm"
                                                title="Télécharger">
                                                 <i class="fa-solid fa-download"></i>
@@ -103,6 +101,79 @@
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Section 2 : Documents déposés par les utilisateurs ── #}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-import"></i>
+                    Documents reçus des utilisateurs
+                    <span class="dc-count-badge ms-2">{{ documentsUtilisateurs|length }}</span>
+                </span>
+            </div>
+            <div class="dc-card__body p-0">
+                {% if documentsUtilisateurs is empty %}
+                    <div class="dc-empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Aucun document déposé par les utilisateurs pour le moment.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="dc-table" id="docsUtilisateursTable">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th class="d-none d-md-table-cell">Déposé par</th>
+                                    <th class="d-none d-lg-table-cell">Date de dépôt</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in documentsUtilisateurs %}
+                                {% set ext = doc.fichier|split('.')|last|lower %}
+                                <tr>
+                                    <td>
+                                        <div class="file-cell">
+                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : 'other')) }}">
+                                                <i class="fa-solid {{ ext == 'pdf' ? 'fa-file-pdf' : (ext in ['doc','docx'] ? 'fa-file-word' : (ext in ['xls','xlsx'] ? 'fa-file-excel' : 'fa-file')) }}"></i>
+                                            </span>
+                                            <div>
+                                                <div class="file-cell__name">{{ doc.nom }}</div>
+                                                <div class="file-cell__ext">{{ ext|upper }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <div class="user-cell">
+                                            <span class="dc-avatar dc-avatar--sm">
+                                                {{ doc.utilisateur.prenom|first|upper }}{{ doc.utilisateur.nom|first|upper }}
+                                            </span>
+                                            <div>
+                                                <div class="user-cell__name">{{ doc.utilisateur.prenom }} {{ doc.utilisateur.nom }}</div>
+                                                <div class="dc-table__muted small">{{ doc.utilisateur.email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell dc-table__muted">
+                                        {{ doc.date ? doc.date|date('d/m/Y à H:i') : '—' }}
+                                    </td>
+                                    <td>
+                                        <div class="dc-actions justify-content-end">
+                                            <a href="{{ path('app_download_utilisateur_document', {id: doc.id}) }}"
+                                               class="dc-btn dc-btn--outline dc-btn--sm"
+                                               title="Télécharger / Consulter">
+                                                <i class="fa-solid fa-download"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

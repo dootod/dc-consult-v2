@@ -34,15 +34,12 @@
 
                     <dt class="col-sm-4 small text-muted mt-3">Fichier</dt>
                     <dd class="col-sm-8 mt-3">
-                        <a href="{{ asset('uploads/documents/' ~ document.fichier) }}"
-                           target="_blank"
+                        {# ✅ Téléchargement via contrôleur sécurisé — le fichier n'est pas exposé publiquement #}
+                        <a href="{{ path('app_download_mes_documents', {id: document.id}) }}"
                            class="dc-btn dc-btn--outline dc-btn--sm">
                             <i class="fa-solid fa-download"></i>
                             Télécharger / Ouvrir
                         </a>
-                        <div class="dc-table__muted small mt-1">
-                            {{ document.fichier }}
-                        </div>
                     </dd>
 
                     <dt class="col-sm-4 small text-muted mt-3">Date d'ajout</dt>
