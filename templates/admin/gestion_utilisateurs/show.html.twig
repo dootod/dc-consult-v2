@@ -27,11 +27,11 @@
     </div>
 </div>
 
-{# ── Layout 2 colonnes ── #}
+{# ── Layout colonnes ── #}
 <div class="row g-4">
 
     {# Colonne gauche : Infos utilisateur ── #}
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-lg-7">
 
         {# ── Card Informations générales ── #}
         <div class="dc-card mb-4">
@@ -91,43 +91,147 @@
 
     </div>
 
-    {# Colonne droite : Documents ── #}
-    <div class="col-12 col-lg-4">
-        <div class="dc-card">
+    {# Colonne droite : Documents (reçus + déposés) ── #}
+    <div class="col-12 col-lg-5">
+
+        {# ── Card Documents reçus (envoyés par l'admin) ── #}
+        <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
-                    <i class="fa-solid fa-file-lines"></i>
+                    <i class="fa-solid fa-file-export"></i>
                     Documents reçus
+                    <span class="dc-count-badge ms-2">{{ documentsRecus|length }}</span>
                 </span>
             </div>
             <div class="dc-card__body p-0">
-                {% if documentsAdmin is empty %}
+                {% if documentsRecus is empty %}
+                    <div class="dc-empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>Aucun document reçu.</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="dc-table">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th class="d-none d-md-table-cell">Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in documentsRecus %}
+                                {% set ext = doc.fichier|split('.')|last|lower %}
+                                <tr>
+                                    <td>
+                                        <div class="file-cell">
+                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : 'other')) }}">
+                                                <i class="fa-solid {{ ext == 'pdf' ? 'fa-file-pdf' : (ext in ['doc','docx'] ? 'fa-file-word' : (ext in ['xls','xlsx'] ? 'fa-file-excel' : 'fa-file')) }}"></i>
+                                            </span>
+                                            <div>
+                                                <div class="file-cell__name">{{ doc.nom }}</div>
+                                                <div class="file-cell__ext">{{ ext|upper }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell dc-table__muted">
+                                        {{ doc.deposeLe ? doc.deposeLe|date('d/m/Y') : '—' }}
+                                    </td>
+                                    <td>
+                                        <div class="dc-actions justify-content-end">
+                                            <a href="{{ path('app_download_gestion_documents', {id: doc.id}) }}"
+                                               class="dc-btn dc-btn--outline dc-btn--sm"
+                                               title="Visualiser / Télécharger">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <form method="post"
+                                                  action="{{ path('app_delete_document_recu_utilisateur', {utilisateurId: utilisateur.id, id: doc.id}) }}"
+                                                  onsubmit="return confirm('Supprimer ce document reçu ? Cette action est irréversible.')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete-recu' ~ doc.id) }}">
+                                                <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Card Documents déposés (uploadés par l'utilisateur) ── #}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-file-import"></i>
+                    Documents déposés
+                    <span class="dc-count-badge ms-2">{{ documentsDeposes|length }}</span>
+                </span>
+            </div>
+            <div class="dc-card__body p-0">
+                {% if documentsDeposes is empty %}
                     <div class="dc-empty-state">
                         <i class="fa-solid fa-inbox"></i>
                         <p>Aucun document déposé.</p>
                     </div>
                 {% else %}
-                    <table class="dc-table">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for doc in documentsAdmin %}
-                            <tr>
-                                <td>{{ doc.nom }}</td>
-                                <td class="dc-table__muted">
-                                    {{ doc.deposeLe ? doc.deposeLe|date('d/m/Y') : '—' }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="dc-table">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th class="d-none d-md-table-cell">Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in documentsDeposes %}
+                                {% set ext = doc.fichier|split('.')|last|lower %}
+                                <tr>
+                                    <td>
+                                        <div class="file-cell">
+                                            <span class="file-icon file-icon--{{ ext == 'pdf' ? 'pdf' : (ext in ['doc','docx'] ? 'doc' : (ext in ['xls','xlsx'] ? 'xls' : 'other')) }}">
+                                                <i class="fa-solid {{ ext == 'pdf' ? 'fa-file-pdf' : (ext in ['doc','docx'] ? 'fa-file-word' : (ext in ['xls','xlsx'] ? 'fa-file-excel' : 'fa-file')) }}"></i>
+                                            </span>
+                                            <div>
+                                                <div class="file-cell__name">{{ doc.nom }}</div>
+                                                <div class="file-cell__ext">{{ ext|upper }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell dc-table__muted">
+                                        {{ doc.date ? doc.date|date('d/m/Y') : '—' }}
+                                    </td>
+                                    <td>
+                                        <div class="dc-actions justify-content-end">
+                                            <a href="{{ path('app_download_utilisateur_document', {id: doc.id}) }}"
+                                               class="dc-btn dc-btn--outline dc-btn--sm"
+                                               title="Visualiser / Télécharger">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <form method="post"
+                                                  action="{{ path('app_delete_document_depose_utilisateur', {utilisateurId: utilisateur.id, id: doc.id}) }}"
+                                                  onsubmit="return confirm('Supprimer ce document déposé ? Cette action est irréversible.')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete-depose' ~ doc.id) }}">
+                                                <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 {% endif %}
             </div>
         </div>
+
     </div>
 
 </div>

@@ -61,6 +61,9 @@
                 </thead>
                 <tbody>
                     {% for utilisateur in utilisateurs %}
+                    {% set nbDeposes = utilisateur.documents|length %}
+                    {% set nbRecus = documentsRecusParUtilisateur[utilisateur.id] ?? 0 %}
+                    {% set nbTotal = nbDeposes + nbRecus %}
                     <tr data-role="{{ 'ROLE_ADMIN' in utilisateur.roles ? 'admin' : 'user' }}">
                         <td>
                             <div class="user-cell">
@@ -81,20 +84,22 @@
                             {% endif %}
                         </td>
                         <td class="d-none d-md-table-cell dc-table__muted">
-                            {{ utilisateur.documents|length }} document(s)
+                            <span title="{{ nbDeposes }} déposé(s) · {{ nbRecus }} reçu(s)">
+                                {{ nbTotal }} document(s)
+                            </span>
                         </td>
                         <td>
                             <div class="dc-actions">
-                                <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm">
+                                <a href="{{ path('app_show_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm" title="Voir le profil">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a href="{{ path('app_edit_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm">
+                                <a href="{{ path('app_edit_gestion_utilisateurs', {id: utilisateur.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm" title="Modifier">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 <form method="post" action="{{ path('app_delete_gestion_utilisateurs', {id: utilisateur.id}) }}"
-                                      onsubmit="return confirm('Supprimer cet utilisateur ? Cette action est irréversible.')">
+                                      onsubmit="return confirm('Supprimer cet utilisateur et tous ses documents ? Cette action est irréversible.')">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
-                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm">
+                                    <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>

@@ -42,7 +42,6 @@ final class GestionDocumentsController extends AbstractController
             if ($fichierFile) {
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                // ✅ FIX : bin2hex(random_bytes(8)) cryptographiquement aléatoire
                 $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
@@ -125,6 +124,9 @@ final class GestionDocumentsController extends AbstractController
         );
     }
 
+    /**
+     * Suppression d'un document envoyé par l'admin à un utilisateur (DocumentAdmin).
+     */
     #[Route('/annuler/{id}', name: 'app_annuler_gestion_documents', methods: ['POST'])]
     public function annuler(
         Request $request,
@@ -143,6 +145,36 @@ final class GestionDocumentsController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Document supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
+        }
+
+        return $this->redirectToRoute('app_gestion_documents');
+    }
+
+    /**
+     * Suppression d'un document déposé par un utilisateur (Document).
+     */
+    #[Route('/supprimer-document-utilisateur/{id}', name: 'app_supprimer_document_utilisateur', methods: ['POST'])]
+    public function supprimerDocumentUtilisateur(
+        Request $request,
+        Document $document,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if ($this->isCsrfTokenValid('supprimer-doc-utilisateur' . $document->getId(), $request->request->get('_token'))) {
+            $cheminFichier = $this->getParameter('documents_directory') . '/' . $document->getFichier();
+            if (file_exists($cheminFichier)) {
+                unlink($cheminFichier);
+            }
+
+            $em->remove($document);
+            $em->flush();
+
+            $this->addFlash('success', 'Document utilisateur supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
         }
 
         return $this->redirectToRoute('app_gestion_documents');
