@@ -2,13 +2,17 @@
 
 namespace App\Controller\admin;
 
+use App\Entity\Document;
 use App\Entity\DocumentAdmin;
 use App\Form\DepotDocumentAdminType;
 use App\Repository\DocumentAdminRepository;
+use App\Repository\DocumentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -16,13 +20,14 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class GestionDocumentsController extends AbstractController
 {
     /**
-     * Page principale : formulaire de dépôt + logs de tous les dépôts admin
+     * Page principale : formulaire de dépôt + documents admins + documents utilisateurs
      */
     #[Route('', name: 'app_gestion_documents', methods: ['GET', 'POST'])]
     public function gestionDocuments(
         Request $request,
         EntityManagerInterface $em,
         DocumentAdminRepository $documentAdminRepository,
+        DocumentRepository $documentRepository,
         SluggerInterface $slugger
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -37,7 +42,7 @@ final class GestionDocumentsController extends AbstractController
             if ($fichierFile) {
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -71,11 +76,57 @@ final class GestionDocumentsController extends AbstractController
         }
 
         return $this->render('admin/gestion_documents/gestion_documents.html.twig', [
-            'form' => $form,
-            'logs' => $documentAdminRepository->findBy([], ['deposeLe' => 'DESC']),
+            'form'                  => $form,
+            'logs'                  => $documentAdminRepository->findBy([], ['deposeLe' => 'DESC']),
+            'documentsUtilisateurs' => $documentRepository->findAllWithUtilisateur(),
         ]);
     }
 
+    /**
+     * Téléchargement sécurisé d'un document admin (envoyé à un utilisateur).
+     */
+    #[Route('/telecharger/{id}', name: 'app_download_gestion_documents', methods: ['GET'])]
+    public function download(DocumentAdmin $documentAdmin): BinaryFileResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $filePath = $this->getParameter('documents_directory') . '/' . $documentAdmin->getFichier();
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier introuvable.');
+        }
+
+        return $this->file(
+            $filePath,
+            $documentAdmin->getNom() . '.' . pathinfo($filePath, PATHINFO_EXTENSION),
+            ResponseHeaderBag::DISPOSITION_INLINE
+        );
+    }
+
+    /**
+     * Téléchargement sécurisé d'un document déposé par un utilisateur.
+     */
+    #[Route('/telecharger-utilisateur/{id}', name: 'app_download_utilisateur_document', methods: ['GET'])]
+    public function downloadUtilisateurDocument(Document $document): BinaryFileResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $filePath = $this->getParameter('documents_directory') . '/' . $document->getFichier();
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier introuvable.');
+        }
+
+        return $this->file(
+            $filePath,
+            $document->getNom() . '.' . pathinfo($filePath, PATHINFO_EXTENSION),
+            ResponseHeaderBag::DISPOSITION_INLINE
+        );
+    }
+
+    /**
+     * Suppression d'un document envoyé par l'admin à un utilisateur (DocumentAdmin).
+     */
     #[Route('/annuler/{id}', name: 'app_annuler_gestion_documents', methods: ['POST'])]
     public function annuler(
         Request $request,
@@ -85,10 +136,45 @@ final class GestionDocumentsController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if ($this->isCsrfTokenValid('annuler' . $documentAdmin->getId(), $request->request->get('_token'))) {
+            $cheminFichier = $this->getParameter('documents_directory') . '/' . $documentAdmin->getFichier();
+            if (file_exists($cheminFichier)) {
+                unlink($cheminFichier);
+            }
+
             $em->remove($documentAdmin);
             $em->flush();
 
             $this->addFlash('success', 'Document supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
+        }
+
+        return $this->redirectToRoute('app_gestion_documents');
+    }
+
+    /**
+     * Suppression d'un document déposé par un utilisateur (Document).
+     */
+    #[Route('/supprimer-document-utilisateur/{id}', name: 'app_supprimer_document_utilisateur', methods: ['POST'])]
+    public function supprimerDocumentUtilisateur(
+        Request $request,
+        Document $document,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if ($this->isCsrfTokenValid('supprimer-doc-utilisateur' . $document->getId(), $request->request->get('_token'))) {
+            $cheminFichier = $this->getParameter('documents_directory') . '/' . $document->getFichier();
+            if (file_exists($cheminFichier)) {
+                unlink($cheminFichier);
+            }
+
+            $em->remove($document);
+            $em->flush();
+
+            $this->addFlash('success', 'Document utilisateur supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
         }
 
         return $this->redirectToRoute('app_gestion_documents');

@@ -1,9 +1,261 @@
 {% extends 'espace.html.twig' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Mon tableau de bord{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/dashboard.css') }}">
+{% endblock %}
 
 {% block body %}
 
-<h1>Dashboard - Bienvenue {{ prenom }}</h1>
+{# ── En-tête ── #}
+<div class="dash-header mb-4">
+    <div class="dash-header__left">
+        <div class="dash-header__avatar">
+            {{ utilisateur.prenom|first|upper }}{{ utilisateur.nom|first|upper }}
+        </div>
+        <div>
+            <h1 class="dash-header__title">
+                Bonjour, <span class="text-primary">{{ utilisateur.prenom }}</span> 👋
+            </h1>
+            <p class="dash-header__sub">Bienvenue dans votre espace personnel DC Consult.</p>
+        </div>
+    </div>
+    <div class="dash-header__date">
+        <i class="fa-regular fa-calendar"></i>
+        {{ dateAujourdhui }}
+    </div>
+</div>
+
+{# ── Statistiques ── #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-4">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--blue">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.documents_recus }}</div>
+                <div class="stat-card__label">Documents reçus</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-4">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--green">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.documents_perso }}</div>
+                <div class="stat-card__label">Mes dépôts</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--orange">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+                <div class="stat-card__value">{{ stats.total_documents }}</div>
+                <div class="stat-card__label">Total documents</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── Blocs principaux ── #}
+<div class="row g-3 mb-3">
+
+    {# Derniers documents reçus #}
+    <div class="col-12 col-lg-7">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-inbox"></i>
+                    Documents reçus récemment
+                </span>
+                <a href="{{ path('app_mes_documents') }}" class="dc-badge dc-badge--blue">
+                    Voir tout
+                </a>
+            </div>
+            <div class="dc-card__body">
+                {% if recentDocumentsAdmin is not empty %}
+                    {% for doc in recentDocumentsAdmin %}
+                        <div class="activity-item">
+                            <div class="activity-dot activity-dot--blue"></div>
+                            <div class="flex-grow-1">
+                                <div class="activity-item__text">
+                                    <i class="fa-regular fa-file-pdf me-1" style="color:var(--color-primary); font-size:0.8rem;"></i>
+                                    {{ doc.nom }}
+                                </div>
+                                <div class="activity-item__time">
+                                    {% if doc.deposeLe %}
+                                        Reçu le {{ doc.deposeLe|date('d/m/Y à H:i') }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{{ path('app_mes_documents') }}" class="dash-doc-link" title="Voir">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="dc-empty-state dc-empty-state--sm">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <p>Aucun document reçu pour l'instant.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Accès rapides #}
+    <div class="col-12 col-lg-5">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-bolt"></i>
+                    Accès rapides
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a href="{{ path('app_mes_documents') }}" class="quick-link">
+                            <i class="fa-solid fa-file-lines"></i>
+                            Mes documents
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_new_mes_documents') }}" class="quick-link">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            Déposer un fichier
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_compte') }}" class="quick-link">
+                            <i class="fa-solid fa-circle-user"></i>
+                            Mon profil
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ path('app_contact') }}" class="quick-link">
+                            <i class="fa-solid fa-envelope"></i>
+                            Nous contacter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ── Ligne inférieure : Profil + Informations ── #}
+<div class="row g-3">
+
+    {# Infos du compte #}
+    <div class="col-12 col-lg-5">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-circle-user"></i>
+                    Mon profil
+                </span>
+                <a href="{{ path('app_compte') }}" class="dc-badge dc-badge--blue">Modifier</a>
+            </div>
+            <div class="dc-card__body">
+                <div class="dash-profile">
+                    <div class="dash-profile__avatar">
+                        {{ utilisateur.prenom|first|upper }}{{ utilisateur.nom|first|upper }}
+                    </div>
+                    <div class="dash-profile__info">
+                        <div class="dash-profile__name">{{ utilisateur.prenom }} {{ utilisateur.nom }}</div>
+                        <div class="dash-profile__email">{{ utilisateur.email }}</div>
+                        <span class="dash-profile__role">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <i class="fa-solid fa-shield-halved"></i> Administrateur
+                            {% else %}
+                                <i class="fa-solid fa-user"></i> Utilisateur
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="dash-profile__fields mt-3">
+                    <div class="dash-profile__field">
+                        <span class="dash-profile__field-label">Nom</span>
+                        <span class="dash-profile__field-value">{{ utilisateur.nom }}</span>
+                    </div>
+                    <div class="dash-profile__field">
+                        <span class="dash-profile__field-label">Prénom</span>
+                        <span class="dash-profile__field-value">{{ utilisateur.prenom }}</span>
+                    </div>
+                    <div class="dash-profile__field">
+                        <span class="dash-profile__field-label">Email</span>
+                        <span class="dash-profile__field-value">{{ utilisateur.email }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# À propos & aide #}
+    <div class="col-12 col-lg-7">
+        <div class="dc-card h-100">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Votre espace DC Consult
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="dash-info-grid">
+                    <div class="dash-info-item">
+                        <div class="dash-info-item__icon dash-info-item__icon--blue">
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                        </div>
+                        <div>
+                            <div class="dash-info-item__title">Recevoir des documents</div>
+                            <div class="dash-info-item__desc">Votre conseiller peut vous transmettre des documents directement via cette plateforme sécurisée.</div>
+                        </div>
+                    </div>
+                    <div class="dash-info-item">
+                        <div class="dash-info-item__icon dash-info-item__icon--green">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <div class="dash-info-item__title">Déposer vos fichiers</div>
+                            <div class="dash-info-item__desc">Partagez vos documents avec votre conseiller en toute simplicité depuis la rubrique Mes documents.</div>
+                        </div>
+                    </div>
+                    <div class="dash-info-item">
+                        <div class="dash-info-item__icon dash-info-item__icon--orange">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div class="dash-info-item__title">Espace sécurisé</div>
+                            <div class="dash-info-item__desc">Vos données et vos documents sont protégés et accessibles uniquement par vous et votre conseiller.</div>
+                        </div>
+                    </div>
+                    <div class="dash-info-item">
+                        <div class="dash-info-item__icon dash-info-item__icon--purple">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div>
+                            <div class="dash-info-item__title">Besoin d'aide ?</div>
+                            <div class="dash-info-item__desc">
+                                <a href="{{ path('app_contact') }}" style="color:var(--color-primary); font-weight:600;">Contactez-nous</a>
+                                — notre équipe est disponible pour répondre à vos questions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 {% endblock %}

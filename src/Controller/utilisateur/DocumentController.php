@@ -3,13 +3,16 @@
 namespace App\Controller\utilisateur;
 
 use App\Entity\Document;
+use App\Entity\DocumentAdmin;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
 use App\Repository\DocumentAdminRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -17,13 +20,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class DocumentController extends AbstractController
 {
     #[Route(name: 'app_mes_documents', methods: ['GET'])]
-    public function index(DocumentRepository $documentRepository, DocumentAdminRepository $documentAdminRepository): Response 
+    public function index(DocumentRepository $documentRepository, DocumentAdminRepository $documentAdminRepository): Response
     {
         /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
         return $this->render('utilisateur/document/index.html.twig', [
-            'documents' => $documentRepository->findBy(
+            'documents'      => $documentRepository->findBy(
                 ['utilisateur' => $utilisateur],
                 ['date' => 'DESC']
             ),
@@ -42,6 +45,58 @@ final class DocumentController extends AbstractController
         return $this->render('utilisateur/document/show.html.twig', [
             'document' => $document,
         ]);
+    }
+
+    /**
+     * Téléchargement sécurisé d'un document personnel.
+     * Vérifié via le DocumentVoter — seul le propriétaire (ou admin) y a accès.
+     */
+    #[Route('/telecharger/{id}', name: 'app_download_mes_documents', methods: ['GET'])]
+    public function download(Document $document): BinaryFileResponse
+    {
+        $this->denyAccessUnlessGranted('DOCUMENT_VIEW', $document);
+
+        $filePath = $this->getParameter('documents_directory') . '/' . $document->getFichier();
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier introuvable.');
+        }
+
+        return $this->file(
+            $filePath,
+            $document->getNom() . '.' . pathinfo($filePath, PATHINFO_EXTENSION),
+            ResponseHeaderBag::DISPOSITION_INLINE
+        );
+    }
+
+    /**
+     * Téléchargement sécurisé d'un document reçu de l'admin (DocumentAdmin).
+     * Seul le destinataire peut y accéder.
+     */
+    #[Route('/telecharger-admin/{id}', name: 'app_download_document_admin', methods: ['GET'])]
+    public function downloadAdmin(DocumentAdmin $documentAdmin): BinaryFileResponse
+    {
+        /** @var \App\Entity\Utilisateur $utilisateur */
+        $utilisateur = $this->getUser();
+
+        // ✅ FIX CRITIQUE : comparaison par ID et non par référence PHP
+        // La comparaison !== sur des objets Doctrine peut échouer si les objets
+        // sont chargés depuis des contextes d'EntityManager différents
+        if ($documentAdmin->getDestinataire()?->getId() !== $utilisateur->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé à ce document.');
+        }
+
+        $filePath = $this->getParameter('documents_directory') . '/' . $documentAdmin->getFichier();
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier introuvable.');
+        }
+
+        return $this->file(
+            $filePath,
+            $documentAdmin->getNom() . '.' . pathinfo($filePath, PATHINFO_EXTENSION),
+            ResponseHeaderBag::DISPOSITION_INLINE
+        );
     }
 
     #[Route('/nouveau', name: 'app_new_mes_documents', methods: ['GET', 'POST'])]
@@ -63,7 +118,9 @@ final class DocumentController extends AbstractController
             if ($fichierFile) {
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                // ✅ FIX : bin2hex(random_bytes(8)) est cryptographiquement aléatoire
+                // contrairement à uniqid() qui est basé sur le timestamp microsecondes
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -113,7 +170,8 @@ final class DocumentController extends AbstractController
 
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $fichierFile->guessExtension();
+                // ✅ FIX : bin2hex(random_bytes(8)) cryptographiquement aléatoire
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -152,7 +210,6 @@ final class DocumentController extends AbstractController
 
             $this->addFlash('success', 'Document supprimé avec succès !');
         } else {
-            // ✅ CORRECTIF : Flash d'erreur si le token CSRF est invalide (était silencieux avant)
             $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
         }
 

@@ -33,7 +33,6 @@ class DepotDocumentAdminType extends AbstractType
                 'constraints'  => [
                     new NotBlank(message: 'Veuillez sélectionner un destinataire.'),
                 ],
-                // On exclut les admins : seuls les ROLE_USER sont destinataires
                 'query_builder' => fn(UtilisateurRepository $repo) => $repo
                     ->createQueryBuilder('u')
                     ->orderBy('u.nom', 'ASC'),
@@ -47,7 +46,18 @@ class DepotDocumentAdminType extends AbstractType
                     new File(
                         maxSize: '10M',
                         maxSizeMessage: 'Le fichier ne doit pas dépasser 10 Mo.',
-                        mimeTypesMessage: 'Format de fichier non autorisé.',
+                        // ✅ FIX CRITIQUE : mimeTypes manquants — n'importe quel fichier était accepté avant
+                        mimeTypes: [
+                            'application/pdf',
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        ],
+                        mimeTypesMessage: 'Format non autorisé. Formats acceptés : PDF, images, Word, Excel.',
                     ),
                 ],
             ]);

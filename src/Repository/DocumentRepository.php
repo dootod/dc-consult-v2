@@ -16,28 +16,20 @@ class DocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, Document::class);
     }
 
-    //    /**
-    //     * @return Document[] Returns an array of Document objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('d.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Document
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Récupère tous les documents déposés par les utilisateurs,
+     * avec JOIN sur l'utilisateur pour éviter les requêtes N+1.
+     * Trié par date décroissante.
+     *
+     * @return Document[]
+     */
+    public function findAllWithUtilisateur(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.utilisateur', 'u')
+            ->addSelect('u')
+            ->orderBy('d.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

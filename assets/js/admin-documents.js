@@ -1,9 +1,12 @@
 // ── Gestion documents — Recherche + drop zone ────────────────
 const initAdminDocuments = () => {
 
-    // ── Recherche dans le tableau ──
+    // ── Recherche dans les deux tableaux ──
     const searchInput = document.getElementById('searchInput');
-    const rows        = document.querySelectorAll('#docsTable tbody tr');
+
+    // ✅ FIX : la recherche couvre maintenant les deux tables
+    // #docsTable (documents envoyés par admin) ET #docsUtilisateursTable (documents reçus des users)
+    const rows = document.querySelectorAll('#docsTable tbody tr, #docsUtilisateursTable tbody tr');
 
     searchInput?.addEventListener('input', () => {
         const q = searchInput.value.toLowerCase().trim();
@@ -13,10 +16,10 @@ const initAdminDocuments = () => {
     });
 
     // ── Drop zone fichier ── (utilise event delegation pour être robuste)
-    const dropZone  = document.getElementById('dropZone');
+    const dropZone = document.getElementById('dropZone');
     if (dropZone) {
         const dropText = document.getElementById('dropZoneText');
-        
+
         // Fonction pour mettre à jour l'affichage du fichier
         const updateFileDisplay = () => {
             const fileInput = dropZone.querySelector('input[type="file"]');
@@ -28,7 +31,7 @@ const initAdminDocuments = () => {
                 }
             }
         };
-        
+
         // Event delegation: Écoute les changements sur tout input file dans dropZone
         dropZone.addEventListener('change', (e) => {
             const target = e.target instanceof Element
@@ -38,7 +41,7 @@ const initAdminDocuments = () => {
                 updateFileDisplay();
             }
         }, true); // Capture phase pour être sûr de capter l'événement
-        
+
         // Click sur drop-zone pour ouvrir le sélecteur de fichier
         dropZone.addEventListener('click', (e) => {
             const fileInput = dropZone.querySelector('input[type="file"]');
@@ -46,28 +49,28 @@ const initAdminDocuments = () => {
                 fileInput?.click();
             }
         });
-        
+
         // Drag and drop
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.stopPropagation();
             dropZone.classList.add('is-dragover');
         });
-        
+
         dropZone.addEventListener('dragleave', (e) => {
             e.preventDefault();
             e.stopPropagation();
             dropZone.classList.remove('is-dragover');
         });
-        
+
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
             dropZone.classList.remove('is-dragover');
-            
+
             const fileInput = dropZone.querySelector('input[type="file"]');
             if (!fileInput) return;
-            
+
             const files = e.dataTransfer.files;
             if (files?.length > 0) {
                 fileInput.files = files;

@@ -27,9 +27,16 @@ class DocumentVoter extends Voter
             return false;
         }
 
+        // ✅ FIX : les admins ont accès à tous les documents
+        // Sans ça, un admin utilisant une route Document (ex: show) serait bloqué
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            return true;
+        }
+
         /** @var Document $document */
         $document = $subject;
 
+        // Un utilisateur ne peut accéder qu'à ses propres documents
         return $document->getUtilisateur() === $user;
     }
 }

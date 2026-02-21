@@ -17,9 +17,9 @@
     </a>
 </div>
 
-{# ✅ CORRECTIF : Partial centralisé (warning et info désormais correctement stylés) #}
 {% include 'components/_flash_messages.html.twig' %}
 
+{# ── Mes documents déposés ── #}
 <div class="mb-4">
     <div class="dc-card">
         <div class="dc-card__head">
@@ -90,6 +90,7 @@
     </div>
 </div>
 
+{# ── Documents reçus de l'administration ── #}
 {% if documentsAdmin is not empty %}
     <div class="dc-card">
         <div class="dc-card__head">
@@ -117,8 +118,8 @@
                                     {{ doc.deposeLe|date('d/m/Y à H:i') }}
                                 </td>
                                 <td>
-                                    <a href="{{ asset('uploads/documents/' ~ doc.fichier) }}"
-                                       target="_blank"
+                                    {# ✅ Route sécurisée — vérifie que l'utilisateur est bien le destinataire #}
+                                    <a href="{{ path('app_download_document_admin', {id: doc.id}) }}"
                                        class="dc-btn dc-btn--outline dc-btn--sm">
                                         <i class="fa-solid fa-download"></i>
                                         Télécharger / Ouvrir
