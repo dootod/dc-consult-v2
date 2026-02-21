@@ -50,7 +50,12 @@
                     <div class="mb-3">
                         <label class="dc-form-label" for="{{ form.password.vars.id }}">Nouveau mot de passe</label>
                         <small class="text-muted d-block mb-2">Laissez vide pour conserver le mot de passe actuel</small>
-                        {{ form_widget(form.password, {attr: {class: 'dc-form-control', placeholder: '••••••••'}}) }}
+                        <div class="auth-input-wrap">
+                            {{ form_widget(form.password, {attr: {class: 'dc-form-control auth-form__input', placeholder: '••••••••'}}) }}
+                            <button type="button" class="auth-toggle-pw" aria-label="Afficher le mot de passe" tabindex="-1">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
                         {{ form_errors(form.password) }}
                     </div>
 

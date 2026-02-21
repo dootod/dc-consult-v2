@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Length;
 
 class EditUtilisateurType extends AbstractType
 {
@@ -29,6 +30,13 @@ class EditUtilisateurType extends AbstractType
                 'label' => 'Nouveau mot de passe',
                 'required' => false,
                 'mapped' => false,
+                'constraints' => [
+                    new Length(
+                        min: 8,
+                        minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères',
+                        max: 4096,
+                    ),
+                ],
             ])
             ->add('role_choice', ChoiceType::class, [
                 'label' => 'Type d\'utilisateur',
