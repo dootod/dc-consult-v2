@@ -114,13 +114,13 @@
                     </label>
                     <div class="auth-input-wrap">
                         {{ form_widget(registrationForm.plainPassword, {
-                            attr: { class: 'dc-form-control auth-form__input', placeholder: 'Minimum 6 caractères' }
+                            attr: { class: 'dc-form-control auth-form__input', placeholder: 'Minimum 8 caractères' }
                         }) }}
                         <button type="button" class="auth-toggle-pw" aria-label="Afficher le mot de passe" tabindex="-1">
                             <i class="fa-regular fa-eye"></i>
                         </button>
                     </div>
-                    <span class="auth-form__hint">Au moins 6 caractères.</span>
+                    <span class="auth-form__hint">Au moins 8 caractères.</span>
                     {% if registrationForm.plainPassword.vars.errors|length > 0 %}
                         <span class="auth-form__error">
                             <i class="fa-solid fa-circle-exclamation"></i>
