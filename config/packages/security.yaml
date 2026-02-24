@@ -49,10 +49,6 @@ security:
                 # Invalide la session complète à la déconnexion
                 # OWASP A07 : Empêche la réutilisation de sessions après logout
                 invalidate_session: true
-                # CSRF sur le logout pour éviter les forced-logout attacks
-                enable_csrf: true
-                csrf_token_id: logout
-                csrf_parameter: _csrf_token
 
             # ── Anti-brute force sur le login ─────────────────────────────────
             # 5 tentatives max par IP+email sur 15 minutes
