@@ -178,18 +178,15 @@
                     {% if is_granted('ROLE_ADMIN') %}
                         <span class="dc-navbar__role-badge">Admin</span>
                     {% endif %}
+                    <span class="dc-navbar__user-sep"></span>
+                    <form method="post" action="{{ path('app_deconnexion') }}" class="d-inline m-0 p-0">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                        <button type="submit" class="dc-navbar__btn-logout">
+                            <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
+                            <span class="d-none d-lg-inline">Déconnexion</span>
+                        </button>
+                    </form>
                 </div>
-
-                <span class="dc-navbar__divider d-none d-lg-block"></span>
-
-                <form method="post" action="{{ path('app_deconnexion') }}" class="d-inline">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                    <button type="submit" class="dc-navbar__btn-logout">
-                        <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
-                        <span class="d-none d-lg-inline">Déconnexion</span>
-                    </button>
-                </form>
-            </div>
 
         </div>
     </div>
