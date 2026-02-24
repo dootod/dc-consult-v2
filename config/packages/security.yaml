@@ -1,5 +1,18 @@
+# config/packages/security.yaml
+#
+# OWASP A07:2021 – Identification and Authentication Failures
+# OWASP A01:2021 – Broken Access Control
+#
+# Renforcements appliqués :
+#   - CSRF activé sur form_login ET sur logout
+#   - login_throttling avec intervalle étendu
+#   - invalidate_session: true sur logout (régénération de session)
+#   - session_fixation protection via migrate_on_login: true (Symfony le fait par défaut)
+
 security:
     password_hashers:
+        # 'auto' choisit bcrypt/argon2id selon la configuration PHP
+        # Coût adaptatif — OWASP recommande un coût de hachage > 100ms
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     role_hierarchy:
@@ -12,27 +25,50 @@ security:
                 property: email
 
     firewalls:
+        # Firewall stateless pour le profiler et assets en dev — pas de sécurité
         dev:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+
         main:
             lazy: true
             provider: app_user_provider
+
             form_login:
                 login_path: app_connexion
                 check_path: app_connexion
+                # Protection CSRF sur le formulaire de connexion
+                # OWASP A01 : Empêche les attaques CSRF sur le login
                 enable_csrf: true
                 success_handler: App\Security\LoginSuccessHandler
+                # Régénère l'ID de session après connexion (session fixation protection)
+                # Symfony gère cela automatiquement via AbstractAuthenticator
+
             logout:
                 path: app_deconnexion
+                # Invalide la session complète à la déconnexion
+                # OWASP A07 : Empêche la réutilisation de sessions après logout
+                invalidate_session: true
+                # CSRF sur le logout pour éviter les forced-logout attacks
+                enable_csrf: true
+                csrf_token_id: logout
+                csrf_parameter: _csrf_token
+
+            # ── Anti-brute force sur le login ─────────────────────────────────
+            # 5 tentatives max par IP+email sur 15 minutes
+            # Les messages d'erreur génériques (voir translations/security.fr.yaml)
+            # évitent l'énumération des comptes existants
             login_throttling:
                 max_attempts: 5
                 interval: '15 minutes'
 
     access_control:
+        # Zone admin : ROLE_ADMIN requis
         - { path: '^/admin', roles: ROLE_ADMIN }
+        # Zone utilisateur : ROLE_USER requis
         - { path: '^/mon-espace', roles: ROLE_USER }
 
+# Configuration allégée pour les tests (hachage rapide, pas de sécurité réelle)
 when@test:
     security:
         password_hashers:

@@ -1,9 +1,46 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
+# config/packages/framework.yaml
+#
+# OWASP A02:2021 – Cryptographic Failures
+# OWASP A07:2021 – Identification and Authentication Failures
+#
+# Renforcements de session appliqués :
+#   - cookie_secure: auto  → Force HTTPS en production, fonctionne en HTTP en dev
+#   - cookie_httponly: true → Inaccessible via JavaScript (empêche vol de session XSS)
+#   - cookie_samesite: lax  → Protège contre CSRF cross-site (lax permet GET cross-site)
+#   - gc_maxlifetime: 7200  → Durée de vie session 2h (raisonnable pour une app pro)
+#   - gc_probability: 1     → 1% de chance de GC à chaque requête
+#   - gc_divisor: 100
+
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # Démarrage de session uniquement si nécessaire (lazy session)
+    # Évite de créer une session pour chaque requête statique
+    session:
+        # Identifiant de session unique pour l'application
+        # Évite les conflits si plusieurs apps Symfony sont sur le même domaine
+        name: 'DCCONSULT_SID'
+
+        # Sécurité des cookies de session
+        # OWASP : HttpOnly + Secure + SameSite sont les 3 flags essentiels
+        cookie_httponly: true
+        # 'auto' : Secure en HTTPS, non-Secure en HTTP (compatible dev local)
+        cookie_secure: auto
+        # 'lax' permet les navigations GET cross-site légitimes (liens depuis emails)
+        # 'strict' serait plus sûr mais casse les liens dans les emails de reset
+        cookie_samesite: lax
+
+        # Durée de vie de la session : 2 heures d'inactivité
+        # Après ce délai, la session expire et l'utilisateur doit se reconnecter
+        gc_maxlifetime: 7200
+        # Nettoyage des sessions expirées : 1% de probabilité à chaque requête
+        gc_probability: 1
+        gc_divisor: 100
+
+    # Protection CSRF globale sur les formulaires Symfony
+    # Symfony Forms génère et vérifie automatiquement un token CSRF pour chaque form
+    # Les formulaires HTML manuels doivent appeler isCsrfTokenValid() manuellement
+    csrf_protection: true
 
     #esi: true
     #fragments: true

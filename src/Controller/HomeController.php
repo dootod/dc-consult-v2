@@ -6,6 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur public — pages statiques.
+ *
+ * Toutes ces routes sont publiques (pas d'authentification requise).
+ * Aucun traitement de données utilisateur → pas de rate limiting nécessaire.
+ * La protection XSS est assurée par l'auto-escape Twig + les headers CSP (SecurityHeadersSubscriber).
+ */
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
