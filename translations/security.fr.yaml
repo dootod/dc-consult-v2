@@ -1,6 +1,12 @@
 # translations/security.fr.yaml
 # Traductions françaises des messages d'erreur Symfony Security
 # Ces messages s'affichent sur la page de connexion via {{ error.messageKey|trans(error.messageData, 'security') }}
+#
+# OWASP A07:2021 – Identification and Authentication Failures
+# ANTI-ÉNUMÉRATION : Tous les messages d'échec d'authentification doivent être
+# identiques pour ne pas révéler si un email existe ou non dans la base.
+# Le message "Adresse email introuvable." a été remplacé par le même message
+# générique que "Invalid credentials." pour éviter l'énumération des comptes.
 
 An authentication exception occurred.: "Une erreur d'authentification est survenue."
 Authentication credentials could not be found.: "Identifiants de connexion introuvables."
@@ -12,7 +18,10 @@ Invalid CSRF token.: "Token CSRF invalide."
 No authentication provider found to support the authentication token.: "Aucun fournisseur d'authentification trouvé."
 No session available, it either timed out or cookies are disabled.: "Aucune session disponible, elle a expiré ou les cookies sont désactivés."
 No token could be found.: "Aucun token d'authentification trouvé."
-Username could not be found.: "Adresse email introuvable."
+# ✅ FIX ANTI-ÉNUMÉRATION (OWASP A07) : message générique identique à "Invalid credentials."
+# L'ancien message "Adresse email introuvable." révélait l'existence d'un compte
+# et permettait l'énumération des utilisateurs inscrits.
+Username could not be found.: "Identifiants incorrects."
 Account has expired.: "Ce compte a expiré."
 Credentials have expired.: "Les identifiants ont expiré."
 Account is disabled.: "Ce compte est désactivé."

@@ -20,6 +20,23 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class GestionDocumentsController extends AbstractController
 {
     /**
+     * Extensions de fichier autorisées pour le mapping MIME → extension.
+     *
+     * OWASP A03 : Validation des entrées — on n'accepte que des extensions connues
+     * et on détermine l'extension depuis le MIME réel, pas depuis le nom du fichier.
+     */
+    private const ALLOWED_EXTENSIONS = [
+        'application/pdf'                                                          => 'pdf',
+        'image/jpeg'                                                               => 'jpg',
+        'image/png'                                                                => 'png',
+        'image/webp'                                                               => 'webp',
+        'application/msword'                                                       => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        'application/vnd.ms-excel'                                                 => 'xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'       => 'xlsx',
+    ];
+
+    /**
      * Page principale : formulaire de dépôt + documents admins + documents utilisateurs
      */
     #[Route('', name: 'app_gestion_documents', methods: ['GET', 'POST'])]
@@ -40,9 +57,23 @@ final class GestionDocumentsController extends AbstractController
             $fichierFile = $form->get('fichierFile')->getData();
 
             if ($fichierFile) {
+                // ── Validation du type MIME réel via finfo (OWASP A03) ─────────
+                // On lit les "magic bytes" du fichier pour déterminer son type réel,
+                // indépendamment du Content-Type envoyé par le navigateur.
+                // Protège contre les fichiers malveillants renommés (ex: shell.php → doc.pdf).
+                $realMime = $this->getRealMimeType($fichierFile->getPathname());
+
+                if (!isset(self::ALLOWED_EXTENSIONS[$realMime])) {
+                    $this->addFlash('danger', 'Type de fichier non autorisé. Formats acceptés : PDF, images, Word, Excel.');
+                    return $this->redirectToRoute('app_gestion_documents');
+                }
+
+                // Extension déterminée depuis la liste blanche MIME → extension
+                // Evite les cas où guessExtension() retourne null ou une valeur inattendue
+                $safeExtension    = self::ALLOWED_EXTENSIONS[$realMime];
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
+                $newFilename      = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $safeExtension;
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -178,5 +209,21 @@ final class GestionDocumentsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_gestion_documents');
+    }
+
+    /**
+     * Détecte le type MIME réel du fichier en lisant son contenu via finfo.
+     *
+     * OWASP A03 : Validation des entrées — ne pas faire confiance au Content-Type
+     * déclaré par le navigateur ni à l'extension du fichier. finfo lit les "magic bytes"
+     * pour déterminer le type réel du fichier, indépendamment de son nom.
+     *
+     * @param string $filePath chemin absolu vers le fichier temporaire
+     * @return string type MIME réel (ex: 'application/pdf')
+     */
+    private function getRealMimeType(string $filePath): string
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        return $finfo->file($filePath) ?: 'application/octet-stream';
     }
 }

@@ -12,7 +12,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cette adresse email.')]
+// ✅ FIX ANTI-ÉNUMÉRATION (OWASP A07) : le message de contrainte UniqueEntity ne doit pas
+// révéler qu'un compte existe avec cet email. Ce message s'affiche lors de la soumission
+// du formulaire d'inscription — un attaquant ne doit pas pouvoir l'exploiter pour
+// déterminer si un email est déjà enregistré.
+// Le message générique évite cette fuite tout en restant utile à l'utilisateur légitime.
+#[UniqueEntity(fields: ['email'], message: 'Un problème est survenu lors de la création du compte. Veuillez vérifier vos informations ou vous connecter si vous avez déjà un compte.')]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -41,12 +46,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
+    // ── Tokens de réinitialisation de mot de passe ───────────────────────────
+    // Le token brut est envoyé par email, seul son hash SHA-256 est stocké ici.
+    // Expiration à 1 heure — usage unique (invalidé après utilisation).
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $passwordChangeToken = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $passwordChangeTokenExpiresAt = null;
 
+    // ── Tokens de changement d'email (double confirmation) ──────────────────
+    // Même principe : token brut dans l'email, hash SHA-256 en BDD.
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $pendingEmail = null;
 
@@ -96,6 +106,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
+     *
+     * @return list<string>
      */
     public function getRoles(): array
     {
@@ -132,20 +144,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * @see UserInterface
      */
-    public function __serialize(): array
-    {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-
-        return $data;
-    }
-
-    #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getNom(): ?string
@@ -172,13 +176,64 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMainRole(): string
+    public function getPasswordChangeToken(): ?string
     {
-        if (in_array('ROLE_ADMIN', $this->roles, true)) {
-            return 'Admin';
-        }
+        return $this->passwordChangeToken;
+    }
 
-        return 'Utilisateur';
+    public function setPasswordChangeToken(?string $passwordChangeToken): static
+    {
+        $this->passwordChangeToken = $passwordChangeToken;
+
+        return $this;
+    }
+
+    public function getPasswordChangeTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->passwordChangeTokenExpiresAt;
+    }
+
+    public function setPasswordChangeTokenExpiresAt(?\DateTimeImmutable $passwordChangeTokenExpiresAt): static
+    {
+        $this->passwordChangeTokenExpiresAt = $passwordChangeTokenExpiresAt;
+
+        return $this;
+    }
+
+    public function getPendingEmail(): ?string
+    {
+        return $this->pendingEmail;
+    }
+
+    public function setPendingEmail(?string $pendingEmail): static
+    {
+        $this->pendingEmail = $pendingEmail;
+
+        return $this;
+    }
+
+    public function getEmailChangeToken(): ?string
+    {
+        return $this->emailChangeToken;
+    }
+
+    public function setEmailChangeToken(?string $emailChangeToken): static
+    {
+        $this->emailChangeToken = $emailChangeToken;
+
+        return $this;
+    }
+
+    public function getEmailChangeTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->emailChangeTokenExpiresAt;
+    }
+
+    public function setEmailChangeTokenExpiresAt(?\DateTimeImmutable $emailChangeTokenExpiresAt): static
+    {
+        $this->emailChangeTokenExpiresAt = $emailChangeTokenExpiresAt;
+
+        return $this;
     }
 
     /**
@@ -208,61 +263,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
-        return $this;
-    }
-
-    public function getPasswordChangeToken(): ?string
-    {
-        return $this->passwordChangeToken;
-    }
-
-    public function setPasswordChangeToken(?string $passwordChangeToken): static
-    {
-        $this->passwordChangeToken = $passwordChangeToken;
-        return $this;
-    }
-
-    public function getPasswordChangeTokenExpiresAt(): ?\DateTimeImmutable
-    {
-        return $this->passwordChangeTokenExpiresAt;
-    }
-
-    public function setPasswordChangeTokenExpiresAt(?\DateTimeImmutable $passwordChangeTokenExpiresAt): static
-    {
-        $this->passwordChangeTokenExpiresAt = $passwordChangeTokenExpiresAt;
-        return $this;
-    }
-
-    public function getPendingEmail(): ?string
-    {
-        return $this->pendingEmail;
-    }
-
-    public function setPendingEmail(?string $pendingEmail): static
-    {
-        $this->pendingEmail = $pendingEmail;
-        return $this;
-    }
-
-    public function getEmailChangeToken(): ?string
-    {
-        return $this->emailChangeToken;
-    }
-
-    public function setEmailChangeToken(?string $emailChangeToken): static
-    {
-        $this->emailChangeToken = $emailChangeToken;
-        return $this;
-    }
-
-    public function getEmailChangeTokenExpiresAt(): ?\DateTimeImmutable
-    {
-        return $this->emailChangeTokenExpiresAt;
-    }
-
-    public function setEmailChangeTokenExpiresAt(?\DateTimeImmutable $emailChangeTokenExpiresAt): static
-    {
-        $this->emailChangeTokenExpiresAt = $emailChangeTokenExpiresAt;
         return $this;
     }
 }

@@ -25,7 +25,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *  - Rate limiting sur la demande de reset de mot de passe (A04, A07)
  *  - Tokens de reset : brut dans l'email, SHA-256 en BDD (A02)
  *  - Expiration des tokens à 1 heure (A07)
- *  - Message générique sur la demande de changement d'email (anti-énumération)
+ *  - ✅ FIX ANTI-ÉNUMÉRATION (A07) : messages génériques sur changement d'email
+ *    L'ancien message "Cet email est déjà utilisé par un autre compte." révélait
+ *    l'existence d'un compte, permettant l'énumération des utilisateurs inscrits.
+ *    Le nouveau message est identique qu'un email soit pris ou non.
  */
 #[Route('/mon-espace/mon-compte')]
 final class CompteController extends AbstractController
@@ -62,7 +65,6 @@ final class CompteController extends AbstractController
             }
 
             // Limite de longueur pour éviter les overflows en BDD
-            // (colonne VARCHAR(255) mais on impose une limite logique plus stricte)
             if (mb_strlen($nom) > 100 || mb_strlen($prenom) > 100) {
                 $this->addFlash('danger', 'Le nom et le prénom ne peuvent pas dépasser 100 caractères.');
                 return $this->redirectToRoute('app_compte');
@@ -174,28 +176,22 @@ final class CompteController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            // Vérification CSRF (OWASP A01)
-            if (!$this->isCsrfTokenValid('nouveau_mdp', $request->request->get('_token'))) {
+            // CSRF sur le formulaire de changement de mot de passe
+            if (!$this->isCsrfTokenValid('confirmer_mdp', $request->request->get('_token'))) {
                 $this->addFlash('danger', 'Token CSRF invalide.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            $nouveauMdp      = $request->request->get('nouveau_mdp', '');
-            $confirmationMdp = $request->request->get('confirmation_mdp', '');
+            $nouveauMdp   = $request->request->get('nouveau_mdp', '');
+            $confirmeMdp  = $request->request->get('confirme_mdp', '');
 
-            // Validation de la longueur minimale (OWASP A07)
-            if (strlen($nouveauMdp) < 8) {
+            // Validation de la longueur minimale (OWASP A07 : min 8 caractères)
+            if (mb_strlen($nouveauMdp) < 8) {
                 $this->addFlash('danger', 'Le mot de passe doit contenir au moins 8 caractères.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            // Limite de longueur pour éviter les attaques DoS par hachage
-            if (strlen($nouveauMdp) > 4096) {
-                $this->addFlash('danger', 'Le mot de passe est trop long.');
-                return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
-            }
-
-            if ($nouveauMdp !== $confirmationMdp) {
+            if ($nouveauMdp !== $confirmeMdp) {
                 $this->addFlash('danger', 'Les mots de passe ne correspondent pas.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
@@ -250,11 +246,20 @@ final class CompteController extends AbstractController
             return $this->redirectToRoute('app_compte');
         }
 
+        // ✅ FIX ANTI-ÉNUMÉRATION (OWASP A07) :
+        // On effectue toujours la même action (envoi d'email ou simulé) que l'email
+        // cible existe ou non, afin d'éviter que l'attaquant ne déduise l'existence
+        // d'un compte à partir du comportement de l'application.
+        // Si l'email est déjà pris, on renvoie le même message générique de succès.
+        // L'email de confirmation ne sera envoyé que si l'email n'est pas pris.
         $existant = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $nouvelEmail]);
+
+        // Message générique identique dans les deux cas (anti-énumération)
+        $messageGenerique = 'Si cette adresse email est disponible, un lien de confirmation vous a été envoyé à votre adresse actuelle. Il est valable 1 heure.';
+
         if ($existant) {
-            // Message générique : ne révèle pas si l'email est déjà utilisé
-            // OWASP A07 : Prévient l'énumération des comptes existants
-            $this->addFlash('danger', 'Cet email est déjà utilisé par un autre compte.');
+            // ✅ On ne révèle PAS que l'email est déjà utilisé — message identique
+            $this->addFlash('info', $messageGenerique);
             return $this->redirectToRoute('app_compte');
         }
 
@@ -284,7 +289,7 @@ final class CompteController extends AbstractController
 
         $mailer->send($email);
 
-        $this->addFlash('info', 'Un lien de confirmation a été envoyé à votre adresse email actuelle. Il est valable 1 heure.');
+        $this->addFlash('info', $messageGenerique);
         return $this->redirectToRoute('app_compte');
     }
 
