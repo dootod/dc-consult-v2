@@ -7,6 +7,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    # Répertoire de stockage des fichiers uploadés (documents admin + utilisateurs)
+    # Ce paramètre était dans services.yaml avant l'audit — restauré ici
+    documents_directory: '%kernel.project_dir%/var/documents'
 
 services:
     # default configuration for services in *this* file
