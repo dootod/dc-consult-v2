@@ -50,26 +50,39 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
         // uniquement si vous ne pouvez pas utiliser de nonce.
         $csp = implode('; ', [
             "default-src 'self'",
-            // Scripts : domaine courant + FontAwesome + Stimulus (UMD via importmap)
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://kit.fontawesome.com",
-            // Styles : domaine courant + FontAwesome + Google Fonts
-            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://ka-f.fontawesome.com",
-            // Polices
-            "font-src 'self' https://fonts.gstatic.com https://ka-f.fontawesome.com data:",
-            // Images : domaine courant + données inline (avatars, etc.)
+
+            // Scripts : domaine courant + Bootstrap CDN + FontAwesome Kit + cdnjs
+            // 'unsafe-inline' requis pour les scripts inline Symfony (importmap, Stimulus bootstrap)
+            // data: requis pour l'importmap de Symfony AssetMapper qui génère des modules data: URI
+            "script-src 'self' 'unsafe-inline' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://kit.fontawesome.com",
+
+            // Styles : domaine courant + Bootstrap CDN + FontAwesome + Google Fonts
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://ka-f.fontawesome.com",
+
+            // Polices : Google Fonts + FontAwesome (kit ET cdnjs — les deux sont utilisés)
+            "font-src 'self' https://fonts.gstatic.com https://ka-f.fontawesome.com https://cdnjs.cloudflare.com data:",
+
+            // Images : domaine courant + données inline (avatars, icônes base64, etc.)
             "img-src 'self' data: https:",
-            // Connexions XHR/Fetch (Stimulus, Turbo)
+
+            // Connexions XHR/Fetch (Stimulus, Turbo, FontAwesome Kit)
             "connect-src 'self' https://ka-f.fontawesome.com",
+
             // Frames : aucune frame externe autorisée
             "frame-src 'none'",
+
             // Objets (Flash, etc.) : interdits
             "object-src 'none'",
+
             // Base URI : restreinte au domaine courant
             "base-uri 'self'",
+
             // Formulaires : soumission vers le domaine courant uniquement
             "form-action 'self'",
+
             // Empêche le chargement dans des frames (renforce X-Frame-Options)
             "frame-ancestors 'none'",
+
             // Upgrade les requêtes HTTP vers HTTPS
             "upgrade-insecure-requests",
         ]);
