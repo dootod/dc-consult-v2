@@ -4,7 +4,7 @@
 # OWASP A01:2021 – Broken Access Control
 #
 # Renforcements appliqués :
-#   - CSRF activé sur form_login ET sur logout
+#   - CSRF activé sur form_login ET sur logout (enable_csrf: true)
 #   - login_throttling avec intervalle étendu
 #   - invalidate_session: true sur logout (régénération de session)
 #   - session_fixation protection via migrate_on_login: true (Symfony le fait par défaut)
@@ -49,6 +49,14 @@ security:
                 # Invalide la session complète à la déconnexion
                 # OWASP A07 : Empêche la réutilisation de sessions après logout
                 invalidate_session: true
+                # ── Protection CSRF sur le logout ────────────────────────────
+                # OWASP A01 : Sans CSRF sur le logout, un attaquant peut forcer
+                # la déconnexion de l'utilisateur via une simple image ou iframe
+                # (logout CSRF). Le token _csrf_token doit être inclus dans
+                # le formulaire/lien de déconnexion (voir base.html.twig).
+                enable_csrf: true
+                csrf_token_id: 'logout'
+                csrf_parameter: '_csrf_token'
 
             # ── Anti-brute force sur le login ─────────────────────────────────
             # 5 tentatives max par IP+email sur 15 minutes

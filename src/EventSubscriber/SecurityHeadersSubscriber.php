@@ -19,9 +19,34 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *  - Strict-Transport-Security  : Force HTTPS (HSTS)
  *  - Referrer-Policy            : Contrôle les informations dans le header Referer
  *  - Permissions-Policy         : Désactive les APIs navigateur non nécessaires
+ *  - Cache-Control: no-store    : Sur les routes avec tokens sensibles dans l'URL
  */
 class SecurityHeadersSubscriber implements EventSubscriberInterface
 {
+    /**
+     * Routes contenant des tokens sensibles dans l'URL (path parameters).
+     *
+     * OWASP A02 – Cryptographic Failures :
+     * Les tokens dans les URLs apparaissent dans :
+     *  - Les logs serveur (access.log Apache/Nginx)
+     *  - L'historique du navigateur
+     *  - Le header Referer des requêtes suivantes
+     *  - Les proxies/CDN intermédiaires
+     *
+     * Pour ces routes, on impose Cache-Control: no-store pour éviter que
+     * les caches intermédiaires ou le navigateur ne conservent la page
+     * (et donc le token dans l'URL historique du cache).
+     *
+     * Note : Le Referrer-Policy 'strict-origin-when-cross-origin' déjà appliqué
+     * limite la fuite via Referer. Cache-Control: no-store ajoute une couche
+     * supplémentaire de protection.
+     */
+    private const TOKEN_ROUTES = [
+        '/confirmer-mdp/',
+        '/confirmer-email-ancien/',
+        '/confirmer-email-nouveau/',
+    ];
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -78,6 +103,7 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
             "base-uri 'self'",
 
             // Formulaires : soumission vers le domaine courant uniquement
+            // OWASP A01 : Empêche les soumissions vers des sites externes
             "form-action 'self'",
 
             // Empêche le chargement dans des frames (renforce X-Frame-Options)
@@ -126,6 +152,25 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
         // Obsolète dans les navigateurs modernes mais maintenu pour les anciens.
         // La vraie protection XSS est assurée par la CSP ci-dessus.
         $headers->set('X-XSS-Protection', '1; mode=block');
+
+        // ── Cache-Control: no-store sur les routes avec tokens sensibles ─────
+        // OWASP A02 – Cryptographic Failures :
+        // Les tokens dans les URLs (path parameters) des routes de confirmation
+        // ne doivent jamais être mis en cache par le navigateur ou des proxies.
+        // 'no-store' est plus fort que 'no-cache' : interdit tout stockage.
+        // Combiné avec Referrer-Policy, cela limite fortement les fuites de tokens.
+        $requestPath = $event->getRequest()->getPathInfo();
+        foreach (self::TOKEN_ROUTES as $tokenRoute) {
+            if (str_contains($requestPath, $tokenRoute)) {
+                // no-store : le navigateur ne stocke aucune version de la réponse
+                // no-cache : force la revalidation avant utilisation (redondant avec no-store)
+                // must-revalidate : les proxies ne peuvent pas servir une version périmée
+                // private : interdit aux caches partagés (proxies, CDN) de stocker la réponse
+                $headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+                $headers->set('Pragma', 'no-cache'); // Compatibilité HTTP/1.0
+                break;
+            }
+        }
 
         // ── Suppression de l'en-tête Server ─────────────────────────────────
         // Évite de divulguer la technologie serveur (security through obscurity).
