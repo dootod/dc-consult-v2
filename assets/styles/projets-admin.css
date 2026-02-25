@@ -1,0 +1,368 @@
+/* =============================================================
+   DC Consult — Styles Gestion Projets (admin)
+   Chargé uniquement sur les pages /admin/gestion-projets/*
+   ============================================================= */
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS DE PROJET (index)
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.projet-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+/* ── Cover ── */
+.projet-card__cover {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: rgba(var(--color-primary-rgb), 0.06);
+}
+
+.projet-card__cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-base);
+}
+
+.projet-card:hover .projet-card__cover-img {
+    transform: scale(1.04);
+}
+
+.projet-card__cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(var(--color-primary-rgb), 0.25);
+    font-size: 2.5rem;
+}
+
+.projet-card__badge {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+}
+
+/* ── Corps ── */
+.projet-card__body {
+    padding: 1rem;
+    flex: 1;
+}
+
+.projet-card__titre {
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.4rem;
+    line-height: 1.3;
+
+    /* Tronque sur 2 lignes */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.projet-card__meta {
+    font-family: var(--font-body);
+    font-size: 0.775rem;
+    color: var(--color-text-muted);
+    margin: 0.2rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.projet-card__meta i {
+    color: var(--color-primary);
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
+
+/* ── Actions ── */
+.projet-card__actions {
+    padding: 0.65rem 1rem;
+    border-top: 1px solid rgba(var(--color-primary-rgb), 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INFOS PROJET (show)
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.projet-info-item__label {
+    font-family: var(--font-body);
+    font-size: 0.73rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-faint);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.projet-info-item__label i {
+    color: var(--color-primary);
+    font-size: 0.7rem;
+}
+
+.projet-info-item__value {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GRILLE D'IMAGES (show)
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.65rem;
+}
+
+.projet-image-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid rgba(var(--color-primary-rgb), 0.1);
+    transition: border-color var(--transition-fast);
+}
+
+.projet-image-thumb--cover {
+    border-color: var(--color-primary);
+}
+
+.projet-image-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.projet-image-thumb__badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(var(--color-primary-rgb), 0.85));
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.55rem 0.35rem 0.25rem;
+    text-align: center;
+    font-family: var(--font-body);
+}
+
+.projet-image-thumb__delete {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.projet-image-thumb:hover .projet-image-thumb__delete {
+    opacity: 1;
+}
+
+.projet-image-thumb__delete-btn {
+    background: rgba(192, 57, 43, 0.85);
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+}
+
+.projet-image-thumb__delete-btn:hover {
+    background: var(--color-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GRILLE D'IMAGES ÉDITION (edit)
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-images-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.6rem;
+}
+
+.projet-edit-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid rgba(var(--color-primary-rgb), 0.1);
+    transition: border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.projet-edit-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Bouton étoile (cover) */
+.projet-edit-thumb__cover-btn {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    background: rgba(0, 0, 0, 0.45);
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.projet-edit-thumb__cover-btn:hover,
+.projet-edit-thumb__cover-btn.is-cover {
+    background: rgba(var(--color-primary-rgb), 0.9);
+    color: #fff;
+}
+
+.projet-edit-thumb.is-cover-selected {
+    border-color: var(--color-primary);
+}
+
+/* Checkbox suppression */
+.projet-edit-thumb__delete-check {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    cursor: pointer;
+}
+
+.projet-edit-thumb__delete-check input[type="checkbox"] {
+    display: none;
+}
+
+.projet-edit-thumb__delete-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.7rem;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.projet-edit-thumb__delete-overlay:hover {
+    background: rgba(192, 57, 43, 0.75);
+    color: #fff;
+}
+
+.projet-edit-thumb__delete-check input:checked ~ .projet-edit-thumb__delete-overlay {
+    background: var(--color-danger);
+    color: #fff;
+}
+
+.projet-edit-thumb.is-marked-delete {
+    opacity: 0.45;
+    border-color: var(--color-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DROP ZONE multi-images
+   ═══════════════════════════════════════════════════════════════ */
+
+.drop-zone--multi {
+    min-height: 130px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRÉVISUALISATION (new / edit)
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.5rem;
+}
+
+.projet-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1.5px solid rgba(var(--color-primary-rgb), 0.15);
+}
+
+.projet-preview-item:first-child {
+    border-color: var(--color-primary);
+}
+
+.projet-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.projet-preview-item__cover-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(var(--color-primary-rgb), 0.82);
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.15rem 0;
+    font-family: var(--font-body);
+}

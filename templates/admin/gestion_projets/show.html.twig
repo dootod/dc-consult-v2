@@ -1,0 +1,186 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}{{ projet.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/projets-admin.css') }}">
+{% endblock %}
+
+{% block body %}
+
+{% include 'components/_flash_messages.html.twig' %}
+
+{# ── En-tête ── #}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="admin-page-header__title">{{ projet.titre }}</h1>
+        <p class="admin-page-header__sub">Détail du projet — créé le {{ projet.creeLe|date('d/m/Y') }}.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ path('app_edit_gestion_projets', {id: projet.id}) }}" class="dc-btn dc-btn--primary">
+            <i class="fa-solid fa-pen"></i>
+            Modifier
+        </a>
+        <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    {# ── Colonne gauche : infos ── #}
+    <div class="col-12 col-lg-7">
+
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Informations générales
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="row g-3">
+                    {% if projet.localisation %}
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-solid fa-location-dot"></i> Localisation</span>
+                            <span class="projet-info-item__value">{{ projet.localisation }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if projet.date %}
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-regular fa-calendar"></i> Date</span>
+                            <span class="projet-info-item__value">{{ projet.date|date('d/m/Y') }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if projet.taille %}
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-solid fa-ruler-combined"></i> Taille</span>
+                            <span class="projet-info-item__value">{{ projet.taille }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if projet.maitreOuvrage %}
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-solid fa-building-user"></i> Maître d'ouvrage</span>
+                            <span class="projet-info-item__value">{{ projet.maitreOuvrage }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if projet.maitreOeuvre %}
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-solid fa-helmet-safety"></i> Maître d'œuvre</span>
+                            <span class="projet-info-item__value">{{ projet.maitreOeuvre }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-12 col-md-6">
+                        <div class="projet-info-item">
+                            <span class="projet-info-item__label"><i class="fa-regular fa-clock"></i> Modifié le</span>
+                            <span class="projet-info-item__value">{{ projet.modifieLe|date('d/m/Y à H:i') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if projet.description %}
+                    <hr class="my-3" style="border-color: rgba(var(--color-primary-rgb), 0.1);">
+                    <div class="projet-info-item">
+                        <span class="projet-info-item__label"><i class="fa-solid fa-align-left"></i> Description</span>
+                        <p class="projet-info-item__value mt-1" style="white-space: pre-line;">{{ projet.description }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── Danger zone suppression ── #}
+        <div class="dc-card" style="border-color: rgba(192,57,43,0.2);">
+            <div class="dc-card__head" style="border-bottom-color: rgba(192,57,43,0.1);">
+                <span class="dc-card__title" style="color: var(--color-danger);">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Zone de danger
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <p class="text-muted small mb-3">La suppression du projet est irréversible. Toutes ses images seront également supprimées.</p>
+                <form method="post"
+                      action="{{ path('app_delete_gestion_projets', {id: projet.id}) }}"
+                      onsubmit="return confirm('Supprimer définitivement ce projet et toutes ses images ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-projet-' ~ projet.id) }}">
+                    <button type="submit" class="dc-btn dc-btn--danger">
+                        <i class="fa-solid fa-trash"></i>
+                        Supprimer ce projet
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Colonne droite : images ── #}
+    <div class="col-12 col-lg-5">
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-images"></i>
+                    Images ({{ projet.images|length }})
+                </span>
+                <a href="{{ path('app_edit_gestion_projets', {id: projet.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm">
+                    <i class="fa-solid fa-plus"></i>
+                    Gérer
+                </a>
+            </div>
+            <div class="dc-card__body">
+                {% if projet.images is empty %}
+                    <div class="dc-empty-state">
+                        <i class="fa-solid fa-image"></i>
+                        <p>Aucune image pour ce projet.</p>
+                    </div>
+                {% else %}
+                    <div class="projet-images-grid">
+                        {% for image in projet.images %}
+                            <div class="projet-image-thumb {% if image.isCover %}projet-image-thumb--cover{% endif %}">
+                                {# Image servie via route sécurisée ROLE_ADMIN — jamais depuis public/ #}
+                                <img
+                                    src="{{ path('app_voir_image_projet_admin', {id: image.id}) }}"
+                                    alt="Image {{ loop.index }} du projet {{ projet.titre }}"
+                                    loading="lazy"
+                                >
+                                {% if image.isCover %}
+                                    <span class="projet-image-thumb__badge">
+                                        <i class="fa-solid fa-star"></i> Cover
+                                    </span>
+                                {% endif %}
+                                <form method="post"
+                                      action="{{ path('app_delete_projet_image', {id: image.id}) }}"
+                                      class="projet-image-thumb__delete"
+                                      onsubmit="return confirm('Supprimer cette image ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-image-' ~ image.id) }}">
+                                    <button type="submit" class="projet-image-thumb__delete-btn" title="Supprimer">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

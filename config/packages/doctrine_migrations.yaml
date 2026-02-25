@@ -4,3 +4,8 @@ doctrine_migrations:
         # as migrations classes should NOT be autoloaded
         'DoctrineMigrations': '%kernel.project_dir%/migrations'
     enable_profiler: false
+    # MySQL/MariaDB exécutent un implicit commit sur les DDL (CREATE TABLE, ALTER TABLE…)
+    # ce qui rend les transactions inutiles et provoque une deprecation Doctrine Migrations 3.x.
+    # Désactiver les transactions globalement est la solution officielle recommandée.
+    # Voir : https://www.doctrine-project.org/projects/doctrine-migrations/en/stable/explanation/implicit-commits.html
+    transactional: false

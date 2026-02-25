@@ -239,7 +239,10 @@
             </a>
 
             <a href="{{ path('app_gestion_projets') }}"
-               class="dc-sidebar__link {% if app.request.attributes.get('_route') == 'app_gestion_projets' %}is-active{% endif %}">
+            class="dc-sidebar__link {% if app.request.attributes.get('_route') starts with 'app_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_new_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_edit_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_show_gestion_projets' %}is-active{% endif %}">
                 <i class="fa-solid fa-folder-open dc-sidebar__link-icon"></i>
                 Projets
             </a>

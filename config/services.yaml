@@ -8,8 +8,13 @@
 
 parameters:
     # Répertoire de stockage des fichiers uploadés (documents admin + utilisateurs)
-    # Ce paramètre était dans services.yaml avant l'audit — restauré ici
     documents_directory: '%kernel.project_dir%/var/documents'
+
+    # Répertoire de stockage des images de projets
+    # Hors public/ — accès via contrôleur uniquement (BinaryFileResponse)
+    # Route admin   : /admin/gestion-projets/image/{id}  (ROLE_ADMIN)
+    # Route publique: /projets/image/{id}                (publique, images vitrine)
+    projets_images_directory: '%kernel.project_dir%/var/projets'
 
 services:
     # default configuration for services in *this* file

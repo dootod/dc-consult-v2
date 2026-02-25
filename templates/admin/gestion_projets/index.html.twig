@@ -1,0 +1,111 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Gestion des projets{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/projets-admin.css') }}">
+{% endblock %}
+
+{% block body %}
+
+{% include 'components/_flash_messages.html.twig' %}
+
+{# ── En-tête ── #}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="admin-page-header__title">
+            <i class="fa-solid fa-folder-open text-primary me-2" style="font-size:1.2rem;"></i>
+            Gestion des projets
+        </h1>
+        <p class="admin-page-header__sub">{{ projets|length }} projet{{ projets|length != 1 ? 's' : '' }} au total.</p>
+    </div>
+    <a href="{{ path('app_new_gestion_projets') }}" class="dc-btn dc-btn--primary">
+        <i class="fa-solid fa-plus"></i>
+        Nouveau projet
+    </a>
+</div>
+
+{# ── Grille de projets ── #}
+{% if projets is empty %}
+    <div class="dc-card">
+        <div class="dc-card__body">
+            <div class="dc-empty-state">
+                <i class="fa-solid fa-folder-open"></i>
+                <p>Aucun projet pour l'instant.</p>
+                <a href="{{ path('app_new_gestion_projets') }}" class="dc-btn dc-btn--primary mt-2">
+                    <i class="fa-solid fa-plus"></i>
+                    Créer le premier projet
+                </a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row g-4">
+        {% for projet in projets %}
+            {% set cover = projet.coverImage %}
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="projet-card">
+                    {# Cover — servie via route sécurisée ROLE_ADMIN #}
+                    <div class="projet-card__cover">
+                        {% if cover %}
+                            <img
+                                src="{{ path('app_voir_image_projet_admin', {id: cover.id}) }}"
+                                alt="{{ projet.titre }}"
+                                class="projet-card__cover-img"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="projet-card__cover-placeholder">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                        {% endif %}
+
+                        <div class="projet-card__badge">
+                            {{ projet.images|length }} image{{ projet.images|length != 1 ? 's' : '' }}
+                        </div>
+                    </div>
+
+                    {# Infos #}
+                    <div class="projet-card__body">
+                        <h2 class="projet-card__titre">{{ projet.titre }}</h2>
+
+                        {% if projet.localisation %}
+                            <p class="projet-card__meta">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ projet.localisation }}
+                            </p>
+                        {% endif %}
+
+                        {% if projet.date %}
+                            <p class="projet-card__meta">
+                                <i class="fa-regular fa-calendar"></i>
+                                {{ projet.date|date('d/m/Y') }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    {# Actions #}
+                    <div class="projet-card__actions">
+                        <a href="{{ path('app_show_gestion_projets', {id: projet.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm" title="Voir">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{{ path('app_edit_gestion_projets', {id: projet.id}) }}" class="dc-btn dc-btn--outline dc-btn--sm" title="Modifier">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <form method="post"
+                              action="{{ path('app_delete_gestion_projets', {id: projet.id}) }}"
+                              onsubmit="return confirm('Supprimer ce projet ? Cette action est irréversible.')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-projet-' ~ projet.id) }}">
+                            <button type="submit" class="dc-btn dc-btn--danger dc-btn--sm" title="Supprimer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}
