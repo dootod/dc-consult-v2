@@ -10,15 +10,37 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Gestion du compte utilisateur : informations personnelles, mot de passe, email.
+ *
+ * Renforcements de sécurité appliqués (OWASP) :
+ *  - CSRF vérifié manuellement sur tous les formulaires POST (A01)
+ *  - Validation et sanitisation strictes des entrées (A03)
+ *    · Longueur max sur nom/prénom : 100 caractères
+ *    · Validation email via filter_var FILTER_VALIDATE_EMAIL
+ *  - Rate limiting sur la demande de reset de mot de passe (A04, A07)
+ *  - Tokens de reset : brut dans l'email, SHA-256 en BDD (A02)
+ *  - Expiration des tokens à 1 heure (A07)
+ *  - ✅ FIX ANTI-ÉNUMÉRATION (A07) : messages génériques sur changement d'email
+ *    L'ancien message "Cet email est déjà utilisé par un autre compte." révélait
+ *    l'existence d'un compte, permettant l'énumération des utilisateurs inscrits.
+ *    Le nouveau message est identique qu'un email soit pris ou non.
+ */
 #[Route('/mon-espace/mon-compte')]
 final class CompteController extends AbstractController
 {
-    // ----------------------------------------------------------------
-    // Page principale
-    // ----------------------------------------------------------------
+    public function __construct(
+        // Rate limiter pour les demandes de reset de mot de passe
+        private readonly RateLimiterFactory $passwordResetLimiter,
+    ) {}
+
+    // ── Page principale ──────────────────────────────────────────────────────
     #[Route('', name: 'app_compte', methods: ['GET', 'POST'])]
     public function compte(
         Request $request,
@@ -27,8 +49,9 @@ final class CompteController extends AbstractController
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        // ---- Modification nom / prénom ----
+        // ── Modification nom / prénom ────────────────────────────────────────
         if ($request->isMethod('POST') && $request->request->has('_action_identite')) {
+            // Vérification CSRF (OWASP A01)
             if (!$this->isCsrfTokenValid('identite', $request->request->get('_token'))) {
                 $this->addFlash('danger', 'Token CSRF invalide.');
                 return $this->redirectToRoute('app_compte');
@@ -37,8 +60,21 @@ final class CompteController extends AbstractController
             $nom    = trim($request->request->get('nom', ''));
             $prenom = trim($request->request->get('prenom', ''));
 
+            // ── Validation et sanitisation des entrées (OWASP A03) ────────────
             if (empty($nom) || empty($prenom)) {
                 $this->addFlash('danger', 'Le nom et le prénom ne peuvent pas être vides.');
+                return $this->redirectToRoute('app_compte');
+            }
+
+            // Limite de longueur pour éviter les overflows en BDD
+            if (mb_strlen($nom) > 100 || mb_strlen($prenom) > 100) {
+                $this->addFlash('danger', 'Le nom et le prénom ne peuvent pas dépasser 100 caractères.');
+                return $this->redirectToRoute('app_compte');
+            }
+
+            // Rejette les caractères non autorisés (chiffres, balises, etc.)
+            if (!preg_match('/^[\p{L}\s\-\']+$/u', $nom) || !preg_match('/^[\p{L}\s\-\']+$/u', $prenom)) {
+                $this->addFlash('danger', 'Le nom et le prénom ne doivent contenir que des lettres, espaces, tirets et apostrophes.');
                 return $this->redirectToRoute('app_compte');
             }
 
@@ -55,9 +91,7 @@ final class CompteController extends AbstractController
         ]);
     }
 
-    // ----------------------------------------------------------------
-    // Demande de changement de mot de passe
-    // ----------------------------------------------------------------
+    // ── Demande de changement de mot de passe ────────────────────────────────
     #[Route('/demande-changement-mdp', name: 'app_compte_demande_mdp', methods: ['POST'])]
     public function demandeChangementMdp(
         Request $request,
@@ -67,14 +101,26 @@ final class CompteController extends AbstractController
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
+        // Vérification CSRF (OWASP A01)
         if (!$this->isCsrfTokenValid('demande_mdp', $request->request->get('_token'))) {
             $this->addFlash('danger', 'Token CSRF invalide.');
             return $this->redirectToRoute('app_compte');
         }
 
-        // On génère le token brut (envoyé dans l'email)
-        // On stocke uniquement son hash SHA-256 en BDD
-        // Ainsi même si la BDD est compromise, le token brut est inutilisable
+        // ── Rate limiting (OWASP A04) ─────────────────────────────────────────
+        // Max 3 demandes par IP par heure pour éviter le spam d'emails
+        $limiter = $this->passwordResetLimiter->create(
+            'pwd_reset_' . ($request->getClientIp() ?? 'unknown')
+        );
+        $limit = $limiter->consume(1);
+
+        if (!$limit->isAccepted()) {
+            $this->addFlash('danger', 'Trop de demandes. Veuillez patienter avant de réessayer.');
+            return $this->redirectToRoute('app_compte');
+        }
+
+        // Génère le token brut (envoyé dans l'email, jamais stocké)
+        // Stocke uniquement son hash SHA-256 en BDD (OWASP A02)
         $tokenBrut = bin2hex(random_bytes(32));
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
@@ -82,7 +128,7 @@ final class CompteController extends AbstractController
         $utilisateur->setPasswordChangeTokenExpiresAt($expiresAt);
         $em->flush();
 
-        // Le lien contient le token BRUT (pas le hash)
+        // Le lien contient le token BRUT (le hash ne sert qu'en BDD)
         $lien = $this->generateUrl(
             'app_compte_confirmer_mdp',
             ['token' => $tokenBrut],
@@ -103,17 +149,23 @@ final class CompteController extends AbstractController
         return $this->redirectToRoute('app_compte');
     }
 
-    // ----------------------------------------------------------------
-    // Confirmation + formulaire nouveau mot de passe
-    // ----------------------------------------------------------------
+    // ── Confirmation + formulaire nouveau mot de passe ───────────────────────
     #[Route('/confirmer-mdp/{token}', name: 'app_compte_confirmer_mdp', methods: ['GET', 'POST'])]
     public function confirmerChangementMdp(
         string $token,
         Request $request,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
+        ValidatorInterface $validator,
     ): Response {
-        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        // Validation du format du token (64 hex chars = 32 bytes)
+        // Prévient les injections via l'URL (OWASP A03)
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
+            return $this->redirectToRoute('app_connexion');
+        }
+
+        // Comparaison constante-time via hash (OWASP A02 – timing attack prevention)
         $utilisateur = $em->getRepository(Utilisateur::class)
             ->findOneBy(['passwordChangeToken' => hash('sha256', $token)]);
 
@@ -123,29 +175,46 @@ final class CompteController extends AbstractController
             || $utilisateur->getPasswordChangeTokenExpiresAt() < new \DateTimeImmutable()
         ) {
             $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
-            return $this->redirectToRoute('app_compte');
+            return $this->redirectToRoute('app_connexion');
         }
 
         if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('nouveau_mdp', $request->request->get('_token'))) {
+            // ✅ FIX CSRF : l'id du token correspond maintenant au template
+            if (!$this->isCsrfTokenValid('confirmer_mdp', $request->request->get('_token'))) {
                 $this->addFlash('danger', 'Token CSRF invalide.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            $nouveauMdp      = $request->request->get('nouveau_mdp', '');
-            $confirmationMdp = $request->request->get('confirmation_mdp', '');
+            $nouveauMdp  = $request->request->get('nouveau_mdp', '');
+            // ✅ FIX : nom du champ corrigé (confirmation_mdp → confirme_mdp)
+            $confirmeMdp = $request->request->get('confirme_mdp', '');
 
-            if (strlen($nouveauMdp) < 8) {
+            // Validation de la longueur minimale (OWASP A07 : min 8 caractères)
+            if (mb_strlen($nouveauMdp) < 8) {
                 $this->addFlash('danger', 'Le mot de passe doit contenir au moins 8 caractères.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            if ($nouveauMdp !== $confirmationMdp) {
+            // ✅ FIX : vérification de la force du mot de passe (même critère qu'à l'inscription)
+            $violations = $validator->validate($nouveauMdp, [
+                new PasswordStrength(
+                    minScore: PasswordStrength::STRENGTH_WEAK,
+                    message: 'Ce mot de passe est trop faible. Essayez une phrase ou ajoutez des chiffres et symboles.',
+                ),
+            ]);
+
+            if (count($violations) > 0) {
+                $this->addFlash('danger', $violations[0]->getMessage());
+                return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
+            }
+
+            if ($nouveauMdp !== $confirmeMdp) {
                 $this->addFlash('danger', 'Les mots de passe ne correspondent pas.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
             $utilisateur->setPassword($hasher->hashPassword($utilisateur, $nouveauMdp));
+            // Invalidation du token après usage (usage unique)
             $utilisateur->setPasswordChangeToken(null);
             $utilisateur->setPasswordChangeTokenExpiresAt(null);
             $em->flush();
@@ -159,9 +228,7 @@ final class CompteController extends AbstractController
         ]);
     }
 
-    // ----------------------------------------------------------------
-    // Demande de changement d'email — étape 1 : confirmation ancien email
-    // ----------------------------------------------------------------
+    // ── Demande de changement d'email — étape 1 ──────────────────────────────
     #[Route('/demande-changement-email', name: 'app_compte_demande_email', methods: ['POST'])]
     public function demandeChangementEmail(
         Request $request,
@@ -171,6 +238,7 @@ final class CompteController extends AbstractController
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
+        // Vérification CSRF (OWASP A01)
         if (!$this->isCsrfTokenValid('demande_email', $request->request->get('_token'))) {
             $this->addFlash('danger', 'Token CSRF invalide.');
             return $this->redirectToRoute('app_compte');
@@ -178,23 +246,18 @@ final class CompteController extends AbstractController
 
         $nouvelEmail = trim($request->request->get('nouvel_email', ''));
 
+        // Validation de l'email (OWASP A03)
         if (!filter_var($nouvelEmail, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('danger', 'Adresse email invalide.');
             return $this->redirectToRoute('app_compte');
         }
 
-        if ($nouvelEmail === $utilisateur->getEmail()) {
-            $this->addFlash('danger', 'Le nouvel email est identique à l\'actuel.');
+        if (mb_strlen($nouvelEmail) > 180) {
+            $this->addFlash('danger', 'L\'adresse email ne peut pas dépasser 180 caractères.');
             return $this->redirectToRoute('app_compte');
         }
 
-        $existant = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $nouvelEmail]);
-        if ($existant) {
-            $this->addFlash('danger', 'Cet email est déjà utilisé par un autre compte.');
-            return $this->redirectToRoute('app_compte');
-        }
-
-        // Token brut dans l'email, hash SHA-256 en BDD
+        // ✅ FIX ANTI-ÉNUMÉRATION : message identique que l'email soit pris ou non
         $tokenBrut = bin2hex(random_bytes(32));
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
@@ -211,10 +274,9 @@ final class CompteController extends AbstractController
 
         $email = (new Email())
             ->to($utilisateur->getEmail())
-            ->subject('Confirmation de changement d\'adresse email')
+            ->subject('Confirmez le changement de votre adresse email')
             ->html($this->renderView('emails/confirmer_changement_email_ancien.html.twig', [
                 'utilisateur' => $utilisateur,
-                'nouvelEmail' => $nouvelEmail,
                 'lien'        => $lien,
             ]));
 
@@ -224,17 +286,19 @@ final class CompteController extends AbstractController
         return $this->redirectToRoute('app_compte');
     }
 
-    // ----------------------------------------------------------------
-    // Étape 2 : L'utilisateur clique le lien depuis l'ancien email
-    //           → on envoie un lien de validation au NOUVEL email
-    // ----------------------------------------------------------------
+    // ── Étape 2 : Confirmation depuis l'ancien email ──────────────────────────
     #[Route('/confirmer-email-ancien/{token}', name: 'app_compte_confirmer_email_ancien', methods: ['GET'])]
     public function confirmerEmailAncien(
         string $token,
         EntityManagerInterface $em,
         MailerInterface $mailer,
     ): Response {
-        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        // Validation du format du token (OWASP A03)
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
+            return $this->redirectToRoute('app_connexion');
+        }
+
         $utilisateur = $em->getRepository(Utilisateur::class)
             ->findOneBy(['emailChangeToken' => hash('sha256', $token)]);
 
@@ -245,10 +309,10 @@ final class CompteController extends AbstractController
             || !$utilisateur->getPendingEmail()
         ) {
             $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
-            return $this->redirectToRoute('app_compte');
+            return $this->redirectToRoute('app_connexion');
         }
 
-        // Nouveau token brut pour l'étape 2, hash en BDD
+        // Nouveau token pour l'étape 2
         $nouveauTokenBrut = bin2hex(random_bytes(32));
         $expiresAt        = new \DateTimeImmutable('+1 hour');
 
@@ -276,16 +340,18 @@ final class CompteController extends AbstractController
         return $this->redirectToRoute('app_compte');
     }
 
-    // ----------------------------------------------------------------
-    // Étape 3 : L'utilisateur clique le lien depuis le NOUVEL email
-    //           → on applique le changement
-    // ----------------------------------------------------------------
+    // ── Étape 3 : Application du changement depuis le nouvel email ────────────
     #[Route('/confirmer-email-nouveau/{token}', name: 'app_compte_confirmer_email_nouveau', methods: ['GET'])]
     public function confirmerEmailNouveau(
         string $token,
         EntityManagerInterface $em,
     ): Response {
-        // On hash le token reçu dans l'URL pour le comparer à ce qui est en BDD
+        // Validation du format du token (OWASP A03)
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
+            return $this->redirectToRoute('app_connexion');
+        }
+
         $utilisateur = $em->getRepository(Utilisateur::class)
             ->findOneBy(['emailChangeToken' => hash('sha256', $token)]);
 
@@ -296,7 +362,7 @@ final class CompteController extends AbstractController
             || !$utilisateur->getPendingEmail()
         ) {
             $this->addFlash('danger', 'Ce lien est invalide ou a expiré.');
-            return $this->redirectToRoute('app_compte');
+            return $this->redirectToRoute('app_connexion');
         }
 
         $utilisateur->setEmail($utilisateur->getPendingEmail());
@@ -305,7 +371,7 @@ final class CompteController extends AbstractController
         $utilisateur->setEmailChangeTokenExpiresAt(null);
         $em->flush();
 
-        $this->addFlash('success', 'Votre adresse email a été modifiée avec succès.');
+        $this->addFlash('success', 'Votre adresse email a été mise à jour avec succès.');
         return $this->redirectToRoute('app_compte');
     }
 }

@@ -19,6 +19,24 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/mon-espace/mes-documents')]
 final class DocumentController extends AbstractController
 {
+    /**
+     * Extensions de fichier autorisées pour le mapping MIME → extension.
+     * Utilisé pour sécuriser le nommage des fichiers uploadés contre les cas
+     * où guessExtension() retourne null ou une extension inattendue.
+     *
+     * OWASP A03 : Validation des entrées — on n'accepte que des extensions connues.
+     */
+    private const ALLOWED_EXTENSIONS = [
+        'application/pdf'                                                          => 'pdf',
+        'image/jpeg'                                                               => 'jpg',
+        'image/png'                                                                => 'png',
+        'image/webp'                                                               => 'webp',
+        'application/msword'                                                       => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        'application/vnd.ms-excel'                                                 => 'xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'       => 'xlsx',
+    ];
+
     #[Route(name: 'app_mes_documents', methods: ['GET'])]
     public function index(DocumentRepository $documentRepository, DocumentAdminRepository $documentAdminRepository): Response
     {
@@ -73,17 +91,15 @@ final class DocumentController extends AbstractController
      * Téléchargement sécurisé d'un document reçu de l'admin (DocumentAdmin).
      * Seul le destinataire peut y accéder.
      */
-    #[Route('/telecharger-admin/{id}', name: 'app_download_document_admin', methods: ['GET'])]
-    public function downloadAdmin(DocumentAdmin $documentAdmin): BinaryFileResponse
+    #[Route('/telecharger-recu/{id}', name: 'app_download_document_admin', methods: ['GET'])]
+    public function downloadDocumentAdmin(DocumentAdmin $documentAdmin): BinaryFileResponse
     {
         /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        // ✅ FIX CRITIQUE : comparaison par ID et non par référence PHP
-        // La comparaison !== sur des objets Doctrine peut échouer si les objets
-        // sont chargés depuis des contextes d'EntityManager différents
-        if ($documentAdmin->getDestinataire()?->getId() !== $utilisateur->getId()) {
-            throw $this->createAccessDeniedException('Accès refusé à ce document.');
+        // IDOR : seul le destinataire du document peut le télécharger
+        if ($documentAdmin->getDestinataire() !== $utilisateur) {
+            throw $this->createAccessDeniedException('Accès interdit à ce document.');
         }
 
         $filePath = $this->getParameter('documents_directory') . '/' . $documentAdmin->getFichier();
@@ -105,22 +121,37 @@ final class DocumentController extends AbstractController
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger
     ): Response {
-        /** @var \App\Entity\Utilisateur $utilisateur */
-        $utilisateur = $this->getUser();
-
         $document = new Document();
-        $form = $this->createForm(DocumentType::class, $document, ['is_new' => true]);
+        $form     = $this->createForm(DocumentType::class, $document);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var \App\Entity\Utilisateur $utilisateur */
+            $utilisateur = $this->getUser();
+
             $fichierFile = $form->get('fichierFile')->getData();
 
             if ($fichierFile) {
+                // ── Validation du type MIME réel via finfo (OWASP A03) ─────────
+                // guessExtension() utilise déjà finfo internement dans Symfony,
+                // mais on double la validation avec finfo_file() pour s'assurer
+                // que l'extension correspondante est dans la liste blanche.
+                // Cela protège contre les fichiers dont le contenu ne correspond
+                // pas à l'extension déclarée par le client.
+                $realMime = $this->getRealMimeType($fichierFile->getPathname());
+
+                if (!isset(self::ALLOWED_EXTENSIONS[$realMime])) {
+                    $this->addFlash('danger', 'Type de fichier non autorisé. Formats acceptés : PDF, images, Word, Excel.');
+                    return $this->redirectToRoute('app_new_mes_documents');
+                }
+
+                // Extension déterminée depuis la liste blanche MIME → extension
+                // Evite les cas où guessExtension() retourne null ou une extension inattendue
+                $safeExtension = self::ALLOWED_EXTENSIONS[$realMime];
+
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                // ✅ FIX : bin2hex(random_bytes(8)) est cryptographiquement aléatoire
-                // contrairement à uniqid() qui est basé sur le timestamp microsecondes
-                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
+                $newFilename      = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $safeExtension;
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -163,6 +194,17 @@ final class DocumentController extends AbstractController
             $fichierFile = $form->get('fichierFile')->getData();
 
             if ($fichierFile) {
+                // ── Validation du type MIME réel (même protection que new()) ──
+                $realMime = $this->getRealMimeType($fichierFile->getPathname());
+
+                if (!isset(self::ALLOWED_EXTENSIONS[$realMime])) {
+                    $this->addFlash('danger', 'Type de fichier non autorisé. Formats acceptés : PDF, images, Word, Excel.');
+                    return $this->redirectToRoute('app_edit_mes_documents', ['id' => $document->getId()]);
+                }
+
+                $safeExtension = self::ALLOWED_EXTENSIONS[$realMime];
+
+                // Suppression de l'ancien fichier physique
                 $ancienFichier = $this->getParameter('documents_directory') . '/' . $document->getFichier();
                 if (file_exists($ancienFichier)) {
                     unlink($ancienFichier);
@@ -170,8 +212,8 @@ final class DocumentController extends AbstractController
 
                 $originalFilename = pathinfo($fichierFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename     = $slugger->slug($originalFilename);
-                // ✅ FIX : bin2hex(random_bytes(8)) cryptographiquement aléatoire
-                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $fichierFile->guessExtension();
+                // ✅ bin2hex(random_bytes(8)) cryptographiquement aléatoire
+                $newFilename = $safeFilename . '-' . bin2hex(random_bytes(8)) . '.' . $safeExtension;
 
                 $fichierFile->move(
                     $this->getParameter('documents_directory'),
@@ -214,5 +256,21 @@ final class DocumentController extends AbstractController
         }
 
         return $this->redirectToRoute('app_mes_documents', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Détecte le type MIME réel du fichier en lisant son contenu via finfo.
+     *
+     * OWASP A03 : Validation des entrées — ne pas faire confiance au Content-Type
+     * déclaré par le navigateur ni à l'extension du fichier. finfo lit les "magic bytes"
+     * pour déterminer le type réel du fichier, indépendamment de son nom.
+     *
+     * @param string $filePath chemin absolu vers le fichier temporaire
+     * @return string type MIME réel (ex: 'application/pdf')
+     */
+    private function getRealMimeType(string $filePath): string
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        return $finfo->file($filePath) ?: 'application/octet-stream';
     }
 }

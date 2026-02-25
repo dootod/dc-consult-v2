@@ -1,3 +1,23 @@
+# config/packages/twig.yaml
+#
+# OWASP A03:2021 – Injection (XSS)
+#
+# Protection XSS via Twig :
+# ─────────────────────────
+# L'auto-escape HTML est ACTIVÉ PAR DÉFAUT dans le bundle Twig de Symfony
+# et ne peut PAS être configuré via ce fichier (l'option 'autoescape' est
+# une option Twig standalone — non exposée par TwigBundle de Symfony).
+# Symfony/TwigBundle force autoescape = true sur tous les templates *.html.twig.
+#
+# Ce qu'il faut retenir pour l'équipe :
+#  - Toute variable {{ var }} est automatiquement échappée (htmlspecialchars)
+#  - Le filtre |raw désactive cet échappement — UNIQUEMENT sur du HTML
+#    produit en interne et de confiance (jamais sur des données utilisateur)
+#  - La protection en profondeur est assurée par la CSP (SecurityHeadersSubscriber)
+#
+# strict_variables : toute variable non définie lève une exception.
+# Symfony l'active automatiquement en dev via kernel.debug.
+
 twig:
     file_name_pattern: '*.twig'
     form_themes:

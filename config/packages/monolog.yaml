@@ -44,6 +44,13 @@ when@prod:
                 path: php://stderr
                 level: debug
                 formatter: monolog.formatter.json
+                # ✅ FIX OWASP A09 : Processor de nettoyage des données sensibles.
+                # Masque automatiquement les mots de passe, tokens, clés API et autres
+                # données personnelles avant qu'elles n'atteignent les logs de production.
+                # Le processeur est appliqué sur le handler "nested" pour couvrir tous
+                # les logs qui passent par "fingers_crossed" → "nested".
+                processors:
+                    - App\Monolog\SensitiveDataProcessor
             console:
                 type: console
                 process_psr_3_messages: false
@@ -53,3 +60,6 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+                # Le processeur s'applique aussi sur les logs de dépréciation
+                processors:
+                    - App\Monolog\SensitiveDataProcessor

@@ -1,0 +1,41 @@
+# config/packages/rate_limiter.yaml
+#
+# OWASP A07:2021 – Identification and Authentication Failures
+# OWASP A04:2021 – Insecure Design
+#
+# Configuration des rate limiters pour protéger les endpoints publics contre :
+#   - Le brute force
+#   - Le spam / flood de formulaires
+#   - L'énumération d'emails
+#   - Les attaques DDoS applicatives
+#
+# Stratégies disponibles :
+#   - fixed_window    : fenêtre fixe, simple et efficace pour l'anti-spam
+#   - sliding_window  : fenêtre glissante, plus précise (recommandée pour les endpoints critiques)
+#   - token_bucket    : seau à jetons, idéal pour les rafales légitimes
+
+framework:
+    rate_limiter:
+        # ── Inscription ───────────────────────────────────────────────────────
+        # Max 5 inscriptions par IP toutes les 15 minutes
+        # Prévient la création en masse de comptes spam / fake accounts
+        inscription:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '15 minutes'
+
+        # ── Endpoint général public ───────────────────────────────────────────
+        # Max 60 requêtes par minute par IP sur les pages publiques
+        # Prévient le scraping agressif et les attaques volumétriques légères
+        api_public:
+            policy: 'sliding_window'
+            limit: 60
+            interval: '1 minute'
+
+        # ── Réinitialisation de mot de passe ──────────────────────────────────
+        # Max 3 demandes par IP/email par heure
+        # Prévient l'énumération d'emails et le flood d'emails de reset
+        password_reset:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '1 hour'

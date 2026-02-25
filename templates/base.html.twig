@@ -166,9 +166,18 @@
                         <span class="dc-navbar__user-name">
                             {{ app.user.prenom ?? app.user.userIdentifier }}
                         </span>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <span class="dc-navbar__role-badge">Admin</span>
+                        {% endif %}
+                        <span class="dc-navbar__user-sep"></span>
+                        <form method="post" action="{{ path('app_deconnexion') }}" class="d-inline m-0 p-0">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="dc-navbar__btn-logout">
+                                <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
+                                <span class="d-none d-lg-inline">Déconnexion</span>
+                            </button>
+                        </form>
                     </div>
-
-                    <span class="dc-navbar__divider d-none d-lg-block"></span>
 
                     {% if is_granted('ROLE_ADMIN') %}
                         <a href="{{ path('app_dashboard_admin') }}"
@@ -181,11 +190,6 @@
                             <i class="fa-solid fa-gauge fa-sm me-1"></i>Mon espace
                         </a>
                     {% endif %}
-
-                    <a href="{{ logout_path() }}" class="dc-navbar__btn-logout">
-                        <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
-                        <span class="d-none d-lg-inline">Déconnexion</span>
-                    </a>
                 {% else %}
                     <a href="{{ path('app_connexion') }}" class="dc-navbar__btn-login">
                         <i class="fa-solid fa-lock fa-sm"></i>
