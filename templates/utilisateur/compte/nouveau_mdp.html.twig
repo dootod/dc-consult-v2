@@ -7,11 +7,10 @@
 <div class="mb-4">
     <h1 class="mb-1">Choisir un nouveau mot de passe</h1>
     <p class="text-muted small mb-0">
-        Pour des raisons de sécurité, votre nouveau mot de passe doit contenir au minimum 8 caractères.
+        Pour des raisons de sécurité, votre nouveau mot de passe doit contenir au minimum 8 caractères et être suffisamment fort (évitez les mots courants).
     </p>
 </div>
 
-{# ✅ CORRECTIF : Partial centralisé (warning et info désormais correctement stylés) #}
 {% include 'components/_flash_messages.html.twig' %}
 
 <div class="row justify-content-center">
@@ -27,7 +26,7 @@
                 <form method="post"
                       action="{{ path('app_compte_confirmer_mdp', {token: token}) }}"
                       class="vstack gap-3">
-                    <input type="hidden" name="_token" value="{{ csrf_token('nouveau_mdp') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('confirmer_mdp') }}">
 
                     <div>
                         <label for="nouveau_mdp" class="dc-form-label">Nouveau mot de passe</label>
@@ -48,12 +47,12 @@
                     </div>
 
                     <div>
-                        <label for="confirmation_mdp" class="dc-form-label">Confirmer le mot de passe</label>
+                        <label for="confirme_mdp" class="dc-form-label">Confirmer le mot de passe</label>
                         <div class="auth-input-wrap">
                             <input
                                 type="password"
-                                id="confirmation_mdp"
-                                name="confirmation_mdp"
+                                id="confirme_mdp"
+                                name="confirme_mdp"
                                 class="dc-form-control auth-form__input"
                                 required
                                 minlength="8"

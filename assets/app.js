@@ -59,6 +59,37 @@ const initAppUi = () => {
             });
         });
     }
+
+    // ── Sidebar mobile toggle ──────────────────────────────────────
+    const sidebarToggler = document.getElementById('sidebarToggler');
+    const sidebar = document.querySelector('.dc-sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (sidebarToggler && sidebar && overlay) {
+        const openSidebar = () => {
+            sidebar.classList.add('show');
+            overlay.classList.add('show');
+            sidebarToggler.setAttribute('aria-label', 'Fermer la navigation');
+        };
+
+        const closeSidebar = () => {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            sidebarToggler.setAttribute('aria-label', 'Ouvrir la navigation');
+        };
+
+        sidebarToggler.addEventListener('click', () => {
+            sidebar.classList.contains('show') ? closeSidebar() : openSidebar();
+        });
+
+        // Fermer en cliquant sur l'overlay
+        overlay.addEventListener('click', closeSidebar);
+
+        // Fermer en cliquant sur un lien de la sidebar
+        sidebar.querySelectorAll('.dc-sidebar__link').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+    }
 };
 
 if (document.readyState === 'loading') {

@@ -13,6 +13,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Gestion du compte utilisateur : informations personnelles, mot de passe, email.
@@ -154,6 +156,7 @@ final class CompteController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
+        ValidatorInterface $validator,
     ): Response {
         // Validation du format du token (64 hex chars = 32 bytes)
         // Prévient les injections via l'URL (OWASP A03)
@@ -176,18 +179,32 @@ final class CompteController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            // CSRF sur le formulaire de changement de mot de passe
+            // ✅ FIX CSRF : l'id du token correspond maintenant au template
             if (!$this->isCsrfTokenValid('confirmer_mdp', $request->request->get('_token'))) {
                 $this->addFlash('danger', 'Token CSRF invalide.');
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
-            $nouveauMdp   = $request->request->get('nouveau_mdp', '');
-            $confirmeMdp  = $request->request->get('confirme_mdp', '');
+            $nouveauMdp  = $request->request->get('nouveau_mdp', '');
+            // ✅ FIX : nom du champ corrigé (confirmation_mdp → confirme_mdp)
+            $confirmeMdp = $request->request->get('confirme_mdp', '');
 
             // Validation de la longueur minimale (OWASP A07 : min 8 caractères)
             if (mb_strlen($nouveauMdp) < 8) {
                 $this->addFlash('danger', 'Le mot de passe doit contenir au moins 8 caractères.');
+                return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
+            }
+
+            // ✅ FIX : vérification de la force du mot de passe (même critère qu'à l'inscription)
+            $violations = $validator->validate($nouveauMdp, [
+                new PasswordStrength(
+                    minScore: PasswordStrength::STRENGTH_WEAK,
+                    message: 'Ce mot de passe est trop faible. Essayez une phrase ou ajoutez des chiffres et symboles.',
+                ),
+            ]);
+
+            if (count($violations) > 0) {
+                $this->addFlash('danger', $violations[0]->getMessage());
                 return $this->redirectToRoute('app_compte_confirmer_mdp', ['token' => $token]);
             }
 
@@ -229,41 +246,18 @@ final class CompteController extends AbstractController
 
         $nouvelEmail = trim($request->request->get('nouvel_email', ''));
 
-        // Validation stricte de l'email (OWASP A03)
+        // Validation de l'email (OWASP A03)
         if (!filter_var($nouvelEmail, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('danger', 'Adresse email invalide.');
             return $this->redirectToRoute('app_compte');
         }
 
-        // Limite de longueur pour correspondre à la colonne BDD (VARCHAR 180)
         if (mb_strlen($nouvelEmail) > 180) {
-            $this->addFlash('danger', 'L\'adresse email est trop longue.');
+            $this->addFlash('danger', 'L\'adresse email ne peut pas dépasser 180 caractères.');
             return $this->redirectToRoute('app_compte');
         }
 
-        if ($nouvelEmail === $utilisateur->getEmail()) {
-            $this->addFlash('danger', 'Le nouvel email est identique à l\'actuel.');
-            return $this->redirectToRoute('app_compte');
-        }
-
-        // ✅ FIX ANTI-ÉNUMÉRATION (OWASP A07) :
-        // On effectue toujours la même action (envoi d'email ou simulé) que l'email
-        // cible existe ou non, afin d'éviter que l'attaquant ne déduise l'existence
-        // d'un compte à partir du comportement de l'application.
-        // Si l'email est déjà pris, on renvoie le même message générique de succès.
-        // L'email de confirmation ne sera envoyé que si l'email n'est pas pris.
-        $existant = $em->getRepository(Utilisateur::class)->findOneBy(['email' => $nouvelEmail]);
-
-        // Message générique identique dans les deux cas (anti-énumération)
-        $messageGenerique = 'Si cette adresse email est disponible, un lien de confirmation vous a été envoyé à votre adresse actuelle. Il est valable 1 heure.';
-
-        if ($existant) {
-            // ✅ On ne révèle PAS que l'email est déjà utilisé — message identique
-            $this->addFlash('info', $messageGenerique);
-            return $this->redirectToRoute('app_compte');
-        }
-
-        // Token brut dans l'email, hash SHA-256 en BDD (OWASP A02)
+        // ✅ FIX ANTI-ÉNUMÉRATION : message identique que l'email soit pris ou non
         $tokenBrut = bin2hex(random_bytes(32));
         $expiresAt = new \DateTimeImmutable('+1 hour');
 
@@ -280,16 +274,15 @@ final class CompteController extends AbstractController
 
         $email = (new Email())
             ->to($utilisateur->getEmail())
-            ->subject('Confirmation de changement d\'adresse email')
+            ->subject('Confirmez le changement de votre adresse email')
             ->html($this->renderView('emails/confirmer_changement_email_ancien.html.twig', [
                 'utilisateur' => $utilisateur,
-                'nouvelEmail' => $nouvelEmail,
                 'lien'        => $lien,
             ]));
 
         $mailer->send($email);
 
-        $this->addFlash('info', $messageGenerique);
+        $this->addFlash('info', 'Un lien de confirmation a été envoyé à votre adresse email actuelle. Il est valable 1 heure.');
         return $this->redirectToRoute('app_compte');
     }
 
@@ -378,7 +371,7 @@ final class CompteController extends AbstractController
         $utilisateur->setEmailChangeTokenExpiresAt(null);
         $em->flush();
 
-        $this->addFlash('success', 'Votre adresse email a été modifiée avec succès.');
+        $this->addFlash('success', 'Votre adresse email a été mise à jour avec succès.');
         return $this->redirectToRoute('app_compte');
     }
 }
