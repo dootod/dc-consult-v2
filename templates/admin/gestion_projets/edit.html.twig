@@ -2,11 +2,6 @@
 
 {% block title %}Modifier — {{ projet.titre }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('styles/projets-admin.css') }}">
-{% endblock %}
-
 {% block body %}
 
 {% include 'components/_flash_messages.html.twig' %}
@@ -194,7 +189,4 @@
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('js/projets-admin.js') }}"></script>
-{% endblock %}
+

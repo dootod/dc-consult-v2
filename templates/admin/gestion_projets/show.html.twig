@@ -2,11 +2,6 @@
 
 {% block title %}{{ projet.titre }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('styles/projets-admin.css') }}">
-{% endblock %}
-
 {% block body %}
 
 {% include 'components/_flash_messages.html.twig' %}

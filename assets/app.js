@@ -8,9 +8,11 @@ import './stimulus_bootstrap.js';
  */
 import './styles/app.css';
 import './styles/auth.css';
+import './styles/projets-admin.css';
 import './js/admin-documents.js';
 import './js/admin-users.js';
 import './js/auth.js';
+import './js/projets-admin.js';
 
 const initAppUi = () => {
     // ── Effet shadow sur la navbar au scroll ──────────────────────
@@ -43,13 +45,10 @@ const initAppUi = () => {
             navbarToggler.setAttribute('aria-expanded', 'false');
         });
 
-        // Ferme le menu uniquement pour les liens "internes" (ancres),
-        // afin d'éviter l'effet de rétractation juste avant un changement de page
+        // Ferme le menu uniquement pour les liens "internes" (ancres)
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const href = link.getAttribute('href') || '';
-
-                // Si le lien pointe vers une ancre de la page actuelle, on ferme le menu
                 if (href.startsWith('#')) {
                     const bsCollapse = bootstrap?.Collapse?.getOrCreateInstance
                         ? bootstrap.Collapse.getOrCreateInstance(navbarCollapse)
@@ -59,41 +58,6 @@ const initAppUi = () => {
             });
         });
     }
-
-    // ── Sidebar mobile toggle ──────────────────────────────────────
-    const sidebarToggler = document.getElementById('sidebarToggler');
-    const sidebar = document.querySelector('.dc-sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (sidebarToggler && sidebar && overlay) {
-        const openSidebar = () => {
-            sidebar.classList.add('show');
-            overlay.classList.add('show');
-            sidebarToggler.setAttribute('aria-label', 'Fermer la navigation');
-        };
-
-        const closeSidebar = () => {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-            sidebarToggler.setAttribute('aria-label', 'Ouvrir la navigation');
-        };
-
-        sidebarToggler.addEventListener('click', () => {
-            sidebar.classList.contains('show') ? closeSidebar() : openSidebar();
-        });
-
-        // Fermer en cliquant sur l'overlay
-        overlay.addEventListener('click', closeSidebar);
-
-        // Fermer en cliquant sur un lien de la sidebar
-        sidebar.querySelectorAll('.dc-sidebar__link').forEach(link => {
-            link.addEventListener('click', closeSidebar);
-        });
-    }
 };
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAppUi);
-} else {
-    initAppUi();
-}
+document.addEventListener('DOMContentLoaded', initAppUi);

@@ -1,0 +1,150 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block title %}Nouveau projet{% endblock %}
+
+{% block body %}
+
+{% include 'components/_flash_messages.html.twig' %}
+
+{# ── En-tête ── #}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="admin-page-header__title">Nouveau projet</h1>
+        <p class="admin-page-header__sub">Renseignez les informations du projet et uploadez ses images.</p>
+    </div>
+    <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">
+        <i class="fa-solid fa-arrow-left"></i>
+        Retour
+    </a>
+</div>
+
+{{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data', class: 'projet-form'}}) }}
+
+<div class="row g-4">
+
+    {# ── Colonne principale ── #}
+    <div class="col-12 col-lg-8">
+
+        {# Informations générales #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Informations générales
+                </span>
+            </div>
+            <div class="dc-card__body">
+
+                <div class="mb-3">
+                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">
+                        Titre <span class="text-danger">*</span>
+                    </label>
+                    {{ form_widget(form.titre, {attr: {class: 'dc-form-control'}}) }}
+                    {{ form_errors(form.titre) }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
+                    {{ form_widget(form.description, {attr: {class: 'dc-form-control'}}) }}
+                    {{ form_errors(form.description) }}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
+                        {{ form_widget(form.localisation, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.localisation) }}
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="dc-form-label" for="{{ form.date.vars.id }}">Date</label>
+                        {{ form_widget(form.date, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.date) }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {# Caractéristiques techniques #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-ruler-combined"></i>
+                    Caractéristiques
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="dc-form-label" for="{{ form.taille.vars.id }}">Taille</label>
+                        {{ form_widget(form.taille, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.taille) }}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="dc-form-label" for="{{ form.maitreOuvrage.vars.id }}">Maître d'ouvrage</label>
+                        {{ form_widget(form.maitreOuvrage, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.maitreOuvrage) }}
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="dc-form-label" for="{{ form.maitreOeuvre.vars.id }}">Maître d'œuvre</label>
+                        {{ form_widget(form.maitreOeuvre, {attr: {class: 'dc-form-control'}}) }}
+                        {{ form_errors(form.maitreOeuvre) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Colonne latérale : images ── #}
+    <div class="col-12 col-lg-4">
+        <div class="dc-card" style="position: sticky; top: calc(var(--navbar-height) + 1.5rem);">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-images"></i>
+                    Images du projet
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <p class="text-muted small mb-3">
+                    <i class="fa-solid fa-circle-info text-primary me-1"></i>
+                    La <strong>première image</strong> sélectionnée sera la couverture. Les suivantes alimenteront le carrousel.
+                </p>
+
+                {# Multi-upload drop zone #}
+                <div class="drop-zone drop-zone--multi" id="projetDropZone">
+                    {{ form_widget(form.imagesFiles, {attr: {
+                        id: 'projetImagesInput',
+                        class: 'drop-zone__input',
+                        multiple: 'multiple',
+                        accept: 'image/jpeg,image/png,image/webp'
+                    }}) }}
+                    <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
+                    <p class="drop-zone__text" id="projetDropZoneText">Glissez vos images ici ou cliquez</p>
+                    <p class="drop-zone__hint">JPEG, PNG, WebP — 5 Mo max par image</p>
+                </div>
+                {{ form_errors(form.imagesFiles) }}
+
+                {# Prévisualisation des images sélectionnées #}
+                <div class="projet-preview-grid mt-3" id="projetPreviewGrid"></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ── Bouton de soumission ── #}
+<div class="d-flex justify-content-end gap-2 mt-4">
+    <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">Annuler</a>
+    <button type="submit" class="dc-btn dc-btn--primary">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Créer le projet
+    </button>
+</div>
+
+{{ form_end(form) }}
+
+{% endblock %}
+
+
