@@ -1,148 +1,172 @@
 /**
  * DC Consult — Gestion Projets Admin
- * Gère :
- *  - Drop zone multi-images avec prévisualisation
- *  - Sélection de la cover dans l'édition
- *  - Marquage visuel des images à supprimer
+ *
+ * Architecture :
+ *  - Cover   : <label for="coverFileInput"> déclenche l'input nativement (100% fiable)
+ *  - Carousel: <div id="carouselDropZone"> appelle input.click() au clic
+ *  - Preview : FileReader async → Promise.all → ordre garanti
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+'use strict';
 
-    // ── Drop zone multi-images ──────────────────────────────────────────────
+const MIME_OK = ['image/jpeg', 'image/png', 'image/webp'];
 
-    const dropZone    = document.getElementById('projetDropZone');
-    const fileInput   = document.getElementById('projetImagesInput');
-    const dropText    = document.getElementById('projetDropZoneText');
-    const previewGrid = document.getElementById('projetPreviewGrid');
+/** Lit un fichier et renvoie sa data-URL */
+function toDataURL(file) {
+    return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload  = e => res(e.target.result);
+        r.onerror = ()  => rej(new Error('Lecture impossible'));
+        r.readAsDataURL(file);
+    });
+}
 
-    if (dropZone && fileInput) {
+// ────────────────────────────────────────────────────────────────
+// COVER — label natif → input → change → preview
+// ────────────────────────────────────────────────────────────────
+function initCover() {
+    const input    = document.getElementById('coverFileInput');
+    const zone     = document.getElementById('coverDropZone');
+    const icon     = document.getElementById('coverDropIcon');
+    const text     = document.getElementById('coverDropText');
+    const preview  = document.getElementById('coverPreview');
+    const img      = document.getElementById('coverPreviewImg');
+    const removeBtn = document.getElementById('coverPreviewRemove');
 
-        // Clic sur la zone → ouvre le sélecteur de fichiers
-        dropZone.addEventListener('click', () => fileInput.click());
+    if (!input) return;
 
-        // Drag & drop
-        dropZone.addEventListener('dragover', (e) => {
+    // Le <label for="coverFileInput"> ouvre nativement le sélecteur.
+    // On écoute uniquement le 'change' sur l'input.
+    input.addEventListener('change', () => {
+        const f = input.files?.[0];
+        f ? showPreview(f) : hide();
+    });
+
+    // Drag & drop sur la zone (qui est un <label>)
+    if (zone) {
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('is-dragover'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
+        zone.addEventListener('dragend',   () => zone.classList.remove('is-dragover'));
+        zone.addEventListener('drop', e => {
             e.preventDefault();
-            dropZone.classList.add('is-dragover');
-        });
-
-        ['dragleave', 'dragend'].forEach(evt => {
-            dropZone.addEventListener(evt, () => dropZone.classList.remove('is-dragover'));
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('is-dragover');
-
-            const dt = e.dataTransfer;
-            if (dt?.files?.length) {
-                // Transférer les fichiers dans l'input
-                const dataTransfer = new DataTransfer();
-                Array.from(dt.files).forEach(f => {
-                    if (['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
-                        dataTransfer.items.add(f);
-                    }
-                });
-                fileInput.files = dataTransfer.files;
-                updatePreview(fileInput.files);
-            }
-        });
-
-        // Changement via l'input standard
-        fileInput.addEventListener('change', () => {
-            updatePreview(fileInput.files);
+            zone.classList.remove('is-dragover');
+            const f = [...(e.dataTransfer?.files || [])].find(f => MIME_OK.includes(f.type));
+            if (!f) return;
+            const dt = new DataTransfer();
+            dt.items.add(f);
+            input.files = dt.files;
+            showPreview(f);
         });
     }
 
-    /**
-     * Génère les thumbnails de prévisualisation en mémoire.
-     * La première image reçoit le badge "Cover".
-     */
-    function updatePreview(files) {
-        if (!previewGrid) return;
+    removeBtn?.addEventListener('click', () => { input.value = ''; hide(); });
 
-        previewGrid.innerHTML = '';
+    async function showPreview(file) {
+        try {
+            const url = await toDataURL(file);
+            if (img)     img.src           = url;
+            if (preview) preview.style.display = 'block';
+            if (zone)    zone.classList.add('has-file');
+            if (text)    text.textContent   = '✓ ' + file.name;
+            if (icon)    { icon.className = 'fa-solid fa-circle-check pj-dropzone__icon'; icon.style.color = '#16a34a'; }
+        } catch { /* silencieux */ }
+    }
 
-        if (files.length === 0) {
-            if (dropText) dropText.textContent = 'Glissez vos images ici ou cliquez';
-            dropZone?.classList.remove('has-file');
+    function hide() {
+        if (img)     img.src           = '';
+        if (preview) preview.style.display = 'none';
+        if (zone)    zone.classList.remove('has-file');
+        if (text)    text.textContent   = 'Cliquez ou glissez votre image ici';
+        if (icon)    { icon.className = 'fa-solid fa-image pj-dropzone__icon'; icon.style.color = ''; }
+    }
+}
+
+// ────────────────────────────────────────────────────────────────
+// CAROUSEL — div cliquable → input.click() → change → grille
+// ────────────────────────────────────────────────────────────────
+function initCarousel() {
+    const zone  = document.getElementById('carouselDropZone');
+    const input = document.getElementById('carouselFilesInput');
+    const text  = document.getElementById('carouselDropText');
+    const grid  = document.getElementById('carouselPreviewGrid');
+
+    if (!input || !zone) return;
+
+    // Clic sur la div → ouvre le sélecteur
+    zone.addEventListener('click', () => input.click());
+
+    // Drag & drop
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('is-dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
+    zone.addEventListener('dragend',   () => zone.classList.remove('is-dragover'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('is-dragover');
+        const nouveaux = [...(e.dataTransfer?.files || [])].filter(f => MIME_OK.includes(f.type));
+        if (!nouveaux.length) return;
+        const dt = new DataTransfer();
+        [...(input.files || []), ...nouveaux].forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        renderGrid(input.files);
+    });
+
+    // Sélection via le sélecteur natif
+    input.addEventListener('change', () => renderGrid(input.files));
+
+    async function renderGrid(files) {
+        if (!grid) return;
+
+        if (!files?.length) {
+            grid.innerHTML = '';
+            if (text) text.textContent = 'Cliquez ou glissez vos images ici';
+            zone.classList.remove('has-file');
             return;
         }
 
-        const count = files.length;
-        if (dropText) {
-            dropText.textContent = count + ' image' + (count > 1 ? 's' : '') + ' sélectionnée' + (count > 1 ? 's' : '');
-        }
-        dropZone?.classList.add('has-file');
+        const n = files.length;
+        if (text) text.textContent = n + ' image' + (n > 1 ? 's' : '') + ' sélectionnée' + (n > 1 ? 's' : '');
+        zone.classList.add('has-file');
 
-        Array.from(files).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const item = document.createElement('div');
-                item.className = 'projet-preview-item';
-
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = file.name;
-                item.appendChild(img);
-
-                if (index === 0) {
-                    const badge = document.createElement('span');
-                    badge.className = 'projet-preview-item__cover-badge';
-                    badge.textContent = '★ Cover';
-                    item.appendChild(badge);
-                }
-
-                previewGrid.appendChild(item);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // ── Sélection de la cover (page edit) ──────────────────────────────────
-
-    const coverInput = document.getElementById('coverImageIdInput');
-
-    document.querySelectorAll('.projet-edit-thumb__cover-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const imageId = btn.dataset.imageId;
-
-            // Mettre à jour l'input caché
-            if (coverInput) coverInput.value = imageId;
-
-            // Mettre à jour l'UI : toutes les étoiles repassent en "vide"
-            document.querySelectorAll('.projet-edit-thumb__cover-btn').forEach(b => {
-                b.classList.remove('is-cover');
-                b.querySelector('i').className = 'fa-regular fa-star';
-                b.closest('.projet-edit-thumb')?.classList.remove('is-cover-selected');
-            });
-
-            // L'étoile cliquée devient "pleine"
-            btn.classList.add('is-cover');
-            btn.querySelector('i').className = 'fa-solid fa-star';
-            btn.closest('.projet-edit-thumb')?.classList.add('is-cover-selected');
-        });
-    });
-
-    // Marquer la cover actuelle visuellement au chargement
-    if (coverInput && coverInput.value) {
-        const currentCoverBtn = document.querySelector(
-            `.projet-edit-thumb__cover-btn[data-image-id="${coverInput.value}"]`
+        // Lire toutes les images en parallèle → order garanti
+        const results = await Promise.all(
+            [...files].map((f, i) => toDataURL(f).then(url => ({ url, i, name: f.name })))
         );
-        if (currentCoverBtn) {
-            currentCoverBtn.closest('.projet-edit-thumb')?.classList.add('is-cover-selected');
-        }
+        results.sort((a, b) => a.i - b.i);
+
+        grid.innerHTML = '';
+        results.forEach(({ url, name }) => {
+            const item = document.createElement('div');
+            item.className = 'pj-preview-item';
+            const img = document.createElement('img');
+            img.src = url; img.alt = name;
+            item.appendChild(img);
+            grid.appendChild(item);
+        });
     }
+}
 
-    // ── Marquage visuel des images à supprimer ──────────────────────────────
-
-    document.querySelectorAll('.projet-delete-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            const thumb = checkbox.closest('.projet-edit-thumb');
-            if (thumb) {
-                thumb.classList.toggle('is-marked-delete', checkbox.checked);
-            }
+// ────────────────────────────────────────────────────────────────
+// SUPPRESSION (page edit)
+// ────────────────────────────────────────────────────────────────
+function initDeleteCheckboxes() {
+    document.querySelectorAll('.projet-delete-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+            cb.closest('.projet-edit-thumb')?.classList.toggle('is-marked-delete', cb.checked);
         });
     });
+}
 
-});
+// ────────────────────────────────────────────────────────────────
+// BOOT (fonctionne que le script soit defer, module, ou inline)
+// ────────────────────────────────────────────────────────────────
+function boot() {
+    initCover();
+    initCarousel();
+    initDeleteCheckboxes();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+} else {
+    boot();
+}

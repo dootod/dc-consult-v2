@@ -6,7 +6,6 @@
 
 {% include 'components/_flash_messages.html.twig' %}
 
-{# ── En-tête ── #}
 <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
     <div>
         <h1 class="admin-page-header__title">Modifier le projet</h1>
@@ -22,8 +21,8 @@
 
 <div class="row g-4">
 
-    {# ── Colonne principale ── #}
-    <div class="col-12 col-lg-8">
+    {# ── Colonne principale : infos ── #}
+    <div class="col-12 col-lg-7">
 
         <div class="dc-card mb-4">
             <div class="dc-card__head">
@@ -33,21 +32,16 @@
                 </span>
             </div>
             <div class="dc-card__body">
-
                 <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">
-                        Titre <span class="text-danger">*</span>
-                    </label>
+                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">Titre <span class="text-danger">*</span></label>
                     {{ form_widget(form.titre, {attr: {class: 'dc-form-control'}}) }}
                     {{ form_errors(form.titre) }}
                 </div>
-
                 <div class="mb-3">
                     <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
                     {{ form_widget(form.description, {attr: {class: 'dc-form-control'}}) }}
                     {{ form_errors(form.description) }}
                 </div>
-
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
                         <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
@@ -60,11 +54,10 @@
                         {{ form_errors(form.date) }}
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <div class="dc-card mb-4">
+        <div class="dc-card">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-ruler-combined"></i>
@@ -95,43 +88,82 @@
     </div>
 
     {# ── Colonne latérale : images ── #}
-    <div class="col-12 col-lg-4">
+    <div class="col-12 col-lg-5">
 
-        {# Images existantes #}
-        {% if projet.images is not empty %}
+        {# ── Section 1 : Cover actuelle + remplacement ── #}
+        <div class="dc-card mb-4">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-star text-warning"></i>
+                    Image de couverture
+                </span>
+            </div>
+            <div class="dc-card__body">
+
+                {# Cover actuelle #}
+                {% set cover = projet.coverImage %}
+                {% if cover %}
+                    <p class="text-muted small mb-2">Cover actuelle :</p>
+                    <div class="projet-cover-preview mb-3">
+                        <img src="{{ path('app_voir_image_projet_admin', {id: cover.id}) }}"
+                             alt="Cover actuelle">
+                        <span class="projet-cover-preview__badge">
+                            <i class="fa-solid fa-star"></i> Cover
+                        </span>
+                    </div>
+                {% endif %}
+
+                <p class="text-muted small mb-3">
+                    {{ cover ? 'Remplacer la cover (optionnel) :' : 'Aucune cover — uploadez-en une :' }}
+                    <span class="d-block" style="font-size:0.75rem;">La cover apparaît toujours en premier dans le carousel.</span>
+                </p>
+
+                {# Input caché — activé par le label #}
+                {{ form_widget(form.coverFile, {attr: {
+                    id: 'coverFileInput',
+                    class: 'pj-file-input-hidden'
+                }}) }}
+                {{ form_errors(form.coverFile) }}
+
+                <label for="{{ form.coverFile.vars.id }}" class="pj-dropzone" id="coverDropZone">
+                    <i class="fa-solid fa-image pj-dropzone__icon" id="coverDropIcon"></i>
+                    <span class="pj-dropzone__text" id="coverDropText">Cliquez ou glissez votre image ici</span>
+                    <span class="pj-dropzone__hint">JPEG, PNG, WebP — 5 Mo max</span>
+                </label>
+
+                <div id="coverPreview" class="mt-3" style="display:none;">
+                    <div class="projet-cover-preview">
+                        <img id="coverPreviewImg" src="" alt="Nouvelle cover">
+                        <button type="button" class="projet-cover-preview__remove" id="coverPreviewRemove" title="Retirer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <span class="projet-cover-preview__badge">
+                            <i class="fa-solid fa-star"></i> Nouvelle cover
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ── Section 2 : Images carousel existantes ── #}
+        {% set carouselImages = projet.carouselImages %}
+        {% if carouselImages is not empty %}
         <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-images"></i>
-                    Images existantes
+                    Images du carousel ({{ carouselImages|length }})
                 </span>
             </div>
             <div class="dc-card__body">
                 <p class="text-muted small mb-3">
-                    <i class="fa-solid fa-star text-warning me-1"></i> = cover actuelle.
-                    Cochez <i class="fa-solid fa-trash fa-xs"></i> pour supprimer. Cliquez sur <i class="fa-regular fa-star fa-xs"></i> pour changer la cover.
+                    Cochez <i class="fa-solid fa-trash fa-xs"></i> pour supprimer une image.
                 </p>
-
-                {# Champ caché transmis au contrôleur pour savoir quelle image est la nouvelle cover #}
-                <input type="hidden" name="cover_image_id" id="coverImageIdInput" value="{{ projet.coverImage ? projet.coverImage.id : '' }}">
-
                 <div class="projet-images-edit-grid">
-                    {% for image in projet.images %}
-                        <div class="projet-edit-thumb {% if image.isCover %}is-cover-selected{% endif %}" id="thumb-{{ image.id }}">
-                            {# Image servie via route sécurisée ROLE_ADMIN #}
-                            <img
-                                src="{{ path('app_voir_image_projet_admin', {id: image.id}) }}"
-                                alt="Image {{ loop.index }}"
-                                loading="lazy"
-                            >
-                            {# Bouton étoile — changer la cover #}
-                            <button type="button"
-                                    class="projet-edit-thumb__cover-btn {% if image.isCover %}is-cover{% endif %}"
-                                    data-image-id="{{ image.id }}"
-                                    title="{{ image.isCover ? 'Cover actuelle' : 'Définir comme cover' }}">
-                                <i class="fa-{% if image.isCover %}solid{% else %}regular{% endif %} fa-star"></i>
-                            </button>
-                            {# Checkbox suppression #}
+                    {% for image in carouselImages %}
+                        <div class="projet-edit-thumb" id="thumb-{{ image.id }}">
+                            <img src="{{ path('app_voir_image_projet_admin', {id: image.id}) }}"
+                                 alt="Image carousel {{ loop.index }}" loading="lazy">
                             <label class="projet-edit-thumb__delete-check" title="Marquer pour suppression">
                                 <input type="checkbox"
                                        name="images_to_delete[]"
@@ -148,28 +180,35 @@
         </div>
         {% endif %}
 
-        {# Ajouter de nouvelles images #}
-        <div class="dc-card" style="position: sticky; top: calc(var(--navbar-height) + 1.5rem);">
+        {# ── Section 3 : Ajouter des images carousel ── #}
+        <div class="dc-card">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    Ajouter des images
+                    Ajouter des images au carousel
                 </span>
             </div>
             <div class="dc-card__body">
-                <div class="drop-zone drop-zone--multi" id="projetDropZone">
-                    {{ form_widget(form.imagesFiles, {attr: {
-                        id: 'projetImagesInput',
-                        class: 'drop-zone__input',
-                        multiple: 'multiple',
-                        accept: 'image/jpeg,image/png,image/webp'
-                    }}) }}
-                    <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
-                    <p class="drop-zone__text" id="projetDropZoneText">Glissez vos images ici ou cliquez</p>
-                    <p class="drop-zone__hint">JPEG, PNG, WebP — 5 Mo max par image</p>
+                <p class="text-muted small mb-3">
+                    <strong>La cover apparaît toujours en premier automatiquement.</strong>
+                </p>
+
+                {{ form_widget(form.carouselFiles, {attr: {
+                    id: 'carouselFilesInput',
+                    class: 'pj-file-input-hidden',
+                    multiple: 'multiple',
+                    accept: 'image/jpeg,image/png,image/webp'
+                }}) }}
+                {{ form_errors(form.carouselFiles) }}
+
+                <div class="pj-dropzone pj-dropzone--multi" id="carouselDropZone"
+                     data-target="carouselFilesInput">
+                    <i class="fa-solid fa-cloud-arrow-up pj-dropzone__icon"></i>
+                    <span class="pj-dropzone__text" id="carouselDropText">Cliquez ou glissez vos images ici</span>
+                    <span class="pj-dropzone__hint">JPEG, PNG, WebP — 5 Mo max par image</span>
                 </div>
-                {{ form_errors(form.imagesFiles) }}
-                <div class="projet-preview-grid mt-3" id="projetPreviewGrid"></div>
+
+                <div class="pj-preview-grid" id="carouselPreviewGrid"></div>
             </div>
         </div>
 
@@ -188,5 +227,3 @@
 {{ form_end(form) }}
 
 {% endblock %}
-
-

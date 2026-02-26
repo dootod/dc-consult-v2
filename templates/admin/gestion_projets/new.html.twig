@@ -6,11 +6,10 @@
 
 {% include 'components/_flash_messages.html.twig' %}
 
-{# ── En-tête ── #}
 <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
     <div>
         <h1 class="admin-page-header__title">Nouveau projet</h1>
-        <p class="admin-page-header__sub">Renseignez les informations du projet et uploadez ses images.</p>
+        <p class="admin-page-header__sub">Renseignez les informations du projet et ajoutez ses images.</p>
     </div>
     <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">
         <i class="fa-solid fa-arrow-left"></i>
@@ -18,14 +17,13 @@
     </a>
 </div>
 
-{{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data', class: 'projet-form'}}) }}
+{{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data'}}) }}
 
 <div class="row g-4">
 
-    {# ── Colonne principale ── #}
-    <div class="col-12 col-lg-8">
+    {# ── Colonne principale : infos ── #}
+    <div class="col-12 col-lg-7">
 
-        {# Informations générales #}
         <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
@@ -34,21 +32,16 @@
                 </span>
             </div>
             <div class="dc-card__body">
-
                 <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">
-                        Titre <span class="text-danger">*</span>
-                    </label>
+                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">Titre <span class="text-danger">*</span></label>
                     {{ form_widget(form.titre, {attr: {class: 'dc-form-control'}}) }}
                     {{ form_errors(form.titre) }}
                 </div>
-
                 <div class="mb-3">
                     <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
                     {{ form_widget(form.description, {attr: {class: 'dc-form-control'}}) }}
                     {{ form_errors(form.description) }}
                 </div>
-
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
                         <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
@@ -61,12 +54,10 @@
                         {{ form_errors(form.date) }}
                     </div>
                 </div>
-
             </div>
         </div>
 
-        {# Caractéristiques techniques #}
-        <div class="dc-card mb-4">
+        <div class="dc-card">
             <div class="dc-card__head">
                 <span class="dc-card__title">
                     <i class="fa-solid fa-ruler-combined"></i>
@@ -97,44 +88,91 @@
     </div>
 
     {# ── Colonne latérale : images ── #}
-    <div class="col-12 col-lg-4">
-        <div class="dc-card" style="position: sticky; top: calc(var(--navbar-height) + 1.5rem);">
+    <div class="col-12 col-lg-5">
+
+        {# ── Section 1 : Cover ── #}
+        <div class="dc-card mb-4">
             <div class="dc-card__head">
                 <span class="dc-card__title">
-                    <i class="fa-solid fa-images"></i>
-                    Images du projet
+                    <i class="fa-solid fa-star text-warning"></i>
+                    Image de couverture <span class="text-danger">*</span>
                 </span>
             </div>
             <div class="dc-card__body">
                 <p class="text-muted small mb-3">
-                    <i class="fa-solid fa-circle-info text-primary me-1"></i>
-                    La <strong>première image</strong> sélectionnée sera la couverture. Les suivantes alimenteront le carrousel.
+                    Cette image sera affichée sur la carte du projet et apparaîtra <strong>en premier dans le carousel</strong>.
                 </p>
 
-                {# Multi-upload drop zone #}
-                <div class="drop-zone drop-zone--multi" id="projetDropZone">
-                    {{ form_widget(form.imagesFiles, {attr: {
-                        id: 'projetImagesInput',
-                        class: 'drop-zone__input',
-                        multiple: 'multiple',
-                        accept: 'image/jpeg,image/png,image/webp'
-                    }}) }}
-                    <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
-                    <p class="drop-zone__text" id="projetDropZoneText">Glissez vos images ici ou cliquez</p>
-                    <p class="drop-zone__hint">JPEG, PNG, WebP — 5 Mo max par image</p>
+                {# Input caché — déclenché par le label/zone ci-dessous #}
+                {{ form_widget(form.coverFile, {attr: {
+                    id: 'coverFileInput',
+                    class: 'pj-file-input-hidden'
+                }}) }}
+                {{ form_errors(form.coverFile) }}
+
+                {# Zone cliquable (label HTML natif = fiable à 100%) #}
+                <label for="{{ form.coverFile.vars.id }}" class="pj-dropzone" id="coverDropZone"
+                       data-default-text="Cliquez ou glissez votre image ici">
+                    <i class="fa-solid fa-image pj-dropzone__icon" id="coverDropIcon"></i>
+                    <span class="pj-dropzone__text" id="coverDropText">Cliquez ou glissez votre image ici</span>
+                    <span class="pj-dropzone__hint">JPEG, PNG, WebP — 5 Mo max</span>
+                </label>
+
+                {# Prévisualisation cover #}
+                <div id="coverPreview" class="mt-3" style="display:none;">
+                    <div class="projet-cover-preview">
+                        <img id="coverPreviewImg" src="" alt="Aperçu cover">
+                        <button type="button" class="projet-cover-preview__remove" id="coverPreviewRemove" title="Retirer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <span class="projet-cover-preview__badge">
+                            <i class="fa-solid fa-star"></i> Cover
+                        </span>
+                    </div>
                 </div>
-                {{ form_errors(form.imagesFiles) }}
-
-                {# Prévisualisation des images sélectionnées #}
-                <div class="projet-preview-grid mt-3" id="projetPreviewGrid"></div>
-
             </div>
         </div>
+
+        {# ── Section 2 : Carousel ── #}
+        <div class="dc-card">
+            <div class="dc-card__head">
+                <span class="dc-card__title">
+                    <i class="fa-solid fa-images"></i>
+                    Images du carousel
+                </span>
+            </div>
+            <div class="dc-card__body">
+                <p class="text-muted small mb-3">
+                    Ces images composeront le carousel.
+                    <strong>La cover est toujours incluse automatiquement en premier.</strong>
+                    Optionnel.
+                </p>
+
+                {# Input caché multiple #}
+                {{ form_widget(form.carouselFiles, {attr: {
+                    id: 'carouselFilesInput',
+                    class: 'pj-file-input-hidden',
+                    multiple: 'multiple',
+                    accept: 'image/jpeg,image/png,image/webp'
+                }}) }}
+                {{ form_errors(form.carouselFiles) }}
+
+                {# Zone cliquable carousel — PAS un label (l'input n'a pas d'id fixe pour multiple) #}
+                <div class="pj-dropzone pj-dropzone--multi" id="carouselDropZone"
+                     data-target="carouselFilesInput">
+                    <i class="fa-solid fa-cloud-arrow-up pj-dropzone__icon"></i>
+                    <span class="pj-dropzone__text" id="carouselDropText">Cliquez ou glissez vos images ici</span>
+                    <span class="pj-dropzone__hint">JPEG, PNG, WebP — 5 Mo max par image</span>
+                </div>
+
+                <div class="pj-preview-grid" id="carouselPreviewGrid"></div>
+            </div>
+        </div>
+
     </div>
 
 </div>
 
-{# ── Bouton de soumission ── #}
 <div class="d-flex justify-content-end gap-2 mt-4">
     <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">Annuler</a>
     <button type="submit" class="dc-btn dc-btn--primary">
@@ -146,5 +184,3 @@
 {{ form_end(form) }}
 
 {% endblock %}
-
-

@@ -42,10 +42,8 @@ final class GestionProjetsController extends AbstractController
     // ── NEW ──────────────────────────────────────────────────────────────────
 
     #[Route('/nouveau', name: 'app_new_gestion_projets', methods: ['GET', 'POST'])]
-    public function new(
-        Request $request,
-        EntityManagerInterface $em
-    ): Response {
+    public function new(Request $request, EntityManagerInterface $em): Response
+    {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $projet = new Projet();
@@ -53,32 +51,35 @@ final class GestionProjetsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imagesFiles = $form->get('imagesFiles')->getData();
 
-            if (empty($imagesFiles)) {
-                $this->addFlash('danger', 'Au moins une image est requise pour créer un projet.');
-                return $this->render('admin/gestion_projets/new.html.twig', ['form' => $form]);
-            }
-
-            $isFirst = true;
-            foreach ($imagesFiles as $imageFile) {
-                $nomFichier = $this->saveImage($imageFile);
+            // ── Cover (obligatoire à la création) ────────────────────────────
+            $coverFile = $form->get('coverFile')->getData();
+            if ($coverFile) {
+                $nomFichier = $this->saveImage($coverFile);
                 if ($nomFichier === null) {
-                    $this->addFlash('danger', 'Un fichier uploadé n\'est pas une image valide et a été ignoré.');
-                    continue;
+                    $this->addFlash('danger', 'L\'image de couverture n\'est pas valide (JPEG, PNG ou WebP requis).');
+                    return $this->render('admin/gestion_projets/new.html.twig', ['form' => $form]);
                 }
-
-                $projetImage = new ProjetImage();
-                $projetImage->setNomFichier($nomFichier);
-                $projetImage->setIsCover($isFirst);
-                $projet->addImage($projetImage);
-
-                $isFirst = false;
+                $cover = new ProjetImage();
+                $cover->setNomFichier($nomFichier);
+                $cover->setIsCover(true);
+                $projet->addImage($cover);
             }
 
-            if ($projet->getImages()->isEmpty()) {
-                $this->addFlash('danger', 'Aucune image valide n\'a pu être traitée.');
-                return $this->render('admin/gestion_projets/new.html.twig', ['form' => $form]);
+            // ── Images carousel (optionnelles) ────────────────────────────────
+            $carouselFiles = $form->get('carouselFiles')->getData();
+            if (!empty($carouselFiles)) {
+                foreach ($carouselFiles as $file) {
+                    $nomFichier = $this->saveImage($file);
+                    if ($nomFichier === null) {
+                        $this->addFlash('danger', 'Une image du carousel n\'est pas valide et a été ignorée.');
+                        continue;
+                    }
+                    $image = new ProjetImage();
+                    $image->setNomFichier($nomFichier);
+                    $image->setIsCover(false);
+                    $projet->addImage($image);
+                }
             }
 
             $em->persist($projet);
@@ -104,22 +105,20 @@ final class GestionProjetsController extends AbstractController
     // ── EDIT ─────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/modifier', name: 'app_edit_gestion_projets', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(
-        Request $request,
-        Projet $projet,
-        EntityManagerInterface $em
-    ): Response {
+    public function edit(Request $request, Projet $projet, EntityManagerInterface $em): Response
+    {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $form = $this->createForm(ProjetType::class, $projet, ['is_new' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             // ── Suppression des images cochées ────────────────────────────────
             $idsToDelete = $request->request->all('images_to_delete');
             if (!empty($idsToDelete)) {
                 foreach ($idsToDelete as $imageId) {
-                    $imageId      = (int) $imageId;
+                    $imageId       = (int) $imageId;
                     $imageToDelete = $projet->getImages()->filter(
                         fn(ProjetImage $img) => $img->getId() === $imageId
                     )->first();
@@ -132,39 +131,43 @@ final class GestionProjetsController extends AbstractController
                 }
             }
 
-            // ── Changement de cover ───────────────────────────────────────────
-            $newCoverId = $request->request->getInt('cover_image_id');
-            if ($newCoverId > 0) {
-                foreach ($projet->getImages() as $img) {
-                    $img->setIsCover($img->getId() === $newCoverId);
+            // ── Remplacement de la cover ──────────────────────────────────────
+            $coverFile = $form->get('coverFile')->getData();
+            if ($coverFile) {
+                $nomFichier = $this->saveImage($coverFile);
+                if ($nomFichier !== null) {
+                    // Retirer l'ancienne cover
+                    foreach ($projet->getImages() as $img) {
+                        if ($img->isCover()) {
+                            $this->deleteImageFile($img->getNomFichier());
+                            $projet->removeImage($img);
+                            $em->remove($img);
+                            break;
+                        }
+                    }
+                    // Ajouter la nouvelle
+                    $newCover = new ProjetImage();
+                    $newCover->setNomFichier($nomFichier);
+                    $newCover->setIsCover(true);
+                    $projet->addImage($newCover);
+                } else {
+                    $this->addFlash('danger', 'L\'image de couverture fournie n\'est pas valide et a été ignorée.');
                 }
             }
 
-            // ── Ajout de nouvelles images ─────────────────────────────────────
-            $newImagesFiles = $form->get('imagesFiles')->getData();
-            if (!empty($newImagesFiles)) {
-                $hasCover = false;
-                foreach ($projet->getImages() as $img) {
-                    if ($img->isCover()) {
-                        $hasCover = true;
-                        break;
-                    }
-                }
-
-                $isFirstNew = !$hasCover;
-                foreach ($newImagesFiles as $imageFile) {
-                    $nomFichier = $this->saveImage($imageFile);
+            // ── Ajout d'images carousel ───────────────────────────────────────
+            $carouselFiles = $form->get('carouselFiles')->getData();
+            if (!empty($carouselFiles)) {
+                foreach ($carouselFiles as $file) {
+                    $nomFichier = $this->saveImage($file);
                     if ($nomFichier === null) {
-                        $this->addFlash('danger', 'Un fichier uploadé n\'est pas une image valide et a été ignoré.');
+                        $this->addFlash('danger', 'Une image du carousel n\'est pas valide et a été ignorée.');
                         continue;
                     }
-
-                    $projetImage = new ProjetImage();
-                    $projetImage->setNomFichier($nomFichier);
-                    $projetImage->setIsCover($isFirstNew);
-                    $projet->addImage($projetImage);
-
-                    $isFirstNew = false;
+                    $image = new ProjetImage();
+                    $image->setNomFichier($nomFichier);
+                    $image->setIsCover(false);
+                    $projet->addImage($image);
                 }
             }
 
@@ -188,21 +191,16 @@ final class GestionProjetsController extends AbstractController
     // ── DELETE ───────────────────────────────────────────────────────────────
 
     #[Route('/{id}/supprimer', name: 'app_delete_gestion_projets', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function delete(
-        Request $request,
-        Projet $projet,
-        EntityManagerInterface $em
-    ): Response {
+    public function delete(Request $request, Projet $projet, EntityManagerInterface $em): Response
+    {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         if ($this->isCsrfTokenValid('delete-projet-' . $projet->getId(), $request->getPayload()->getString('_token'))) {
             foreach ($projet->getImages() as $image) {
                 $this->deleteImageFile($image->getNomFichier());
             }
-
             $em->remove($projet);
             $em->flush();
-
             $this->addFlash('success', 'Projet « ' . $projet->getTitre() . ' » supprimé avec succès.');
         } else {
             $this->addFlash('danger', 'Action non autorisée : token de sécurité invalide.');
@@ -214,11 +212,8 @@ final class GestionProjetsController extends AbstractController
     // ── DELETE IMAGE individuelle ─────────────────────────────────────────────
 
     #[Route('/image/{id}/supprimer', name: 'app_delete_projet_image', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function deleteImage(
-        Request $request,
-        ProjetImage $projetImage,
-        EntityManagerInterface $em
-    ): Response {
+    public function deleteImage(Request $request, ProjetImage $projetImage, EntityManagerInterface $em): Response
+    {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $projet = $projetImage->getProjet();
@@ -232,6 +227,7 @@ final class GestionProjetsController extends AbstractController
             $em->remove($projetImage);
             $em->flush();
 
+            // Si la cover a été supprimée, désigner la première image restante
             if ($wasCover && $projet->getImages()->count() > 0) {
                 $projet->getImages()->first()->setIsCover(true);
                 $em->flush();
@@ -248,15 +244,9 @@ final class GestionProjetsController extends AbstractController
     // ── SERVE IMAGE (admin) ───────────────────────────────────────────────────
 
     /**
-     * Sert une image de projet depuis var/projets/ avec autorisation ROLE_ADMIN.
-     *
-     * Sécurité :
-     *  - ROLE_ADMIN obligatoire (+ access_control security.yaml couvre /admin/*)
-     *  - Path traversal impossible : l'ID en BDD donne le nom de fichier — jamais de
-     *    nom brut dans l'URL ni de paramètre de chemin contrôlable par l'utilisateur
-     *  - Content-Type forcé depuis les magic bytes réels (finfo) — jamais depuis l'URL
-     *  - DISPOSITION_INLINE pour affichage in-browser
-     *  - Cache navigateur 1h (performance sans compromettre la sécurité)
+     * Sert une image depuis var/projets/ — réservé aux admins.
+     * Path traversal impossible : chemin résolu via l'ID en BDD.
+     * Content-Type forcé depuis les magic bytes réels (finfo).
      */
     #[Route('/image/{id}/voir', name: 'app_voir_image_projet_admin', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function voirImageAdmin(ProjetImage $projetImage): BinaryFileResponse
@@ -269,7 +259,6 @@ final class GestionProjetsController extends AbstractController
             throw $this->createNotFoundException('Image introuvable.');
         }
 
-        // Content-Type depuis les magic bytes réels (ne fait JAMAIS confiance à l'extension)
         $finfo = new \finfo(\FILEINFO_MIME_TYPE);
         $mime  = $finfo->file($filePath) ?: 'application/octet-stream';
 
@@ -285,13 +274,10 @@ final class GestionProjetsController extends AbstractController
     // ── HELPERS ──────────────────────────────────────────────────────────────
 
     /**
-     * Sauvegarde une image uploadée dans var/projets/ après validation MIME réelle.
+     * Sauvegarde une image uploadée après validation MIME réelle (magic bytes).
+     * OWASP A03 : protège contre les fichiers malveillants renommés.
      *
-     * OWASP A03 : finfo lit les "magic bytes" du fichier temporaire pour déterminer
-     * son type réel, indépendamment du Content-Type déclaré par le navigateur.
-     * Protège contre les fichiers malveillants renommés (ex: shell.php → photo.jpg).
-     *
-     * @return string|null Nom du fichier stocké, null si type MIME invalide
+     * @return string|null Nom du fichier stocké, null si MIME invalide
      */
     private function saveImage(\Symfony\Component\HttpFoundation\File\UploadedFile $file): ?string
     {
@@ -303,7 +289,6 @@ final class GestionProjetsController extends AbstractController
         }
 
         $extension  = self::ALLOWED_IMAGE_MIMES[$mimeType];
-        // Nom aléatoire cryptographiquement sûr — jamais le nom original de l'utilisateur
         $nomFichier = bin2hex(random_bytes(16)) . '.' . $extension;
 
         $file->move($this->getProjectImagesDir(), $nomFichier);
@@ -311,9 +296,6 @@ final class GestionProjetsController extends AbstractController
         return $nomFichier;
     }
 
-    /**
-     * Supprime le fichier image physique depuis var/projets/ s'il existe.
-     */
     private function deleteImageFile(string $nomFichier): void
     {
         $chemin = $this->getProjectImagesDir() . '/' . $nomFichier;
@@ -322,9 +304,6 @@ final class GestionProjetsController extends AbstractController
         }
     }
 
-    /**
-     * Retourne le chemin absolu vers var/projets/.
-     */
     private function getProjectImagesDir(): string
     {
         return $this->getParameter('projets_images_directory');

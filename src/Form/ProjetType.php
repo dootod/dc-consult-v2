@@ -16,6 +16,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProjetType extends AbstractType
 {
+    private const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    private const IMAGE_MAX_SIZE   = '5M';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isNew = $options['is_new'];
@@ -31,10 +34,7 @@ class ProjetType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label'    => 'Description',
                 'required' => false,
-                'attr'     => [
-                    'placeholder' => 'Description du projet…',
-                    'rows'        => 5,
-                ],
+                'attr'     => ['placeholder' => 'Description du projet…', 'rows' => 5],
             ])
             ->add('localisation', TextType::class, [
                 'label'    => 'Localisation',
@@ -62,12 +62,39 @@ class ProjetType extends AbstractType
                 'required' => false,
                 'attr'     => ['placeholder' => 'Ex : Cabinet DC Architectes'],
             ])
-            // ── Upload d'images multiples ─────────────────────────────────────
-            // mapped: false → on gère l'upload manuellement dans le contrôleur
-            ->add('imagesFiles', FileType::class, [
-                'label'       => $isNew ? 'Images (première = couverture)' : 'Ajouter des images',
+
+            // ── Image de couverture (1 seule) ─────────────────────────────────
+            // Obligatoire à la création. Sera automatiquement affichée en tête du carousel.
+            ->add('coverFile', FileType::class, [
+                'label'       => 'Image de couverture',
                 'mapped'      => false,
-                'required'    => $isNew,   // obligatoire seulement à la création
+                'required'    => $isNew,
+                'multiple'    => false,
+                'attr'        => ['accept' => 'image/jpeg,image/png,image/webp'],
+                'constraints' => $isNew ? [
+                    new NotBlank(message: 'Une image de couverture est obligatoire.'),
+                    new File(
+                        maxSize: self::IMAGE_MAX_SIZE,
+                        maxSizeMessage: 'L\'image ne doit pas dépasser 5 Mo.',
+                        mimeTypes: self::IMAGE_MIME_TYPES,
+                        mimeTypesMessage: 'Seules les images JPEG, PNG et WebP sont acceptées.',
+                    ),
+                ] : [
+                    new File(
+                        maxSize: self::IMAGE_MAX_SIZE,
+                        maxSizeMessage: 'L\'image ne doit pas dépasser 5 Mo.',
+                        mimeTypes: self::IMAGE_MIME_TYPES,
+                        mimeTypesMessage: 'Seules les images JPEG, PNG et WebP sont acceptées.',
+                    ),
+                ],
+            ])
+
+            // ── Images du carousel (0 à N images) ─────────────────────────────
+            // Optionnelles. La cover est toujours affichée en premier dans le carousel.
+            ->add('carouselFiles', FileType::class, [
+                'label'       => 'Images du carousel',
+                'mapped'      => false,
+                'required'    => false,
                 'multiple'    => true,
                 'attr'        => [
                     'accept'   => 'image/jpeg,image/png,image/webp',
@@ -77,13 +104,9 @@ class ProjetType extends AbstractType
                     new All([
                         'constraints' => [
                             new File(
-                                maxSize: '5M',
+                                maxSize: self::IMAGE_MAX_SIZE,
                                 maxSizeMessage: 'Chaque image ne doit pas dépasser 5 Mo.',
-                                mimeTypes: [
-                                    'image/jpeg',
-                                    'image/png',
-                                    'image/webp',
-                                ],
+                                mimeTypes: self::IMAGE_MIME_TYPES,
                                 mimeTypesMessage: 'Seules les images JPEG, PNG et WebP sont acceptées.',
                             ),
                         ],
