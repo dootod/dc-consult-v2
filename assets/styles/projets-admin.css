@@ -1,6 +1,5 @@
 /* =============================================================
    DC Consult — Styles Gestion Projets (admin)
-   Chargé uniquement sur les pages /admin/gestion-projets/*
    ============================================================= */
 
 /* ═══════════════════════════════════════════════════════════════
@@ -15,112 +14,182 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    height: 100%;
     transition: box-shadow var(--transition-base), transform var(--transition-base);
 }
 
 .projet-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
+    transform: translateY(-4px);
 }
 
+/* Barre couleur en haut */
+.projet-card__bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), #4a90d9);
+    flex-shrink: 0;
+}
+
+/* Cover */
 .projet-card__cover {
     position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    background: rgba(var(--color-primary-rgb), 0.06);
+    background: linear-gradient(135deg,
+        rgba(var(--color-primary-rgb), 0.07),
+        rgba(var(--color-primary-rgb), 0.02));
 }
 
 .projet-card__cover-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-base);
+    transition: transform 0.4s ease;
+    display: block;
 }
 
 .projet-card:hover .projet-card__cover-img {
-    transform: scale(1.04);
+    transform: scale(1.06);
 }
 
 .projet-card__cover-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: rgba(var(--color-primary-rgb), 0.25);
-    font-size: 2.5rem;
+    color: rgba(var(--color-primary-rgb), 0.18);
+    font-size: 3rem;
 }
 
+/* Overlay dégradé sur la cover */
+.projet-card__cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.15));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.projet-card:hover .projet-card__cover::after {
+    opacity: 1;
+}
+
+/* Badge images count */
 .projet-card__badge {
     position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    background: rgba(0, 0, 0, 0.55);
+    bottom: 0.6rem;
+    right: 0.6rem;
+    background: rgba(0, 0, 0, 0.58);
     color: #fff;
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     padding: 0.2rem 0.55rem;
     border-radius: 20px;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
+/* Corps */
 .projet-card__body {
-    padding: 1rem;
+    padding: 1.1rem 1.25rem 0.85rem;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
 }
 
 .projet-card__titre {
     font-family: var(--font-title);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--color-text);
-    margin: 0 0 0.4rem;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    margin: 0;
+    line-height: 1.35;
+    /* Fix lint : propriété standard + webkit */
     overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .projet-card__meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 0.9rem;
-    margin-bottom: 0.75rem;
+    flex-direction: column;
+    gap: 0.28rem;
 }
 
 .projet-card__meta-item {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
     font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--color-text-muted);
 }
 
 .projet-card__meta-item i {
     font-size: 0.7rem;
-    color: var(--color-text-faint);
+    color: var(--color-primary);
+    width: 13px;
+    flex-shrink: 0;
 }
 
-.projet-card__footer {
-    padding: 0.65rem 1rem;
-    border-top: 1px solid rgba(var(--color-primary-rgb), 0.07);
-    background: rgba(var(--color-primary-rgb), 0.02);
+.projet-card__desc {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+/* Actions */
+.projet-card__actions {
     display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.25rem;
+    border-top: 1px solid rgba(var(--color-primary-rgb), 0.07);
+    background: rgba(var(--color-primary-rgb), 0.015);
+    flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   GRILLE INDEX
+   EMPTY STATE
    ═══════════════════════════════════════════════════════════════ */
 
-.projets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.25rem;
+.dc-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 3.5rem 1rem;
+    color: var(--color-text-faint);
+    text-align: center;
+}
+
+.dc-empty-state i {
+    font-size: 2.5rem;
+    opacity: 0.3;
+}
+
+.dc-empty-state p {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--color-text-muted);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -193,9 +262,7 @@
     letter-spacing: 0.04em;
 }
 
-.projet-info-item__label i {
-    font-size: 0.7rem;
-}
+.projet-info-item__label i { font-size: 0.7rem; }
 
 .projet-info-item__value {
     font-family: var(--font-body);
@@ -205,34 +272,33 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   EMPTY STATE
+   FORMULAIRES — séparateur de section
    ═══════════════════════════════════════════════════════════════ */
 
-.dc-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 2rem 1rem;
-    color: var(--color-text-faint);
-    text-align: center;
-}
-
-.dc-empty-state i {
-    font-size: 2rem;
-    opacity: 0.4;
-}
-
-.dc-empty-state p {
+.pj-section-title {
     font-family: var(--font-body);
-    font-size: 0.85rem;
-    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.pj-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(var(--color-primary-rgb), 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   UPLOAD — INPUT CACHÉ
-   L'input est placé dans le label (label wrapping).
-   Il doit être invisible mais rester dans le flux pour fonctionner.
+   INPUT CACHÉ (dans le label)
+   On utilise clip-path et non display:none pour que le navigateur
+   reconnaisse l'input comme interactif et l'envoie au submit.
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-input-hidden {
@@ -245,38 +311,35 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-    /* NE PAS utiliser display:none ni visibility:hidden — certains navigateurs
-       refuseraient alors que le label déclenche l'input */
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   UPLOAD — ZONE DE DÉPÔT (label wrapping)
+   ZONE DE DÉPÔT
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-dropzone {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
     min-height: 120px;
-    border: 2px dashed rgba(var(--color-primary-rgb), 0.3);
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.25);
     border-radius: var(--radius-md);
     padding: 1.5rem 1rem;
     text-align: center;
     background: rgba(var(--color-primary-rgb), 0.02);
     cursor: pointer;
     transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-    /* Nécessaire pour contenir le pj-input-hidden en position:absolute */
-    position: relative;
     user-select: none;
 }
 
 .pj-dropzone:hover,
 .pj-dropzone.is-dragover {
     border-color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.06);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
+    background: rgba(var(--color-primary-rgb), 0.055);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.07);
 }
 
 .pj-dropzone.has-file {
@@ -285,14 +348,12 @@
     background: rgba(var(--color-primary-rgb), 0.04);
 }
 
-.pj-dropzone--multi {
-    min-height: 100px;
-}
+.pj-dropzone--multi { min-height: 100px; }
 
 .pj-dropzone__icon {
     font-size: 1.75rem;
-    color: rgba(var(--color-primary-rgb), 0.4);
-    transition: color 0.18s ease, transform 0.18s ease;
+    color: rgba(var(--color-primary-rgb), 0.35);
+    transition: color 0.18s ease, transform 0.2s ease;
     pointer-events: none;
 }
 
@@ -302,9 +363,7 @@
     transform: translateY(-3px);
 }
 
-.pj-dropzone.has-file .pj-dropzone__icon {
-    color: #16a34a;
-}
+.pj-dropzone.has-file .pj-dropzone__icon { color: #16a34a; }
 
 .pj-dropzone__text {
     font-family: var(--font-body);
@@ -316,20 +375,18 @@
     pointer-events: none;
 }
 
-.pj-dropzone.has-file .pj-dropzone__text {
-    color: var(--color-primary);
-}
+.pj-dropzone.has-file .pj-dropzone__text { color: var(--color-primary); }
 
 .pj-dropzone__hint {
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.71rem;
     color: var(--color-text-faint);
     margin: 0;
     pointer-events: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   UPLOAD — PREVIEW COVER
+   PREVIEW COVER
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-cover-preview {
@@ -338,16 +395,10 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 2px solid var(--color-primary);
-    background: rgba(var(--color-primary-rgb), 0.05);
     margin-top: 0.75rem;
 }
 
-.pj-cover-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
+.pj-cover-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .pj-cover-preview__badge {
     position: absolute;
@@ -363,9 +414,7 @@
     backdrop-filter: blur(4px);
 }
 
-.pj-cover-preview__badge i {
-    color: #fbbf24;
-}
+.pj-cover-preview__badge i { color: #fbbf24; }
 
 .pj-cover-preview__remove {
     position: absolute;
@@ -375,7 +424,7 @@
     height: 28px;
     border-radius: 50%;
     border: none;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0,0,0,0.55);
     color: #fff;
     font-size: 0.78rem;
     cursor: pointer;
@@ -386,11 +435,9 @@
     line-height: 1;
 }
 
-.pj-cover-preview__remove:hover {
-    background: var(--color-danger);
-}
+.pj-cover-preview__remove:hover { background: var(--color-danger); }
 
-/* Cover existante (page edit) */
+/* Cover existante (edit) */
 .pj-existing-cover {
     position: relative;
     aspect-ratio: 16 / 9;
@@ -399,12 +446,7 @@
     border: 2px solid var(--color-primary);
 }
 
-.pj-existing-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
+.pj-existing-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ═══════════════════════════════════════════════════════════════
    CAROUSEL EXISTANT — page edit
@@ -425,21 +467,16 @@
 }
 
 .pj-existing-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    width: 100%; height: 100%; object-fit: cover; display: block;
     transition: filter 0.15s ease;
 }
 
 .pj-existing-thumb__order {
     position: absolute;
-    top: 0.25rem;
-    left: 0.25rem;
-    width: 20px;
-    height: 20px;
+    top: 0.25rem; left: 0.25rem;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0,0,0,0.6);
     color: #fff;
     font-family: var(--font-body);
     font-size: 0.65rem;
@@ -460,36 +497,27 @@
 }
 
 .pj-existing-thumb__delete-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 32px; height: 32px;
     border-radius: 50%;
     background: rgba(0,0,0,0);
     color: transparent;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* État sélectionné pour suppression */
-.pj-existing-thumb.is-marked-delete {
-    border-color: var(--color-danger);
-}
-
-.pj-existing-thumb.is-marked-delete img {
-    filter: brightness(0.35) saturate(0.2);
-}
-
-.pj-existing-thumb.is-marked-delete .pj-existing-thumb__delete-icon {
-    background: rgba(192, 57, 43, 0.7);
-    color: #fff;
-}
-
-/* Hover sur thumbs non sélectionnés */
 .pj-existing-thumb:not(.is-marked-delete):hover .pj-existing-thumb__delete-icon {
-    background: rgba(0, 0, 0, 0.4);
-    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.4);
+    color: rgba(255,255,255,0.8);
+}
+
+.pj-existing-thumb.is-marked-delete { border-color: var(--color-danger); }
+.pj-existing-thumb.is-marked-delete img { filter: brightness(0.35) saturate(0.2); }
+.pj-existing-thumb.is-marked-delete .pj-existing-thumb__delete-icon {
+    background: rgba(192,57,43,0.7);
+    color: #fff;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -512,65 +540,43 @@
     transition: transform 0.15s ease;
 }
 
-.pj-order-item:hover {
-    transform: translateY(-2px);
-}
-
-.pj-order-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
+.pj-order-item:hover { transform: translateY(-2px); }
+.pj-order-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .pj-order-num {
     position: absolute;
-    top: 0.25rem;
-    left: 0.25rem;
-    width: 20px;
-    height: 20px;
+    top: 0.25rem; left: 0.25rem;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0,0,0,0.65);
     color: #fff;
     font-family: var(--font-body);
-    font-size: 0.65rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 0.65rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
     pointer-events: none;
 }
 
 .pj-order-remove {
     position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
-    width: 22px;
-    height: 22px;
+    top: 0.25rem; right: 0.25rem;
+    width: 22px; height: 22px;
     border-radius: 50%;
     border: none;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0,0,0,0.55);
     color: #fff;
     font-size: 0.65rem;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     transition: background var(--transition-fast);
-    padding: 0;
-    line-height: 1;
+    padding: 0; line-height: 1;
 }
 
-.pj-order-remove:hover {
-    background: var(--color-danger);
-}
+.pj-order-remove:hover { background: var(--color-danger); }
 
 .pj-order-name {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.65);
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.65);
     color: #fff;
     font-family: var(--font-body);
     font-size: 0.58rem;
@@ -582,12 +588,10 @@
     transition: opacity 0.15s ease;
 }
 
-.pj-order-item:hover .pj-order-name {
-    opacity: 1;
-}
+.pj-order-item:hover .pj-order-name { opacity: 1; }
 
 /* ═══════════════════════════════════════════════════════════════
-   ERREURS DE FORMULAIRE
+   ERREURS
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-field-error {
@@ -601,13 +605,9 @@
     line-height: 1.35;
 }
 
-.pj-field-error i {
-    font-size: 0.75rem;
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-}
+.pj-field-error i { font-size: 0.75rem; flex-shrink: 0; margin-top: 0.1rem; }
 
 .pj-input-error {
     border-color: var(--color-danger) !important;
-    background: rgba(192, 57, 43, 0.03) !important;
+    background: rgba(192,57,43,0.03) !important;
 }

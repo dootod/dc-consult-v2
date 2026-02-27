@@ -6,7 +6,7 @@
 
 {% include 'components/_flash_messages.html.twig' %}
 
-<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-5">
     <div>
         <h1 class="admin-page-header__title">Modifier le projet</h1>
         <p class="admin-page-header__sub">{{ projet.titre }}</p>
@@ -18,96 +18,82 @@
 
 {{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data', id: 'projetForm'}}) }}
 
-<div class="row g-4">
+{# ════════ SECTION 1 — Informations ════════ #}
+<div class="dc-card mb-4">
+    <div class="dc-card__head">
+        <span class="dc-card__title"><i class="fa-solid fa-pen-to-square"></i> Informations générales</span>
+    </div>
+    <div class="dc-card__body">
+        <div class="row g-4">
 
-    {# ═══ Colonne infos ═══ #}
-    <div class="col-12 col-lg-7">
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title"><i class="fa-solid fa-circle-info"></i> Informations générales</span>
+            <div class="col-12 col-md-8">
+                <label class="dc-form-label" for="{{ form.titre.vars.id }}">Titre <span class="text-danger">*</span></label>
+                {{ form_widget(form.titre, {attr: {class: 'dc-form-control' ~ (form.titre.vars.errors|length ? ' pj-input-error' : '')}}) }}
+                {% if form.titre.vars.errors|length > 0 %}
+                    <div class="pj-field-error mt-1"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.titre) }}</span></div>
+                {% endif %}
             </div>
-            <div class="dc-card__body">
 
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">
-                        Titre <span class="text-danger">*</span>
-                    </label>
-                    {{ form_widget(form.titre, {attr: {class: 'dc-form-control' ~ (form.titre.vars.errors|length ? ' pj-input-error' : '')}}) }}
-                    {% if form.titre.vars.errors|length > 0 %}
-                        <div class="pj-field-error">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                            <span>{{ form_errors(form.titre) }}</span>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
-                    {{ form_widget(form.description, {attr: {class: 'dc-form-control'}}) }}
-                </div>
-
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
-                    {{ form_widget(form.localisation, {attr: {class: 'dc-form-control'}}) }}
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.date.vars.id }}">Date</label>
-                        {{ form_widget(form.date, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.taille.vars.id }}">Taille</label>
-                        {{ form_widget(form.taille, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.maitreOuvrage.vars.id }}">Maître d'ouvrage</label>
-                        {{ form_widget(form.maitreOuvrage, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.maitreOeuvre.vars.id }}">Maître d'œuvre</label>
-                        {{ form_widget(form.maitreOeuvre, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                </div>
-
+            <div class="col-12 col-md-4">
+                <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
+                {{ form_widget(form.localisation, {attr: {class: 'dc-form-control'}}) }}
             </div>
+
+            <div class="col-12">
+                <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
+                {{ form_widget(form.description, {attr: {class: 'dc-form-control', rows: 4}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.date.vars.id }}">Date</label>
+                {{ form_widget(form.date, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.taille.vars.id }}">Taille / Surface</label>
+                {{ form_widget(form.taille, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.maitreOuvrage.vars.id }}">Maître d'ouvrage</label>
+                {{ form_widget(form.maitreOuvrage, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.maitreOeuvre.vars.id }}">Maître d'œuvre</label>
+                {{ form_widget(form.maitreOeuvre, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
         </div>
     </div>
+</div>
 
-    {# ═══ Colonne images ═══ #}
-    <div class="col-12 col-lg-5">
+{# ════════ SECTION 2 — Images ════════ #}
+<div class="dc-card mb-4">
+    <div class="dc-card__head">
+        <span class="dc-card__title"><i class="fa-solid fa-images"></i> Images du projet</span>
+    </div>
+    <div class="dc-card__body">
+        <div class="row g-5">
 
-        {# ── Cover actuelle + remplacement ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-star" style="color:#f59e0b;"></i>
-                    Image de couverture
-                </span>
-            </div>
-            <div class="dc-card__body">
+            {# ── Cover ── #}
+            <div class="col-12 col-lg-5">
+                <p class="pj-section-title"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> Couverture</p>
 
-                {# Affiche la cover actuelle si elle existe #}
                 {% set cover = projet.coverImage %}
                 {% if cover %}
                     <p class="dc-form-label mb-2">Cover actuelle</p>
                     <div class="pj-existing-cover mb-3">
                         <img src="{{ path('app_voir_image_projet_admin', {id: cover.id}) }}" alt="Cover actuelle">
-                        <span class="pj-cover-preview__badge">
-                            <i class="fa-solid fa-star"></i> Cover
-                        </span>
+                        <span class="pj-cover-preview__badge"><i class="fa-solid fa-star"></i> Cover</span>
                     </div>
+                    <p class="text-muted small mb-3">Remplacer la cover (optionnel)</p>
+                {% else %}
+                    <p class="text-muted small mb-3">Aucune cover — uploadez-en une.</p>
                 {% endif %}
 
-                <p class="text-muted small mb-3">
-                    {{ cover ? 'Remplacer la cover (optionnel) :' : 'Aucune cover — uploadez-en une :' }}
-                </p>
-
                 {% if form.coverFile.vars.errors|length > 0 %}
-                    <div class="pj-field-error mb-3">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>{{ form_errors(form.coverFile) }}</span>
-                    </div>
+                    <div class="pj-field-error mb-3"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.coverFile) }}</span></div>
                 {% endif %}
 
                 <label class="pj-dropzone js-cover-zone">
@@ -122,65 +108,42 @@
                     <button type="button" class="pj-cover-preview__remove js-cover-clear" title="Retirer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <span class="pj-cover-preview__badge">
-                        <i class="fa-solid fa-star"></i> Nouvelle cover
-                    </span>
-                </div>
-
-            </div>
-        </div>
-
-        {# ── Carousel existant (images en BDD) ── #}
-        {% set carouselImages = projet.carouselImages %}
-        {% if carouselImages is not empty %}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-images"></i>
-                    Carousel actuel ({{ carouselImages|length }} image{{ carouselImages|length > 1 ? 's' : '' }})
-                </span>
-            </div>
-            <div class="dc-card__body">
-                <p class="text-muted small mb-3">
-                    Cochez une image pour la supprimer lors de la sauvegarde.
-                </p>
-                <div class="pj-existing-grid">
-                    {% for image in carouselImages %}
-                        <div class="pj-existing-thumb js-delete-thumb" id="thumb-{{ image.id }}">
-                            <img src="{{ path('app_voir_image_projet_admin', {id: image.id}) }}"
-                                 alt="Image {{ loop.index }}" loading="lazy">
-                            <span class="pj-existing-thumb__order">{{ loop.index + 1 }}</span>
-                            <label class="pj-existing-thumb__overlay" title="Supprimer cette image">
-                                <input type="checkbox"
-                                       name="images_to_delete[]"
-                                       value="{{ image.id }}"
-                                       class="pj-input-hidden js-delete-checkbox">
-                                <span class="pj-existing-thumb__delete-icon">
-                                    <i class="fa-solid fa-trash"></i>
-                                </span>
-                            </label>
-                        </div>
-                    {% endfor %}
+                    <span class="pj-cover-preview__badge"><i class="fa-solid fa-star"></i> Nouvelle cover</span>
                 </div>
             </div>
-        </div>
-        {% endif %}
 
-        {# ── Ajouter des images carousel ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Ajouter au carousel
-                </span>
-            </div>
-            <div class="dc-card__body">
-                <p class="text-muted small mb-3">Ajoutées après les images existantes. Sélection multiple.</p>
+            {# ── Carousel ── #}
+            <div class="col-12 col-lg-7">
+                <p class="pj-section-title"><i class="fa-solid fa-images"></i> Carousel</p>
+
+                {# Images existantes #}
+                {% set carouselImages = projet.carouselImages %}
+                {% if carouselImages is not empty %}
+                    <p class="text-muted small mb-2">Images actuelles — cochez pour supprimer.</p>
+                    <div class="pj-existing-grid mb-4">
+                        {% for image in carouselImages %}
+                            <div class="pj-existing-thumb js-delete-thumb" id="thumb-{{ image.id }}">
+                                <img src="{{ path('app_voir_image_projet_admin', {id: image.id}) }}"
+                                     alt="Image {{ loop.index }}" loading="lazy">
+                                <span class="pj-existing-thumb__order">{{ loop.index + 1 }}</span>
+                                <label class="pj-existing-thumb__overlay" title="Supprimer">
+                                    <input type="checkbox"
+                                           name="images_to_delete[]"
+                                           value="{{ image.id }}"
+                                           class="pj-input-hidden js-delete-checkbox">
+                                    <span class="pj-existing-thumb__delete-icon">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <p class="text-muted small mb-3">Ajouter des images (sélection multiple).</p>
 
                 {% if form.carouselFiles.vars.errors|length > 0 %}
-                    <div class="pj-field-error mb-3">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>{{ form_errors(form.carouselFiles) }}</span>
-                    </div>
+                    <div class="pj-field-error mb-3"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.carouselFiles) }}</span></div>
                 {% endif %}
 
                 <label class="pj-dropzone pj-dropzone--multi js-carousel-zone">
@@ -194,26 +157,18 @@
                     <span class="pj-dropzone__hint">JPEG · PNG · WebP · 5 Mo max · sélection multiple</span>
                 </label>
 
+                <div class="js-order-card mt-4" style="display:none;">
+                    <p class="pj-section-title"><i class="fa-solid fa-list-ol"></i> Nouvelles images à ajouter</p>
+                    <p class="text-muted small mb-3">Cliquez <i class="fa-solid fa-xmark fa-xs"></i> pour retirer une image.</p>
+                    <div class="pj-order-grid js-order-grid"></div>
+                </div>
             </div>
-        </div>
 
-        {# ── Aperçu nouvelles images ── #}
-        <div class="dc-card js-order-card" style="display:none;" aria-live="polite">
-            <div class="dc-card__head">
-                <span class="dc-card__title"><i class="fa-solid fa-list-ol"></i> Nouvelles images à ajouter</span>
-            </div>
-            <div class="dc-card__body">
-                <p class="text-muted small mb-3">
-                    Cliquez <i class="fa-solid fa-xmark fa-xs"></i> pour retirer une image avant envoi.
-                </p>
-                <div class="pj-order-grid js-order-grid"></div>
-            </div>
         </div>
-
     </div>
 </div>
 
-<div class="d-flex justify-content-end gap-2 mt-4">
+<div class="d-flex justify-content-end gap-2">
     <a href="{{ path('app_show_gestion_projets', {id: projet.id}) }}" class="dc-btn dc-btn--outline">Annuler</a>
     <button type="submit" class="dc-btn dc-btn--primary">
         <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications

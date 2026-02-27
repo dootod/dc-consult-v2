@@ -1,90 +1,63 @@
 /**
  * DC Consult — Gestion Projets Admin
  *
- * Stratégie upload :
- *  - L'input[type=file] est placé PHYSIQUEMENT DANS le <label> (label wrapping).
- *  - Le clic sur le label déclenche nativement l'input, sans JS et sans attribut for.
- *  - Ce fichier gère uniquement les previews et la synchronisation de l'état.
- *
- * Sélecteurs : classes prefixées js- pour découpler CSS et comportement.
+ * Upload strategy:
+ * - L'<input> est placé DANS le <label> (label wrapping) → sélecteur natif garanti.
+ * - Carousel : on ne fait JAMAIS input.value = '' car ça vide les fichiers.
+ *   On accumule via DataTransfer et on réécrit input.files à chaque fois.
+ *   La liste JS `fileList` est la source de vérité pour les previews.
  */
 
 const MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-/** Lit un fichier et renvoie une data-URL */
 function readAsDataURL(file) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('Lecture impossible'));
-        reader.readAsDataURL(file);
+        const r = new FileReader();
+        r.onload  = e => resolve(e.target.result);
+        r.onerror = () => reject(new Error('Lecture impossible'));
+        r.readAsDataURL(file);
     });
 }
 
-/** Construit un FileList à partir d'un tableau de File via DataTransfer */
-function buildFileList(files) {
-    const dt = new DataTransfer();
-    files.forEach((f) => dt.items.add(f));
-    return dt.files;
-}
+// ─────────────────────────────────────────────────────────────
+// COVER
+// ─────────────────────────────────────────────────────────────
+function initCover() {
+    const zone    = document.querySelector('.js-cover-zone');
+    const input   = document.querySelector('.js-cover-input');
+    const preview = document.querySelector('.js-cover-preview');
+    const img     = document.querySelector('.js-cover-img');
+    const clear   = document.querySelector('.js-cover-clear');
+    const icon    = document.querySelector('.js-cover-icon');
+    const text    = document.querySelector('.js-cover-text');
 
-// ═══════════════════════════════════════════════════════════════
-// MODULE COVER
-// ═══════════════════════════════════════════════════════════════
-function initCoverUpload() {
-    const zone     = document.querySelector('.js-cover-zone');
-    const input    = document.querySelector('.js-cover-input');
-    const preview  = document.querySelector('.js-cover-preview');
-    const img      = document.querySelector('.js-cover-img');
-    const clearBtn = document.querySelector('.js-cover-clear');
-    const icon     = document.querySelector('.js-cover-icon');
-    const text     = document.querySelector('.js-cover-text');
-
-    // Si aucun de ces éléments n'existe, on n'est pas sur une page concernée
     if (!input || !zone) return;
 
-    // ── Changement de fichier via le sélecteur natif ──
     input.addEventListener('change', () => {
-        const file = input.files?.[0];
-        if (file && MIME_TYPES.includes(file.type)) {
-            showCoverPreview(file);
-        } else if (input.files?.length > 0) {
-            // Fichier sélectionné mais mauvais type
-            resetCoverPreview();
-        }
+        const f = input.files?.[0];
+        if (f && MIME_TYPES.includes(f.type)) show(f);
     });
 
-    // ── Drag & drop ──
-    zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        zone.classList.add('is-dragover');
-    });
+    // Drag & drop
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('is-dragover'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
     zone.addEventListener('dragend',   () => zone.classList.remove('is-dragover'));
-    zone.addEventListener('drop', (e) => {
+    zone.addEventListener('drop', e => {
         e.preventDefault();
         zone.classList.remove('is-dragover');
-
-        const file = [...(e.dataTransfer?.files ?? [])]
-            .find((f) => MIME_TYPES.includes(f.type));
-
-        if (!file) return;
-
-        // Injecter le fichier dans l'input via DataTransfer
-        input.files = buildFileList([file]);
-        showCoverPreview(file);
+        const f = [...(e.dataTransfer?.files ?? [])].find(f => MIME_TYPES.includes(f.type));
+        if (!f) return;
+        const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files;
+        show(f);
     });
 
-    // ── Bouton "retirer" ──
-    clearBtn?.addEventListener('click', (e) => {
-        // Empêche le clic de remonter vers le label (ce qui ré-ouvrirait le sélecteur)
-        e.preventDefault();
-        e.stopPropagation();
-        input.value = '';
-        resetCoverPreview();
+    clear?.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        input.value = ''; // OK pour la cover — un seul fichier, pas d'accumulation
+        reset();
     });
 
-    async function showCoverPreview(file) {
+    async function show(file) {
         try {
             const url = await readAsDataURL(file);
             if (img)     img.src = url;
@@ -92,12 +65,10 @@ function initCoverUpload() {
             if (zone)    zone.classList.add('has-file');
             if (text)    text.textContent = '✓ ' + file.name;
             if (icon)    { icon.className = 'fa-solid fa-circle-check pj-dropzone__icon js-cover-icon'; icon.style.color = '#16a34a'; }
-        } catch {
-            // Silencieux — l'utilisateur verra juste le nom sans preview
-        }
+        } catch { /* silencieux */ }
     }
 
-    function resetCoverPreview() {
+    function reset() {
         if (img)     img.src = '';
         if (preview) { preview.style.display = 'none'; preview.setAttribute('aria-hidden', 'true'); }
         if (zone)    zone.classList.remove('has-file');
@@ -106,147 +77,136 @@ function initCoverUpload() {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MODULE CAROUSEL
-// ═══════════════════════════════════════════════════════════════
-function initCarouselUpload() {
-    const zone     = document.querySelector('.js-carousel-zone');
-    const input    = document.querySelector('.js-carousel-input');
-    const textEl   = document.querySelector('.js-carousel-text');
+// ─────────────────────────────────────────────────────────────
+// CAROUSEL
+// ─────────────────────────────────────────────────────────────
+function initCarousel() {
+    const zone      = document.querySelector('.js-carousel-zone');
+    const input     = document.querySelector('.js-carousel-input');
+    const textEl    = document.querySelector('.js-carousel-text');
     const orderCard = document.querySelector('.js-order-card');
     const orderGrid = document.querySelector('.js-order-grid');
 
     if (!input || !zone) return;
 
-    // Fichiers sélectionnés côté JS (on gère notre propre liste pour cumuler)
-    let selectedFiles = [];
+    // Source de vérité JS pour les previews et la déduplication
+    let fileList = [];
 
-    // ── Changement via le sélecteur natif ──
     input.addEventListener('change', () => {
         if (!input.files?.length) return;
-        addFiles([...input.files]);
-        // Reset l'input pour permettre de re-sélectionner les mêmes fichiers
-        input.value = '';
+        merge([...input.files]);
     });
 
-    // ── Drag & drop ──
-    zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        zone.classList.add('is-dragover');
-    });
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('is-dragover'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
     zone.addEventListener('dragend',   () => zone.classList.remove('is-dragover'));
-    zone.addEventListener('drop', (e) => {
+    zone.addEventListener('drop', e => {
         e.preventDefault();
         zone.classList.remove('is-dragover');
-        const files = [...(e.dataTransfer?.files ?? [])];
-        if (files.length) addFiles(files);
+        merge([...(e.dataTransfer?.files ?? [])]);
     });
 
-    function addFiles(newFiles) {
-        const existingNames = new Set(selectedFiles.map((f) => f.name));
-        const toAdd = newFiles.filter(
-            (f) => MIME_TYPES.includes(f.type) && !existingNames.has(f.name)
-        );
+    /**
+     * Fusionne les nouveaux fichiers dans fileList (déduplication par nom),
+     * puis réécrit input.files avec la liste complète.
+     *
+     * IMPORTANT : on ne fait JAMAIS input.value = '' ici.
+     * On réécrit input.files directement — c'est ce que le navigateur
+     * enverra dans le POST multipart au submit.
+     */
+    function merge(incoming) {
+        const known = new Set(fileList.map(f => f.name));
+        const toAdd = incoming.filter(f => MIME_TYPES.includes(f.type) && !known.has(f.name));
         if (!toAdd.length) return;
 
-        selectedFiles = [...selectedFiles, ...toAdd];
-        syncInput();
-        updateZoneLabel();
-        renderOrderGrid();
+        fileList = [...fileList, ...toAdd];
+
+        // Réécriture de input.files avec la liste complète accumulée
+        const dt = new DataTransfer();
+        fileList.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+
+        updateLabel();
+        renderGrid();
     }
 
-    function removeFile(index) {
-        selectedFiles.splice(index, 1);
-        syncInput();
-        updateZoneLabel();
-        renderOrderGrid();
+    function remove(index) {
+        fileList.splice(index, 1);
+
+        const dt = new DataTransfer();
+        fileList.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+
+        updateLabel();
+        renderGrid();
     }
 
-    function syncInput() {
-        input.files = buildFileList(selectedFiles);
-    }
-
-    function updateZoneLabel() {
-        const n = selectedFiles.length;
-        if (textEl) {
-            textEl.textContent = n > 0
-                ? `${n} image${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}`
-                : 'Cliquez ou glissez vos images ici';
-        }
+    function updateLabel() {
+        const n = fileList.length;
+        if (textEl) textEl.textContent = n > 0
+            ? `${n} image${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}`
+            : 'Cliquez ou glissez vos images ici';
         zone.classList.toggle('has-file', n > 0);
     }
 
-    async function renderOrderGrid() {
+    async function renderGrid() {
         if (!orderCard || !orderGrid) return;
-
-        if (!selectedFiles.length) {
-            orderCard.style.display = 'none';
-            return;
-        }
-
+        if (!fileList.length) { orderCard.style.display = 'none'; return; }
         orderCard.style.display = '';
 
-        // Lire toutes les images en parallèle
-        const urls = await Promise.all(selectedFiles.map(readAsDataURL));
+        // Lecture parallèle des previews
+        const urls = await Promise.all(fileList.map(readAsDataURL));
 
         orderGrid.innerHTML = '';
-        selectedFiles.forEach((file, index) => {
+        fileList.forEach((file, i) => {
             const item = document.createElement('div');
             item.className = 'pj-order-item';
 
-            const imgEl = document.createElement('img');
-            imgEl.src = urls[index];
-            imgEl.alt = file.name;
-            item.appendChild(imgEl);
+            const im = document.createElement('img');
+            im.src = urls[i]; im.alt = file.name;
+            item.appendChild(im);
 
             const num = document.createElement('span');
             num.className = 'pj-order-num';
-            num.textContent = index + 1;
+            num.textContent = i + 1;
             item.appendChild(num);
 
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.className = 'pj-order-remove';
-            removeBtn.title = 'Retirer cette image';
-            removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-            removeBtn.addEventListener('click', () => removeFile(index));
-            item.appendChild(removeBtn);
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'pj-order-remove'; btn.title = 'Retirer';
+            btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            btn.addEventListener('click', () => remove(i));
+            item.appendChild(btn);
 
-            const nameEl = document.createElement('span');
-            nameEl.className = 'pj-order-name';
-            nameEl.textContent = file.name;
-            item.appendChild(nameEl);
+            const name = document.createElement('span');
+            name.className = 'pj-order-name';
+            name.textContent = file.name;
+            item.appendChild(name);
 
             orderGrid.appendChild(item);
         });
     }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MODULE SUPPRESSION (page edit uniquement)
-// ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+// SUPPRESSION checkboxes — page edit
+// ─────────────────────────────────────────────────────────────
 function initDeleteCheckboxes() {
-    document.querySelectorAll('.js-delete-checkbox').forEach((cb) => {
+    document.querySelectorAll('.js-delete-checkbox').forEach(cb => {
         cb.addEventListener('change', () => {
-            cb.closest('.js-delete-thumb')
-              ?.classList.toggle('is-marked-delete', cb.checked);
+            cb.closest('.js-delete-thumb')?.classList.toggle('is-marked-delete', cb.checked);
         });
     });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 // BOOT
-// ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 function init() {
-    initCoverUpload();
-    initCarouselUpload();
+    initCover();
+    initCarousel();
     initDeleteCheckboxes();
 }
 
-// Compatible avec AssetMapper (module ES) et DOMContentLoaded classique
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();

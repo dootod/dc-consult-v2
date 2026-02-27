@@ -6,10 +6,10 @@
 
 {% include 'components/_flash_messages.html.twig' %}
 
-<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-5">
     <div>
         <h1 class="admin-page-header__title">Nouveau projet</h1>
-        <p class="admin-page-header__sub">Renseignez les informations du projet et ajoutez ses images.</p>
+        <p class="admin-page-header__sub">Renseignez les informations et ajoutez les images du projet.</p>
     </div>
     <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">
         <i class="fa-solid fa-arrow-left"></i> Retour
@@ -18,130 +18,100 @@
 
 {{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data', id: 'projetForm'}}) }}
 
-<div class="row g-4">
+{# ════════ SECTION 1 — Informations ════════ #}
+<div class="dc-card mb-4">
+    <div class="dc-card__head">
+        <span class="dc-card__title"><i class="fa-solid fa-pen-to-square"></i> Informations générales</span>
+    </div>
+    <div class="dc-card__body">
+        <div class="row g-4">
 
-    {# ═══ Colonne infos ═══ #}
-    <div class="col-12 col-lg-7">
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title"><i class="fa-solid fa-circle-info"></i> Informations générales</span>
+            <div class="col-12 col-md-8">
+                <label class="dc-form-label" for="{{ form.titre.vars.id }}">Titre <span class="text-danger">*</span></label>
+                {{ form_widget(form.titre, {attr: {class: 'dc-form-control' ~ (form.titre.vars.errors|length ? ' pj-input-error' : '')}}) }}
+                {% if form.titre.vars.errors|length > 0 %}
+                    <div class="pj-field-error mt-1"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.titre) }}</span></div>
+                {% endif %}
             </div>
-            <div class="dc-card__body">
 
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.titre.vars.id }}">
-                        Titre <span class="text-danger">*</span>
-                    </label>
-                    {{ form_widget(form.titre, {attr: {class: 'dc-form-control' ~ (form.titre.vars.errors|length ? ' pj-input-error' : '')}}) }}
-                    {% if form.titre.vars.errors|length > 0 %}
-                        <div class="pj-field-error">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                            <span>{{ form_errors(form.titre) }}</span>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
-                    {{ form_widget(form.description, {attr: {class: 'dc-form-control'}}) }}
-                </div>
-
-                <div class="mb-3">
-                    <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
-                    {{ form_widget(form.localisation, {attr: {class: 'dc-form-control'}}) }}
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.date.vars.id }}">Date</label>
-                        {{ form_widget(form.date, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.taille.vars.id }}">Taille</label>
-                        {{ form_widget(form.taille, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.maitreOuvrage.vars.id }}">Maître d'ouvrage</label>
-                        {{ form_widget(form.maitreOuvrage, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="dc-form-label" for="{{ form.maitreOeuvre.vars.id }}">Maître d'œuvre</label>
-                        {{ form_widget(form.maitreOeuvre, {attr: {class: 'dc-form-control'}}) }}
-                    </div>
-                </div>
-
+            <div class="col-12 col-md-4">
+                <label class="dc-form-label" for="{{ form.localisation.vars.id }}">Localisation</label>
+                {{ form_widget(form.localisation, {attr: {class: 'dc-form-control'}}) }}
             </div>
+
+            <div class="col-12">
+                <label class="dc-form-label" for="{{ form.description.vars.id }}">Description</label>
+                {{ form_widget(form.description, {attr: {class: 'dc-form-control', rows: 4}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.date.vars.id }}">Date</label>
+                {{ form_widget(form.date, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.taille.vars.id }}">Taille / Surface</label>
+                {{ form_widget(form.taille, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.maitreOuvrage.vars.id }}">Maître d'ouvrage</label>
+                {{ form_widget(form.maitreOuvrage, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="dc-form-label" for="{{ form.maitreOeuvre.vars.id }}">Maître d'œuvre</label>
+                {{ form_widget(form.maitreOeuvre, {attr: {class: 'dc-form-control'}}) }}
+            </div>
+
         </div>
     </div>
+</div>
 
-    {# ═══ Colonne images ═══ #}
-    <div class="col-12 col-lg-5">
+{# ════════ SECTION 2 — Images ════════ #}
+<div class="dc-card mb-4">
+    <div class="dc-card__head">
+        <span class="dc-card__title"><i class="fa-solid fa-images"></i> Images du projet</span>
+    </div>
+    <div class="dc-card__body">
+        <div class="row g-5">
 
-        {# ── Cover ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-star" style="color:#f59e0b;"></i>
-                    Image de couverture <span class="text-danger">*</span>
-                </span>
-            </div>
-            <div class="dc-card__body">
+            {# ── Cover ── #}
+            <div class="col-12 col-lg-5">
+                <p class="pj-section-title"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> Couverture <span class="text-danger">*</span></p>
+                <p class="text-muted small mb-3">Affichée sur la carte et en position 1 dans le carousel.</p>
 
                 {% if form.coverFile.vars.errors|length > 0 %}
-                    <div class="pj-field-error mb-3">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>{{ form_errors(form.coverFile) }}</span>
-                    </div>
+                    <div class="pj-field-error mb-3"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.coverFile) }}</span></div>
                 {% endif %}
 
-                {#
-                    TECHNIQUE CLÉ : l'input est placé DANS le label (label wrapping).
-                    Cela déclenche nativement le sélecteur de fichier au clic sur le label,
-                    sans avoir besoin d'un attribut `for` ni de JavaScript.
-                    L'input est visuellement caché via la classe pj-input-hidden.
-                #}
-                <label class="pj-dropzone js-cover-zone" data-target="cover"
-                       {% if form.coverFile.vars.errors|length > 0 %}data-invalid="true"{% endif %}>
+                {# Input DANS le label → déclenchement natif garanti sans JS #}
+                <label class="pj-dropzone js-cover-zone">
                     {{ form_widget(form.coverFile, {attr: {class: 'pj-input-hidden js-cover-input', accept: 'image/jpeg,image/png,image/webp'}}) }}
                     <i class="fa-solid fa-cloud-arrow-up pj-dropzone__icon js-cover-icon"></i>
                     <span class="pj-dropzone__text js-cover-text">Cliquez ou glissez votre image ici</span>
                     <span class="pj-dropzone__hint">JPEG · PNG · WebP — 5 Mo max</span>
                 </label>
 
-                {# Preview cover — cachée par défaut, affichée par JS après sélection #}
                 <div class="pj-cover-preview js-cover-preview" style="display:none;" aria-hidden="true">
                     <img class="js-cover-img" src="" alt="">
-                    <button type="button" class="pj-cover-preview__remove js-cover-clear" title="Retirer cette image">
+                    <button type="button" class="pj-cover-preview__remove js-cover-clear" title="Retirer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <span class="pj-cover-preview__badge">
-                        <i class="fa-solid fa-star"></i> Cover
-                    </span>
+                    <span class="pj-cover-preview__badge"><i class="fa-solid fa-star"></i> Cover</span>
                 </div>
-
             </div>
-        </div>
 
-        {# ── Carousel ── #}
-        <div class="dc-card mb-4">
-            <div class="dc-card__head">
-                <span class="dc-card__title">
-                    <i class="fa-solid fa-images"></i> Images du carousel
-                </span>
-            </div>
-            <div class="dc-card__body">
-                <p class="text-muted small mb-3">
-                    Sélection multiple. La cover est toujours en position 1.
-                </p>
+            {# ── Carousel ── #}
+            <div class="col-12 col-lg-7">
+                <p class="pj-section-title"><i class="fa-solid fa-images"></i> Carousel <span class="text-muted fw-normal ms-1" style="text-transform:none;font-size:0.78rem;">(optionnel)</span></p>
+                <p class="text-muted small mb-3">Sélection multiple. La cover est toujours en position 1.</p>
 
                 {% if form.carouselFiles.vars.errors|length > 0 %}
-                    <div class="pj-field-error mb-3">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <span>{{ form_errors(form.carouselFiles) }}</span>
-                    </div>
+                    <div class="pj-field-error mb-3"><i class="fa-solid fa-circle-exclamation"></i><span>{{ form_errors(form.carouselFiles) }}</span></div>
                 {% endif %}
 
-                {# Même technique : input dans le label #}
+                {# Input DANS le label → déclenchement natif garanti sans JS #}
                 <label class="pj-dropzone pj-dropzone--multi js-carousel-zone">
                     {{ form_widget(form.carouselFiles, {attr: {
                         class: 'pj-input-hidden js-carousel-input',
@@ -153,26 +123,19 @@
                     <span class="pj-dropzone__hint">JPEG · PNG · WebP · 5 Mo max · sélection multiple</span>
                 </label>
 
+                {# Aperçu ordre — affiché dynamiquement par JS #}
+                <div class="js-order-card mt-4" style="display:none;">
+                    <p class="pj-section-title"><i class="fa-solid fa-list-ol"></i> Aperçu de l'ordre</p>
+                    <p class="text-muted small mb-3">Cliquez <i class="fa-solid fa-xmark fa-xs"></i> pour retirer une image.</p>
+                    <div class="pj-order-grid js-order-grid"></div>
+                </div>
             </div>
-        </div>
 
-        {# ── Ordre du carousel — affiché dynamiquement par JS ── #}
-        <div class="dc-card js-order-card" style="display:none;" aria-live="polite">
-            <div class="dc-card__head">
-                <span class="dc-card__title"><i class="fa-solid fa-list-ol"></i> Ordre du carousel</span>
-            </div>
-            <div class="dc-card__body">
-                <p class="text-muted small mb-3">
-                    Position 1 = cover. Cliquez <i class="fa-solid fa-xmark fa-xs"></i> pour retirer une image du carousel.
-                </p>
-                <div class="pj-order-grid js-order-grid"></div>
-            </div>
         </div>
-
     </div>
 </div>
 
-<div class="d-flex justify-content-end gap-2 mt-4">
+<div class="d-flex justify-content-end gap-2">
     <a href="{{ path('app_gestion_projets') }}" class="dc-btn dc-btn--outline">Annuler</a>
     <button type="submit" class="dc-btn dc-btn--primary">
         <i class="fa-solid fa-floppy-disk"></i> Créer le projet
