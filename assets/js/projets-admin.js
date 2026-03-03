@@ -2,10 +2,10 @@
  * DC Consult — Gestion Projets Admin
  *
  * Upload strategy:
- * - L'<input> est placé DANS le <label> (label wrapping) → sélecteur natif garanti.
+ * - L'<input> est placé DANS le <label> (label wrapping) -> sélecteur natif garanti.
  * - Carousel : on ne fait JAMAIS input.value = '' car ça vide les fichiers.
  *   On accumule via DataTransfer et on réécrit input.files à chaque fois.
- *   La liste JS `fileList` est la source de vérité pour les previews.
+ *   La liste JS fileList est la source de vérité pour les previews.
  */
 
 const MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -19,17 +19,16 @@ function readAsDataURL(file) {
     });
 }
 
-// ─────────────────────────────────────────────────────────────
 // COVER
-// ─────────────────────────────────────────────────────────────
 function initCover() {
-    const zone    = document.querySelector('.js-cover-zone');
-    const input   = document.querySelector('.js-cover-input');
-    const preview = document.querySelector('.js-cover-preview');
-    const img     = document.querySelector('.js-cover-img');
-    const clear   = document.querySelector('.js-cover-clear');
-    const icon    = document.querySelector('.js-cover-icon');
-    const text    = document.querySelector('.js-cover-text');
+    const zone      = document.querySelector('.js-cover-zone');
+    const input     = document.querySelector('.js-cover-input');
+    const preview   = document.querySelector('.js-cover-preview');
+    const img       = document.querySelector('.js-cover-img');
+    const clear     = document.querySelector('.js-cover-clear');
+    const icon      = document.querySelector('.js-cover-icon');
+    const text      = document.querySelector('.js-cover-text');
+    const coverCard = document.querySelector('.js-cover-card');
 
     if (!input || !zone) return;
 
@@ -38,7 +37,6 @@ function initCover() {
         if (f && MIME_TYPES.includes(f.type)) show(f);
     });
 
-    // Drag & drop
     zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('is-dragover'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
     zone.addEventListener('dragend',   () => zone.classList.remove('is-dragover'));
@@ -53,33 +51,41 @@ function initCover() {
 
     clear?.addEventListener('click', e => {
         e.preventDefault(); e.stopPropagation();
-        input.value = ''; // OK pour la cover — un seul fichier, pas d'accumulation
+        input.value = '';
         reset();
     });
 
     async function show(file) {
         try {
             const url = await readAsDataURL(file);
-            if (img)     img.src = url;
-            if (preview) { preview.style.display = ''; preview.removeAttribute('aria-hidden'); }
+            if (img) img.src = url;
+            if (coverCard) {
+                coverCard.style.display = '';
+            } else if (preview) {
+                preview.style.display = '';
+            }
+            if (preview) preview.removeAttribute('aria-hidden');
             if (zone)    zone.classList.add('has-file');
-            if (text)    text.textContent = '✓ ' + file.name;
+            if (text)    text.textContent = '\u2713 ' + file.name;
             if (icon)    { icon.className = 'fa-solid fa-circle-check pj-dropzone__icon js-cover-icon'; icon.style.color = '#16a34a'; }
         } catch { /* silencieux */ }
     }
 
     function reset() {
-        if (img)     img.src = '';
-        if (preview) { preview.style.display = 'none'; preview.setAttribute('aria-hidden', 'true'); }
+        if (img) img.src = '';
+        if (coverCard) {
+            coverCard.style.display = 'none';
+        } else if (preview) {
+            preview.style.display = 'none';
+        }
+        if (preview) preview.setAttribute('aria-hidden', 'true');
         if (zone)    zone.classList.remove('has-file');
         if (text)    text.textContent = 'Cliquez ou glissez votre image ici';
         if (icon)    { icon.className = 'fa-solid fa-cloud-arrow-up pj-dropzone__icon js-cover-icon'; icon.style.color = ''; }
     }
 }
 
-// ─────────────────────────────────────────────────────────────
 // CAROUSEL
-// ─────────────────────────────────────────────────────────────
 function initCarousel() {
     const zone      = document.querySelector('.js-carousel-zone');
     const input     = document.querySelector('.js-carousel-input');
@@ -89,7 +95,6 @@ function initCarousel() {
 
     if (!input || !zone) return;
 
-    // Source de vérité JS pour les previews et la déduplication
     let fileList = [];
 
     input.addEventListener('change', () => {
@@ -106,14 +111,6 @@ function initCarousel() {
         merge([...(e.dataTransfer?.files ?? [])]);
     });
 
-    /**
-     * Fusionne les nouveaux fichiers dans fileList (déduplication par nom),
-     * puis réécrit input.files avec la liste complète.
-     *
-     * IMPORTANT : on ne fait JAMAIS input.value = '' ici.
-     * On réécrit input.files directement — c'est ce que le navigateur
-     * enverra dans le POST multipart au submit.
-     */
     function merge(incoming) {
         const known = new Set(fileList.map(f => f.name));
         const toAdd = incoming.filter(f => MIME_TYPES.includes(f.type) && !known.has(f.name));
@@ -121,7 +118,6 @@ function initCarousel() {
 
         fileList = [...fileList, ...toAdd];
 
-        // Réécriture de input.files avec la liste complète accumulée
         const dt = new DataTransfer();
         fileList.forEach(f => dt.items.add(f));
         input.files = dt.files;
@@ -144,7 +140,7 @@ function initCarousel() {
     function updateLabel() {
         const n = fileList.length;
         if (textEl) textEl.textContent = n > 0
-            ? `${n} image${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}`
+            ? n + ' image' + (n > 1 ? 's' : '') + ' sélectionnée' + (n > 1 ? 's' : '')
             : 'Cliquez ou glissez vos images ici';
         zone.classList.toggle('has-file', n > 0);
     }
@@ -154,7 +150,6 @@ function initCarousel() {
         if (!fileList.length) { orderCard.style.display = 'none'; return; }
         orderCard.style.display = '';
 
-        // Lecture parallèle des previews
         const urls = await Promise.all(fileList.map(readAsDataURL));
 
         orderGrid.innerHTML = '';
@@ -187,9 +182,7 @@ function initCarousel() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
 // SUPPRESSION checkboxes — page edit
-// ─────────────────────────────────────────────────────────────
 function initDeleteCheckboxes() {
     document.querySelectorAll('.js-delete-checkbox').forEach(cb => {
         cb.addEventListener('change', () => {
@@ -198,9 +191,7 @@ function initDeleteCheckboxes() {
     });
 }
 
-// ─────────────────────────────────────────────────────────────
 // BOOT
-// ─────────────────────────────────────────────────────────────
 function init() {
     initCover();
     initCarousel();

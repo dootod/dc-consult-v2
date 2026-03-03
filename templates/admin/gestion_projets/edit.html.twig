@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% block title %}Modifier — {{ projet.titre }}{% endblock %}
+{% block title %}{{ projet.titre }}{% endblock %}
 
 {% block body %}
 
@@ -19,7 +19,7 @@
 
 {{ form_start(form, {attr: {novalidate: 'novalidate', enctype: 'multipart/form-data'}}) }}
 
-{# ════════ SECTION 1 — Informations ════════ #}
+{# ════════ SECTION 1 - Informations ════════ #}
 <div class="dc-card mb-4">
     <div class="dc-card__head">
         <span class="dc-card__title"><i class="fa-solid fa-circle-info"></i> Informations générales</span>
@@ -69,7 +69,7 @@
     </div>
 </div>
 
-{# ════════ SECTION 2 — Images ════════ #}
+{# ════════ SECTION 2 - Images ════════ #}
 <div class="dc-card mb-4">
     <div class="dc-card__head">
         <span class="dc-card__title"><i class="fa-solid fa-images"></i> Images du projet</span>
@@ -107,7 +107,7 @@
             <div class="col-12 col-lg-7">
                 {% set carouselImages = projet.carouselImages %}
                 {% if carouselImages is not empty %}
-                    <p class="dc-form-label mb-2">Images actuelles — cochez pour supprimer.</p>
+                    <p class="dc-form-label mb-2">Images actuelles - cochez pour supprimer.</p>
                     <div class="pj-existing-grid">
                         {% for image in carouselImages %}
                             <div class="pj-existing-thumb js-delete-thumb" id="thumb-{{ image.id }}">
@@ -148,7 +148,7 @@
                     {{ form_widget(form.coverFile, {attr: {class: 'pj-input-hidden js-cover-input', accept: 'image/jpeg,image/png,image/webp'}}) }}
                     <i class="fa-solid fa-cloud-arrow-up pj-dropzone__icon js-cover-icon"></i>
                     <span class="pj-dropzone__text js-cover-text">Cliquez ou glissez votre image ici</span>
-                    <span class="pj-dropzone__hint">JPEG · PNG · WebP — 5 Mo max</span>
+                    <span class="pj-dropzone__hint">JPEG · PNG · WebP - 5 Mo max</span>
                 </label>
             </div>
 
@@ -177,12 +177,16 @@
 
             {# Preview nouvelle cover (cachée par défaut, affichée par JS) #}
             <div class="col-12 col-lg-5">
-                <div class="pj-cover-preview js-cover-preview" style="display:none;" aria-hidden="true">
-                    <img class="js-cover-img" src="" alt="">
-                    <button type="button" class="pj-cover-preview__remove js-cover-clear" title="Retirer">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                    <span class="pj-cover-preview__badge"><i class="fa-solid fa-star"></i> Nouvelle cover</span>
+                <div class="js-cover-card" style="display:none;">
+                    <p class="pj-section-title mb-2"><i class="fa-solid fa-star" style="color:#f59e0b;"></i> Nouvelle cover</p>
+                    <p class="text-muted small mb-3">Cliquez <i class="fa-solid fa-xmark fa-xs"></i> pour retirer l'image.</p>
+                    <div class="pj-cover-preview js-cover-preview" aria-hidden="true">
+                        <img class="js-cover-img" src="" alt="">
+                        <button type="button" class="pj-cover-preview__remove js-cover-clear" title="Retirer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <span class="pj-cover-preview__badge"><i class="fa-solid fa-star"></i> Nouvelle cover</span>
+                    </div>
                 </div>
             </div>
 
