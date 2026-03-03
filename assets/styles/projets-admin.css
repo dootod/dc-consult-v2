@@ -23,14 +23,12 @@
     transform: translateY(-4px);
 }
 
-/* Barre couleur en haut */
 .projet-card__bar {
     height: 3px;
     background: linear-gradient(90deg, var(--color-primary), #4a90d9);
     flex-shrink: 0;
 }
 
-/* Cover */
 .projet-card__cover {
     position: relative;
     aspect-ratio: 16 / 10;
@@ -63,7 +61,6 @@
     font-size: 3rem;
 }
 
-/* Overlay dégradé sur la cover */
 .projet-card__cover::after {
     content: '';
     position: absolute;
@@ -78,7 +75,6 @@
     opacity: 1;
 }
 
-/* Badge images count */
 .projet-card__badge {
     position: absolute;
     bottom: 0.6rem;
@@ -96,7 +92,6 @@
     gap: 0.3rem;
 }
 
-/* Corps */
 .projet-card__body {
     padding: 1.1rem 1.25rem 0.85rem;
     flex: 1;
@@ -112,7 +107,6 @@
     color: var(--color-text);
     margin: 0;
     line-height: 1.35;
-    /* Fix lint : propriété standard + webkit */
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -155,7 +149,6 @@
     line-clamp: 2;
 }
 
-/* Actions */
 .projet-card__actions {
     display: flex;
     align-items: center;
@@ -243,6 +236,47 @@
     right: 0.25rem;
 }
 
+.projet-image-thumb__delete-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 0.72rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+    padding: 0;
+    line-height: 1;
+}
+
+.projet-image-thumb__delete-btn:hover {
+    background: var(--color-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHOW — carte images pleine hauteur
+   ═══════════════════════════════════════════════════════════════ */
+
+.projet-images-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.projet-images-card .dc-card__body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.projet-images-card .projet-images-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.65rem;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    INFO ITEMS — SHOW
    ═══════════════════════════════════════════════════════════════ */
@@ -296,9 +330,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INPUT CACHÉ (dans le label)
-   On utilise clip-path et non display:none pour que le navigateur
-   reconnaisse l'input comme interactif et l'envoie au submit.
+   INPUT CACHÉ
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-input-hidden {
@@ -314,7 +346,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ZONE DE DÉPÔT
+   ZONE DE DEPOT — hauteur fixe 130px alignee avec les miniatures
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-dropzone {
@@ -324,10 +356,11 @@
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
-    min-height: 120px;
+    height: 130px;
+    min-height: 130px;
     border: 2px dashed rgba(var(--color-primary-rgb), 0.25);
     border-radius: var(--radius-md);
-    padding: 1.5rem 1rem;
+    padding: 1rem;
     text-align: center;
     background: rgba(var(--color-primary-rgb), 0.02);
     cursor: pointer;
@@ -348,7 +381,7 @@
     background: rgba(var(--color-primary-rgb), 0.04);
 }
 
-.pj-dropzone--multi { min-height: 100px; }
+.pj-dropzone--multi { min-height: 130px; }
 
 .pj-dropzone__icon {
     font-size: 1.75rem;
@@ -386,12 +419,12 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PREVIEW COVER
+   PREVIEW COVER — hauteur fixe 130px
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-cover-preview {
     position: relative;
-    aspect-ratio: 16 / 9;
+    height: 130px;
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 2px solid var(--color-primary);
@@ -437,10 +470,10 @@
 
 .pj-cover-preview__remove:hover { background: var(--color-danger); }
 
-/* Cover existante (edit) */
+/* Cover existante (edit) — hauteur fixe 130px */
 .pj-existing-cover {
     position: relative;
-    aspect-ratio: 16 / 9;
+    height: 130px;
     border-radius: var(--radius-md);
     overflow: hidden;
     border: 2px solid var(--color-primary);
@@ -449,18 +482,18 @@
 .pj-existing-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ═══════════════════════════════════════════════════════════════
-   CAROUSEL EXISTANT — page edit
+   CAROUSEL EXISTANT — page edit — hauteur fixe 130px
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-existing-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-    gap: 0.55rem;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.7rem;
 }
 
 .pj-existing-thumb {
     position: relative;
-    aspect-ratio: 1;
+    height: 130px;
     border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1.5px solid rgba(var(--color-primary-rgb), 0.15);
@@ -521,18 +554,18 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   GRILLE ORDRE CAROUSEL (nouvelles images)
+   GRILLE ORDRE CAROUSEL (nouvelles images) — hauteur fixe 130px
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-order-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.7rem;
 }
 
 .pj-order-item {
     position: relative;
-    aspect-ratio: 1;
+    height: 130px;
     border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1.5px solid rgba(var(--color-primary-rgb), 0.2);
@@ -610,4 +643,13 @@
 .pj-input-error {
     border-color: var(--color-danger) !important;
     background: rgba(192,57,43,0.03) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EDIT — colonnes cover / carousel en flex-column
+   ═══════════════════════════════════════════════════════════════ */
+
+.pj-images-col {
+    display: flex;
+    flex-direction: column;
 }
