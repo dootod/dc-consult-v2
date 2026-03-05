@@ -689,3 +689,10 @@
     color: var(--color-primary);
     font-weight: 600;
 }
+
+/* ── Responsive mobile ────────────────────────────────────── */
+@media (max-width: 575.98px) {
+    .stat-card__icon {
+        display: none;
+    }
+}

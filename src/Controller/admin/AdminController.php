@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\UtilisateurRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\DocumentAdminRepository;
+use App\Repository\ProjetRepository;
 
 final class AdminController extends AbstractController
 {
@@ -15,7 +16,8 @@ final class AdminController extends AbstractController
     public function dashboard(
         UtilisateurRepository $utilisateurRepository,
         DocumentRepository $documentRepository,
-        DocumentAdminRepository $documentAdminRepository
+        DocumentAdminRepository $documentAdminRepository,
+        ProjetRepository $projetRepository
     ): Response {
         $email = $this->getUser()?->getUserIdentifier();
         $utilisateur = $utilisateurRepository->findOneBy(['email' => $email]);
@@ -32,7 +34,7 @@ final class AdminController extends AbstractController
 
         $stats = [
             'utilisateurs' => $totalUtilisateurs,
-            'projets'      => 0,
+            'projets'      => $projetRepository->count([]),
             'documents'    => $totalDocuments,
             'admins'       => $totalAdmins,
         ];

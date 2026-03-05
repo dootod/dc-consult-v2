@@ -49,48 +49,39 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
+            gap: 16px;
         }
 
         .dc-loader-spinner {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             border: 3px solid rgba(0, 85, 164, 0.15);
             border-top-color: #0055A4;
-            border-right-color: #0055A4;
             border-radius: 50%;
-            animation: dc-loader-spin 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: dc-loader-spin 0.8s linear infinite;
         }
 
         .dc-loader-text {
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #2d2d2d;
-            letter-spacing: 0.3px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0055A4;
+            letter-spacing: 2px;
         }
 
         .dc-loader-text span {
             display: inline-block;
-            animation: dc-loader-blink 1.4s ease-in-out infinite;
+            animation: dc-loader-spin 1.2s ease-in-out infinite;
         }
 
-        .dc-loader-text span:nth-child(1) { animation-delay: 0s; }
         .dc-loader-text span:nth-child(2) { animation-delay: 0.2s; }
         .dc-loader-text span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes dc-loader-blink {
-            0%, 60%, 100% { opacity: 0.5; }
-            30% { opacity: 1; }
-        }
     </style>
 
     {% block stylesheets %}{% endblock %}
 </head>
-
 <body>
 
-{# Page Loader #}
 <div class="dc-page-loader" id="pageLoader">
     <div class="dc-loader-content">
         <div class="dc-loader-spinner"></div>
@@ -101,14 +92,14 @@
 </div>
 
 <nav class="dc-navbar navbar navbar-expand-lg fixed-top" id="mainNavbar">
-    <div class="container-fluid px-4">
+    <div class="container">
 
         <a href="{{ path('app_home') }}" class="dc-navbar__brand navbar-brand">
             <img src="{{ asset('images/logo.png') }}" alt="DC Consult" class="dc-navbar__logo">
         </a>
 
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            {# Sidebar toggle pour mobile (visible qu'à partir de lg) #}
+        {# Boutons mobile : sidebar (boussole) + burger #}
+        <div class="d-flex align-items-center gap-2 d-lg-none">
             <button type="button"
                     class="dc-navbar__sidebar-btn"
                     id="sidebarToggler"
@@ -117,7 +108,6 @@
                 <i class="fa-solid fa-compass"></i>
             </button>
 
-            {# Navbar burger menu #}
             <button class="dc-navbar__menu-toggle"
                     type="button"
                     data-bs-toggle="collapse"
@@ -168,7 +158,8 @@
             </ul>
 
             <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
-                <div class="dc-navbar__user">
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('app_dashboard_admin') : path('app_dashboard') }}"
+                   class="dc-navbar__user">
                     <span class="dc-navbar__user-avatar">
                         <i class="fa-solid fa-user"></i>
                     </span>
@@ -186,7 +177,8 @@
                             <span class="d-none d-lg-inline">Déconnexion</span>
                         </button>
                     </form>
-                </div>
+                </a>
+            </div>
 
         </div>
     </div>
@@ -239,7 +231,10 @@
             </a>
 
             <a href="{{ path('app_gestion_projets') }}"
-               class="dc-sidebar__link {% if app.request.attributes.get('_route') == 'app_gestion_projets' %}is-active{% endif %}">
+            class="dc-sidebar__link {% if app.request.attributes.get('_route') starts with 'app_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_new_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_edit_gestion_projets'
+                or app.request.attributes.get('_route') starts with 'app_show_gestion_projets' %}is-active{% endif %}">
                 <i class="fa-solid fa-folder-open dc-sidebar__link-icon"></i>
                 Projets
             </a>
