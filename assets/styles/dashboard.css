@@ -419,7 +419,6 @@
     padding: 1.25rem;
 }
 
-/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 767.98px) {
     .dash-header {
         flex-direction: column;
@@ -436,5 +435,9 @@
 
     .dash-header__title {
         font-size: 1.2rem;
+    }
+
+    .stat-card__icon {
+        display: none;
     }
 }
