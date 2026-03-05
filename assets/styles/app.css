@@ -371,9 +371,7 @@ button.dc-navbar__btn-logout {
 /* ── Collapse mobile - moderne ── */
 @media (max-width: 991.98px) {
     .dc-navbar .navbar-collapse.show {
-        background: linear-gradient(135deg, 
-            var(--color-primary-dark) 0%, 
-            rgba(0, 0, 0, 0.5) 100%);
+        background: var(--color-primary);
         border-top: 2px solid rgba(255, 255, 255, 0.1);
         padding: 1.5rem 1rem;
         margin: 0.75rem 1rem 0;

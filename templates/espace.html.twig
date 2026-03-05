@@ -92,14 +92,14 @@
 </div>
 
 <nav class="dc-navbar navbar navbar-expand-lg fixed-top" id="mainNavbar">
-    <div class="container-fluid px-3">
+    <div class="container">
 
         <a href="{{ path('app_home') }}" class="dc-navbar__brand navbar-brand">
             <img src="{{ asset('images/logo.png') }}" alt="DC Consult" class="dc-navbar__logo">
         </a>
 
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            {# Sidebar toggle pour mobile (visible qu'à partir de lg) #}
+        {# Boutons mobile : sidebar (boussole) + burger #}
+        <div class="d-flex align-items-center gap-2 d-lg-none">
             <button type="button"
                     class="dc-navbar__sidebar-btn"
                     id="sidebarToggler"
@@ -108,7 +108,6 @@
                 <i class="fa-solid fa-compass"></i>
             </button>
 
-            {# Navbar burger menu #}
             <button class="dc-navbar__menu-toggle"
                     type="button"
                     data-bs-toggle="collapse"
