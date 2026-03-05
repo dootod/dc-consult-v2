@@ -101,8 +101,8 @@ class ProjetType extends AbstractType
                     'multiple' => 'multiple',
                 ],
                 'constraints' => [
-                    new All([
-                        'constraints' => [
+                    new All(
+                        constraints: [
                             new File(
                                 maxSize: self::IMAGE_MAX_SIZE,
                                 maxSizeMessage: 'Chaque image ne doit pas dépasser 5 Mo.',
@@ -110,7 +110,7 @@ class ProjetType extends AbstractType
                                 mimeTypesMessage: 'Seules les images JPEG, PNG et WebP sont acceptées.',
                             ),
                         ],
-                    ]),
+                    ),
                 ],
             ]);
     }
