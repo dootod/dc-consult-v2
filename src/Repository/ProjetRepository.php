@@ -30,4 +30,32 @@ class ProjetRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Retourne une page de projets avec leurs images (pagination "Voir plus").
+     *
+     * @return Projet[]
+     */
+    public function findPageWithImages(int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.images', 'i')
+            ->addSelect('i')
+            ->orderBy('p.creeLe', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte le nombre total de projets publiés.
+     */
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

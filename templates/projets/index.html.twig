@@ -4,6 +4,83 @@
 
 {% block body %}
 
-<h1>Nos projets</h1>
+{# ════════════════════════════════════════════════════════════════
+   HERO
+   ════════════════════════════════════════════════════════════════ #}
+<section class="projets-hero">
+    <div class="projets-hero__bg" aria-hidden="true"></div>
+    <div class="projets-hero__content container">
+        <span class="projets-hero__label">Notre portfolio</span>
+        <h1 class="projets-hero__title">Nos Projets</h1>
+        <p class="projets-hero__subtitle">
+            Découvrez l'ensemble de nos réalisations, des projets résidentiels aux
+            grands ouvrages tertiaires, conçus avec exigence et savoir‑faire.
+        </p>
+        <div class="projets-hero__line" aria-hidden="true"></div>
+    </div>
+</section>
+
+{# ════════════════════════════════════════════════════════════════
+   GRILLE PROJETS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="projets-grid-section">
+    <div class="container">
+
+        {% if projets is empty %}
+            {# ── Etat vide ── #}
+            <div class="projets-empty">
+                <div class="projets-empty__icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h2 class="projets-empty__title">Aucun projet pour le moment</h2>
+                <p class="projets-empty__text">
+                    Revenez bientôt, nos réalisations seront publiées prochainement.
+                </p>
+            </div>
+
+        {% else %}
+
+            {# ── Compteur ── #}
+            <div class="projets-count">
+                <span class="projets-count__number js-projets-count">{{ loaded }}</span>
+                <span class="projets-count__sep">/</span>
+                <span class="projets-count__total">{{ total }}</span>
+                <span class="projets-count__label">projet{{ total > 1 ? 's' : '' }} affiché{{ total > 1 ? 's' : '' }}</span>
+            </div>
+
+            {# ── Grille de cartes ── #}
+            <div class="row g-4 js-projets-grid" id="projetsGrid">
+                {% include 'projets/_cards.html.twig' %}
+            </div>
+
+            {# ── Bouton Voir plus ── #}
+            {% if loaded < total %}
+                <div class="projets-load-more" id="projetsLoadMoreWrapper">
+                    <button
+                        type="button"
+                        class="projets-load-more__btn js-load-more"
+                        data-offset="{{ loaded }}"
+                        data-per-page="{{ per_page }}"
+                        aria-label="Charger plus de projets"
+                    >
+                        <span class="js-load-more-label">
+                            Voir plus
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                        <span class="js-load-more-spinner" style="display:none;">
+                            <span class="projets-spinner"></span>
+                            Chargement…
+                        </span>
+                    </button>
+                    <p class="projets-load-more__hint">
+                        {{ total - loaded }} projet{{ (total - loaded) > 1 ? 's' : '' }} restant{{ (total - loaded) > 1 ? 's' : '' }}
+                    </p>
+                </div>
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+</section>
 
 {% endblock %}

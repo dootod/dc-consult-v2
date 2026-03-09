@@ -9,6 +9,8 @@ import './stimulus_bootstrap.js';
 import './styles/app.css';
 import './styles/auth.css';
 import './styles/projets-admin.css';
+import './styles/projets.css';
+import './js/projets.js';
 import './js/admin-documents.js';
 import './js/admin-users.js';
 import './js/auth.js';
@@ -58,42 +60,10 @@ const initAppUi = () => {
             });
         });
     }
-
-    // ── Gestion de la sidebar mobile (bouton boussole) ────────────
-    const sidebarToggler = document.getElementById('sidebarToggler');
-    const sidebar        = document.querySelector('.dc-sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    if (sidebarToggler && sidebar && sidebarOverlay) {
-        const openSidebar = () => {
-            sidebar.classList.add('show');
-            sidebarOverlay.classList.add('show');
-            sidebarToggler.setAttribute('aria-expanded', 'true');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeSidebar = () => {
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-            sidebarToggler.setAttribute('aria-expanded', 'false');
-            document.body.style.overflow = '';
-        };
-
-        sidebarToggler.addEventListener('click', () => {
-            const isOpen = sidebar.classList.contains('show');
-            isOpen ? closeSidebar() : openSidebar();
-        });
-
-        // Fermer en cliquant sur l'overlay
-        sidebarOverlay.addEventListener('click', closeSidebar);
-
-        // Fermer avec Échap
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && sidebar.classList.contains('show')) {
-                closeSidebar();
-            }
-        });
-    }
 };
 
-document.addEventListener('DOMContentLoaded', initAppUi);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAppUi);
+} else {
+    initAppUi();
+}

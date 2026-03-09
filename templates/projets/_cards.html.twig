@@ -1,0 +1,95 @@
+{#
+  Partial : grille de cartes projets
+  Utilisé par :
+    - projets/index.html.twig (premier rendu)
+    - app_projets_load_more    (rendu XHR "Voir plus")
+
+  Variables attendues :
+    projets  : Projet[]
+    total    : int  — nombre total de projets en BDD
+    loaded   : int  — nombre de projets déjà chargés après ce rendu
+    per_page : int  — pas de pagination
+#}
+
+{% for projet in projets %}
+    <div class="col-12 col-md-6">
+        <article class="projet-card">
+
+            {# ── Image de couverture ── #}
+            <div class="projet-card__cover">
+                {% set cover = projet.coverImage %}
+                {% if cover %}
+                    <img
+                        src="{{ path('app_image_projet_publique', {id: cover.id}) }}"
+                        alt="Couverture du projet {{ projet.titre|e('html_attr') }}"
+                        class="projet-card__cover-img"
+                        loading="lazy"
+                    >
+                {% else %}
+                    <div class="projet-card__cover-placeholder">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                {% endif %}
+
+                {# ── Localisation flottante ── #}
+                {% if projet.localisation %}
+                    <span class="projet-card__location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ projet.localisation }}
+                    </span>
+                {% endif %}
+            </div>
+
+            {# ── Corps de la carte ── #}
+            <div class="projet-card__body">
+
+                <h2 class="projet-card__title">{{ projet.titre }}</h2>
+
+                <ul class="projet-card__meta">
+                    {% if projet.date %}
+                        <li class="projet-card__meta-item">
+                            <i class="fa-regular fa-calendar"></i>
+                            {{ projet.date|date('Y') }}
+                        </li>
+                    {% endif %}
+                    {% if projet.taille %}
+                        <li class="projet-card__meta-item">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                            {{ projet.taille }}
+                        </li>
+                    {% endif %}
+                    {% if projet.maitreOuvrage %}
+                        <li class="projet-card__meta-item">
+                            <i class="fa-solid fa-user-tie"></i>
+                            {{ projet.maitreOuvrage }}
+                        </li>
+                    {% endif %}
+                </ul>
+
+                {% if projet.description %}
+                    <p class="projet-card__desc">
+                        {{ projet.description|length > 120 ? projet.description|slice(0, 120) ~ '…' : projet.description }}
+                    </p>
+                {% endif %}
+
+            </div>
+
+            {# ── Pied de carte ── #}
+            <div class="projet-card__footer">
+                <a href="{{ path('app_projet_show', {id: projet.id}) }}" class="projet-card__btn">
+                    En savoir plus
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </article>
+    </div>
+{% endfor %}
+
+{# ── Marqueur de pagination lu par JS ── #}
+<meta
+    class="js-projets-pagination-meta"
+    data-total="{{ total }}"
+    data-loaded="{{ loaded }}"
+    data-per-page="{{ per_page }}"
+>
