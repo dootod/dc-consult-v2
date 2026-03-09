@@ -1,0 +1,257 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ projet.titre }} — DC Consult{% endblock %}
+
+{% block body %}
+
+{# ════════════════════════════════════════════════════════════════
+   HERO — image de couverture plein largeur
+   ════════════════════════════════════════════════════════════════ #}
+<section class="projet-show-hero">
+    {% set cover = projet.coverImage %}
+    {% if cover %}
+        {% set coverUrl = path('app_image_projet_publique', {id: cover.id}) %}
+        <div class="projet-show-hero__bg"
+             style="background-image: url('{{ coverUrl }}');"
+             aria-hidden="true">
+        </div>
+    {% else %}
+        <div class="projet-show-hero__bg projet-show-hero__bg--empty" aria-hidden="true"></div>
+    {% endif %}
+    <div class="projet-show-hero__overlay" aria-hidden="true"></div>
+
+    <div class="projet-show-hero__content container">
+
+        {# Fil d'ariane #}
+        <nav class="projet-show-breadcrumb" aria-label="Fil d'ariane">
+            <a href="{{ path('app_projets') }}" class="projet-show-breadcrumb__link">
+                <i class="fa-solid fa-arrow-left"></i>
+                Nos projets
+            </a>
+        </nav>
+
+        <h1 class="projet-show-hero__title">{{ projet.titre }}</h1>
+
+        {# Badges meta #}
+        <div class="projet-show-hero__badges">
+            {% if projet.localisation %}
+                <span class="projet-show-badge">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ projet.localisation }}
+                </span>
+            {% endif %}
+            {% if projet.date %}
+                <span class="projet-show-badge">
+                    <i class="fa-regular fa-calendar"></i>
+                    {{ projet.date|date('Y') }}
+                </span>
+            {% endif %}
+            {% if projet.taille %}
+                <span class="projet-show-badge">
+                    <i class="fa-solid fa-ruler-combined"></i>
+                    {{ projet.taille }}
+                </span>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+{# ════════════════════════════════════════════════════════════════
+   CORPS DE LA PAGE
+   ════════════════════════════════════════════════════════════════ #}
+<div class="projet-show-body">
+    <div class="container">
+        <div class="row g-5">
+
+            {# ── Colonne gauche : description + intervenants ── #}
+            <div class="col-12 col-lg-7">
+
+                {# Description #}
+                {% if projet.description %}
+                    <div class="projet-show-section">
+                        <h2 class="projet-show-section__title">
+                            <span class="projet-show-section__icon"><i class="fa-solid fa-align-left"></i></span>
+                            Présentation du projet
+                        </h2>
+                        <div class="projet-show-description">
+                            {{ projet.description|nl2br }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Fiche technique #}
+                <div class="projet-show-section">
+                    <h2 class="projet-show-section__title">
+                        <span class="projet-show-section__icon"><i class="fa-solid fa-list-check"></i></span>
+                        Fiche technique
+                    </h2>
+
+                    <div class="projet-show-specs">
+
+                        {% if projet.localisation %}
+                            <div class="projet-show-spec">
+                                <span class="projet-show-spec__label">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Localisation
+                                </span>
+                                <span class="projet-show-spec__value">{{ projet.localisation }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if projet.date %}
+                            <div class="projet-show-spec">
+                                <span class="projet-show-spec__label">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    Année
+                                </span>
+                                <span class="projet-show-spec__value">{{ projet.date|date('Y') }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if projet.taille %}
+                            <div class="projet-show-spec">
+                                <span class="projet-show-spec__label">
+                                    <i class="fa-solid fa-ruler-combined"></i>
+                                    Surface / Taille
+                                </span>
+                                <span class="projet-show-spec__value">{{ projet.taille }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if projet.maitreOuvrage %}
+                            <div class="projet-show-spec">
+                                <span class="projet-show-spec__label">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    Maître d'ouvrage
+                                </span>
+                                <span class="projet-show-spec__value">{{ projet.maitreOuvrage }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if projet.maitreOeuvre %}
+                            <div class="projet-show-spec">
+                                <span class="projet-show-spec__label">
+                                    <i class="fa-solid fa-drafting-compass"></i>
+                                    Maître d'œuvre
+                                </span>
+                                <span class="projet-show-spec__value">{{ projet.maitreOeuvre }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if not projet.localisation and not projet.date and not projet.taille
+                              and not projet.maitreOuvrage and not projet.maitreOeuvre %}
+                            <p class="projet-show-specs__empty">
+                                <i class="fa-solid fa-circle-info"></i>
+                                Aucune information technique renseignée.
+                            </p>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                {# CTA retour #}
+                <div class="projet-show-back">
+                    <a href="{{ path('app_projets') }}" class="dc-btn dc-btn--outline">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Retour aux projets
+                    </a>
+                </div>
+
+            </div>
+
+            {# ── Colonne droite : galerie photos ── #}
+            <div class="col-12 col-lg-5">
+
+                {% set carouselImages = projet.carouselImages %}
+
+                {% if projet.images is not empty %}
+                    <div class="projet-show-section">
+                        <h2 class="projet-show-section__title">
+                            <span class="projet-show-section__icon"><i class="fa-solid fa-images"></i></span>
+                            Galerie photos
+                        </h2>
+
+                        {# ── Carousel Bootstrap ── #}
+                        {% if carouselImages is not empty %}
+
+                            <div id="projetCarousel" class="carousel slide projet-show-carousel" data-bs-ride="false">
+
+                                {# Indicateurs #}
+                                <div class="carousel-indicators">
+                                    {% for image in carouselImages %}
+                                        <button
+                                            type="button"
+                                            data-bs-target="#projetCarousel"
+                                            data-bs-slide-to="{{ loop.index0 }}"
+                                            {% if loop.first %}class="active" aria-current="true"{% endif %}
+                                            aria-label="Image {{ loop.index }}"
+                                        ></button>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="carousel-inner">
+                                    {% for image in carouselImages %}
+                                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                            <img
+                                                src="{{ path('app_image_projet_publique', {id: image.id}) }}"
+                                                class="d-block w-100 projet-show-carousel__img"
+                                                alt="Photo {{ loop.index }} du projet {{ projet.titre|e('html_attr') }}"
+                                                loading="lazy"
+                                            >
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <button class="carousel-control-prev" type="button" data-bs-target="#projetCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Précédent</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#projetCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Suivant</span>
+                                </button>
+                            </div>
+
+                        {% else %}
+                            {# Uniquement la cover, pas de carousel #}
+                            {% if cover %}
+                                <div class="projet-show-cover-only">
+                                    <img
+                                        src="{{ path('app_image_projet_publique', {id: cover.id}) }}"
+                                        alt="Couverture du projet {{ projet.titre|e('html_attr') }}"
+                                        class="projet-show-cover-only__img"
+                                        loading="lazy"
+                                    >
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Grille miniatures #}
+                        {% if projet.images|length > 1 %}
+                            <div class="projet-show-thumbs">
+                                {% for image in projet.images %}
+                                    <div class="projet-show-thumb {% if image.isCover %}projet-show-thumb--cover{% endif %}">
+                                        <img
+                                            src="{{ path('app_image_projet_publique', {id: image.id}) }}"
+                                            alt="Miniature {{ loop.index }}"
+                                            loading="lazy"
+                                        >
+                                        {% if image.isCover %}
+                                            <span class="projet-show-thumb__badge">Cover</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
