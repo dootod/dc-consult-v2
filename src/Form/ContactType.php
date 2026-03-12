@@ -22,53 +22,52 @@ class ContactType extends AbstractType
             ->add('nom', TextType::class, [
                 'label'       => false,
                 'attr'        => [
-                    'placeholder' => 'Nom *',
-                    'class'       => 'dc-form-control',
-                    'autocomplete'=> 'family-name',
+                    'placeholder'  => 'Nom *',
+                    'class'        => 'dc-form-control',
+                    'autocomplete' => 'family-name',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir votre nom.']),
-                    new Length(['max' => 100, 'maxMessage' => 'Le nom ne peut pas dépasser {{ limit }} caractères.']),
+                    new NotBlank(message: 'Veuillez saisir votre nom.'),
+                    new Length(max: 100, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.'),
                 ],
             ])
             ->add('prenom', TextType::class, [
                 'label'       => false,
                 'attr'        => [
-                    'placeholder' => 'Prénom *',
-                    'class'       => 'dc-form-control',
-                    'autocomplete'=> 'given-name',
+                    'placeholder'  => 'Prénom *',
+                    'class'        => 'dc-form-control',
+                    'autocomplete' => 'given-name',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir votre prénom.']),
-                    new Length(['max' => 100, 'maxMessage' => 'Le prénom ne peut pas dépasser {{ limit }} caractères.']),
+                    new NotBlank(message: 'Veuillez saisir votre prénom.'),
+                    new Length(max: 100, maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères.'),
                 ],
             ])
             ->add('email', EmailType::class, [
                 'label'       => false,
                 'attr'        => [
-                    'placeholder' => 'Adresse email *',
-                    'class'       => 'dc-form-control',
-                    'autocomplete'=> 'email',
+                    'placeholder'  => 'Adresse email *',
+                    'class'        => 'dc-form-control',
+                    'autocomplete' => 'email',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir votre adresse email.']),
-                    new Email(['message' => 'L\'adresse email « {{ value }} » n\'est pas valide.']),
+                    new NotBlank(message: 'Veuillez saisir votre adresse email.'),
+                    new Email(message: 'L\'adresse email « {{ value }} » n\'est pas valide.'),
                 ],
             ])
             ->add('telephone', TelType::class, [
                 'label'       => false,
                 'required'    => false,
                 'attr'        => [
-                    'placeholder' => 'Numéro de téléphone',
-                    'class'       => 'dc-form-control',
-                    'autocomplete'=> 'tel',
+                    'placeholder'  => 'Numéro de téléphone',
+                    'class'        => 'dc-form-control',
+                    'autocomplete' => 'tel',
                 ],
                 'constraints' => [
-                    new Regex([
-                        'pattern' => '/^[\d\s\+\-\(\)\.]{6,20}$/',
-                        'message' => 'Le numéro de téléphone n\'est pas valide.',
-                        'match'   => true,
-                    ]),
+                    new Regex(
+                        pattern: '/^[\d\s\+\-\(\)\.]{6,20}$/',
+                        message: 'Le numéro de téléphone n\'est pas valide.',
+                    ),
                 ],
             ])
             ->add('sujet', TextType::class, [
@@ -78,8 +77,8 @@ class ContactType extends AbstractType
                     'class'       => 'dc-form-control',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir un sujet.']),
-                    new Length(['max' => 200, 'maxMessage' => 'Le sujet ne peut pas dépasser {{ limit }} caractères.']),
+                    new NotBlank(message: 'Veuillez saisir un sujet.'),
+                    new Length(max: 200, maxMessage: 'Le sujet ne peut pas dépasser {{ limit }} caractères.'),
                 ],
             ])
             ->add('message', TextareaType::class, [
@@ -90,13 +89,13 @@ class ContactType extends AbstractType
                     'rows'        => 6,
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir votre message.']),
-                    new Length([
-                        'min'        => 10,
-                        'minMessage' => 'Votre message doit contenir au moins {{ limit }} caractères.',
-                        'max'        => 3000,
-                        'maxMessage' => 'Votre message ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
+                    new NotBlank(message: 'Veuillez saisir votre message.'),
+                    new Length(
+                        min:        10,
+                        minMessage: 'Votre message doit contenir au moins {{ limit }} caractères.',
+                        max:        3000,
+                        maxMessage: 'Votre message ne peut pas dépasser {{ limit }} caractères.',
+                    ),
                 ],
             ])
         ;
