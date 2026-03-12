@@ -10,6 +10,7 @@ import './styles/app.css';
 import './styles/auth.css';
 import './styles/projets-admin.css';
 import './styles/projets.css';
+import './styles/contact.css';
 import './js/projets.js';
 import './js/admin-documents.js';
 import './js/admin-users.js';
