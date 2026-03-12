@@ -3,7 +3,7 @@
 {% block title %}Nous contacter{% endblock %}
 
 {% block stylesheets %}
-    {# Leaflet CSS — OpenStreetMap, fonctionne en local et en prod sans clé API #}
+    {# Leaflet CSS - OpenStreetMap, fonctionne en local et en prod sans clé API #}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <link rel="stylesheet" href="{{ asset('styles/contact.css') }}">
 {% endblock %}
@@ -11,7 +11,7 @@
 {% block body %}
 
 {# ════════════════════════════════════════════════════════════════
-   HERO — même style que projets-hero
+   HERO - même style que projets-hero
    ════════════════════════════════════════════════════════════════ #}
 <section class="contact-hero" aria-label="En-tête contact">
     <div class="contact-hero__bg" aria-hidden="true"></div>
@@ -47,7 +47,7 @@
                         </p>
                     </div>
 
-                    {# Blocs — flex:1 pour occuper toute la hauteur #}
+                    {# Blocs - flex:1 pour occuper toute la hauteur #}
                     <div class="contact-info-card__body">
 
                         {# Adresse #}
@@ -86,7 +86,7 @@
                             </div>
                         </a>
 
-                        {# Horaires — redesign avec dot coloré #}
+                        {# Horaires - redesign avec dot coloré #}
                         <div class="contact-info-block">
                             <div class="contact-info-block__icon">
                                 <i class="fa-solid fa-clock"></i>
@@ -213,15 +213,15 @@
         </div>
 
         {# ════════════════════════════════════════════════════════
-           MAP OPENSTREETMAP — Leaflet, pleine largeur, sans clé API
+           MAP OPENSTREETMAP - Leaflet, pleine largeur, sans clé API
            Fonctionne en local (http) et en production (https)
            ════════════════════════════════════════════════════════ #}
         <div class="contact-map-section">
             <div class="contact-map-header">
                 <i class="fa-solid fa-location-dot"></i>
-                <span>10 Allée des Champs Élysées — 91080 Évry-Courcouronnes</span>
+                <span>10 Allée des Champs Élysées - 91080 Évry-Courcouronnes</span>
             </div>
-            <div class="contact-map-wrapper" aria-label="Carte — DC Consult Évry-Courcouronnes">
+            <div class="contact-map-wrapper" aria-label="Carte - DC Consult Évry-Courcouronnes">
                 <div id="contactMap"></div>
             </div>
         </div>
