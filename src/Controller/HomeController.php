@@ -93,10 +93,11 @@ final class HomeController extends AbstractController
     // ── CONTACT ───────────────────────────────────────────────────────────────
 
     /**
-     * Page de contact avec formulaire.
+     * Deux emails envoyés à chaque soumission valide :
+     *  1. dc.consult@orange.fr  — notification interne (emails/contact.html.twig)
+     *  2. Expéditeur            — accusé de réception  (emails/contact_accuse_reception.html.twig)
      *
-     * NOTE : 'email' est un nom réservé par TemplatedEmail (Symfony Bridge).
-     * On utilise donc 'senderEmail' dans le contexte Twig.
+     * NOTE : 'email' est réservé par TemplatedEmail → on utilise 'senderEmail'.
      */
     #[Route('/contact', name: 'app_contact', methods: ['GET', 'POST'])]
     public function contact(
@@ -116,27 +117,41 @@ final class HomeController extends AbstractController
                 return $this->redirectToRoute('app_contact');
             }
 
-            $data = $form->getData();
+            $data   = $form->getData();
+            $sentAt = new \DateTimeImmutable();
+
+            // Contexte partagé entre les deux templates email
+            $context = [
+                'nom'         => $data['nom'],
+                'prenom'      => $data['prenom'],
+                'senderEmail' => $data['email'],   // 'email' est réservé par TemplatedEmail
+                'telephone'   => $data['telephone'] ?? null,
+                'sujet'       => $data['sujet'],
+                'message'     => $data['message'],
+                'sentAt'      => $sentAt,
+            ];
 
             try {
-                $emailMessage = (new TemplatedEmail())
-                    ->to(new Address('t.dumont1809@gmail.com', 'DC Consult'))
-                    ->replyTo(new Address($data['email'], $data['prenom'] . ' ' . $data['nom']))
-                    ->subject('[Contact] ' . $data['sujet'])
-                    ->htmlTemplate('emails/contact.html.twig')
-                    ->context([
-                        'nom'         => $data['nom'],
-                        'prenom'      => $data['prenom'],
-                        'senderEmail' => $data['email'],   // 'email' est réservé par TemplatedEmail
-                        'telephone'   => $data['telephone'] ?? null,
-                        'sujet'       => $data['sujet'],
-                        'message'     => $data['message'],
-                        'sentAt'      => new \DateTimeImmutable(),
-                    ]);
+                // ── 1. Notification interne à DC Consult ─────────────────────
+                $mailer->send(
+                    (new TemplatedEmail())
+                        ->to(new Address('dc.consult@orange.fr', 'DC Consult'))
+                        ->replyTo(new Address($data['email'], $data['prenom'] . ' ' . $data['nom']))
+                        ->subject('[Contact] ' . $data['sujet'])
+                        ->htmlTemplate('emails/contact.html.twig')
+                        ->context($context)
+                );
 
-                $mailer->send($emailMessage);
+                // ── 2. Accusé de réception à l'expéditeur ────────────────────
+                $mailer->send(
+                    (new TemplatedEmail())
+                        ->to(new Address($data['email'], $data['prenom'] . ' ' . $data['nom']))
+                        ->subject('Votre message a bien été reçu – DC Consult')
+                        ->htmlTemplate('emails/contact_accuse_reception.html.twig')
+                        ->context($context)
+                );
 
-                $this->addFlash('success', 'Votre message a bien été envoyé ! Nous vous répondrons dans les plus brefs délais.');
+                $this->addFlash('success', 'Votre message a bien été envoyé ! Un accusé de réception vous a été adressé par email.');
                 return $this->redirectToRoute('app_contact');
 
             } catch (TransportExceptionInterface $e) {

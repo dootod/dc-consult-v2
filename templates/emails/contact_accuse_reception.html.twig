@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Votre message a bien été reçu – DC Consult</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f2f0ef;
+            font-family: Arial, sans-serif;
+            color: #2d2d2d;
+        }
+        .email-wrapper {
+            width: 100%;
+            padding: 24px 0;
+        }
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 85, 164, 0.1);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        .email-header {
+            padding: 20px 28px;
+            background: linear-gradient(135deg, #0055A4, #003f7d);
+            color: #ffffff;
+        }
+        .email-header-title {
+            margin: 0 0 4px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .email-header-sub {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        .email-body {
+            padding: 28px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .email-success-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(22, 163, 74, 0.07);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
+        }
+        .email-success-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(22, 163, 74, 0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        .email-success-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #15803d;
+            margin: 0;
+        }
+        .email-recap-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #0055A4;
+            margin: 22px 0 10px;
+            opacity: 0.85;
+        }
+        .email-recap-box {
+            background: #f2f0ef;
+            border-radius: 6px;
+            border-left: 3px solid #0055A4;
+            padding: 14px 16px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .email-recap-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .email-recap-row:last-child {
+            margin-bottom: 0;
+        }
+        .email-recap-label {
+            font-weight: 700;
+            color: #4a4a5a;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+        .email-recap-value {
+            color: #2d2d2d;
+        }
+        .email-divider {
+            border: none;
+            border-top: 1px solid rgba(0, 85, 164, 0.1);
+            margin: 22px 0;
+        }
+        .email-contact-block {
+            background: rgba(0, 85, 164, 0.04);
+            border-radius: 6px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #4a4a5a;
+            line-height: 1.6;
+        }
+        .email-contact-block a {
+            color: #0055A4;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .email-footer {
+            padding: 14px 28px;
+            font-size: 11px;
+            color: #aaaaaa;
+            text-align: center;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="email-wrapper">
+    <div class="email-container">
+
+        <div class="email-header">
+            <h1 class="email-header-title">Votre message a bien été reçu</h1>
+            <p class="email-header-sub">DC Consult — Bureau d'études techniques</p>
+        </div>
+
+        <div class="email-body">
+
+            <p>Bonjour {{ prenom }} {{ nom }},</p>
+
+            <div class="email-success-banner">
+                <div class="email-success-icon">✓</div>
+                <p class="email-success-text">Votre message a été transmis à notre équipe avec succès.</p>
+            </div>
+
+            <p>
+                Nous avons bien reçu votre demande concernant <strong>« {{ sujet }} »</strong>
+                et nous vous répondrons dans les meilleurs délais, généralement sous <strong>24 à 48h ouvrées</strong>.
+            </p>
+
+            <p class="email-recap-title">Récapitulatif de votre message</p>
+            <div class="email-recap-box">
+                <div class="email-recap-row">
+                    <span class="email-recap-label">Sujet</span>
+                    <span class="email-recap-value">{{ sujet }}</span>
+                </div>
+                <div class="email-recap-row">
+                    <span class="email-recap-label">Message</span>
+                    <span class="email-recap-value">{{ message|nl2br }}</span>
+                </div>
+                <div class="email-recap-row">
+                    <span class="email-recap-label">Envoyé le</span>
+                    <span class="email-recap-value">{{ sentAt|date('d/m/Y à H:i') }}</span>
+                </div>
+            </div>
+
+            <hr class="email-divider">
+
+            <div class="email-contact-block">
+                Si vous avez besoin de nous contacter directement :<br>
+                📞 <a href="tel:+33637194574">06 37 19 45 74</a> &nbsp;|&nbsp;
+                ✉️ <a href="mailto:dc.consult@orange.fr">dc.consult@orange.fr</a><br>
+                Lundi – Vendredi, 8h00 – 18h00
+            </div>
+
+            <p style="margin-top: 22px;">Cordialement,<br><strong>L'équipe DC&nbsp;Consult</strong></p>
+
+        </div>
+
+        <div class="email-footer">
+            Cet email est un accusé de réception automatique, merci de ne pas y répondre directement.
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
