@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau message de contact – DC Consult</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f2f0ef; font-family: Arial, sans-serif; color: #2d2d2d; }
+        .wrapper { width: 100%; padding: 24px 0; }
+        .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid rgba(0,85,164,0.1); box-shadow: 0 4px 18px rgba(0,0,0,0.06); overflow: hidden; }
+        .header { padding: 20px 28px; background: linear-gradient(135deg, #0055A4, #003f7d); color: #fff; }
+        .header h1 { margin: 0; font-size: 18px; font-weight: 700; }
+        .header p { margin: 4px 0 0; font-size: 13px; opacity: 0.8; }
+        .body { padding: 28px; font-size: 14px; line-height: 1.65; }
+        .field { margin-bottom: 16px; }
+        .field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #0055A4; margin-bottom: 4px; }
+        .field-value { background: #f2f0ef; border-radius: 6px; padding: 10px 14px; font-size: 14px; color: #2d2d2d; border-left: 3px solid #0055A4; }
+        .message-value { white-space: pre-wrap; }
+        .divider { border: none; border-top: 1px solid rgba(0,85,164,0.1); margin: 20px 0; }
+        .footer { padding: 16px 28px; font-size: 11px; color: #aaaaaa; text-align: center; background: #fafafa; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="header">
+            <h1>Nouveau message de contact</h1>
+            <p>Reçu le {{ sentAt|date('d/m/Y à H:i') }}</p>
+        </div>
+        <div class="body">
+            <div class="field">
+                <div class="field-label">Nom complet</div>
+                <div class="field-value">{{ prenom }} {{ nom }}</div>
+            </div>
+            <div class="field">
+                <div class="field-label">Adresse email</div>
+                <div class="field-value">{{ senderEmail }}</div>
+            </div>
+            {% if telephone %}
+            <div class="field">
+                <div class="field-label">Téléphone</div>
+                <div class="field-value">{{ telephone }}</div>
+            </div>
+            {% endif %}
+            <div class="field">
+                <div class="field-label">Sujet</div>
+                <div class="field-value">{{ sujet }}</div>
+            </div>
+            <hr class="divider">
+            <div class="field">
+                <div class="field-label">Message</div>
+                <div class="field-value message-value">{{ message }}</div>
+            </div>
+        </div>
+        <div class="footer">
+            Message envoyé depuis le formulaire de contact du site DC&nbsp;Consult
+        </div>
+    </div>
+</div>
+</body>
+</html>

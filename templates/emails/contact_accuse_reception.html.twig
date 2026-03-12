@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre message a bien été reçu – DC Consult</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f2f5;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;">
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f0f2f5;padding:32px 0;">
+    <tr>
+        <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;">
+
+                <!-- LOGO / PRÉ-HEADER -->
+                <tr>
+                    <td align="center" style="padding-bottom:20px;">
+                        <p style="margin:0;font-size:12px;color:#8a8fa8;letter-spacing:0.05em;text-transform:uppercase;">DC Consult - Bureau d'études techniques</p>
+                    </td>
+                </tr>
+
+                <!-- CARTE PRINCIPALE -->
+                <tr>
+                    <td style="background-color:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+                        <!-- BANDE BLEUE EN HAUT -->
+                        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                            <tr>
+                                <td style="background:linear-gradient(135deg,#0055A4 0%,#003f7d 100%);padding:28px 36px 28px;">
+                                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                            <td>
+                                                <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.6);">DC Consult</p>
+                                                <h1 style="margin:0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;">Message bien reçu</h1>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- CORPS -->
+                        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                            <tr>
+                                <td style="padding:32px 36px 0;">
+
+                                    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#1a1a2e;">
+                                        Bonjour <strong>{{ prenom }} {{ nom }}</strong>,
+                                    </p>
+
+                                    <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#3a3a4a;">
+                                        Nous avons bien reçu votre message concernant <strong style="color:#0055A4;">« {{ sujet }} »</strong>.
+                                        Notre équipe vous répondra dans les meilleurs délais, généralement sous <strong>24 à 48h ouvrées</strong>.
+                                    </p>
+
+                                    <!-- SÉPARATEUR -->
+                                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                        <tr>
+                                            <td style="padding-bottom:24px;border-top:1px solid #eaedf2;"></td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- TITRE SECTION RÉCAP -->
+                                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:14px;">
+                                        <tr>
+                                            <td valign="middle" style="padding-bottom:14px;">
+                                                <!-- Icône file-lines FA (SVG inline) -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="13" height="13" style="vertical-align:middle;margin-right:6px;" fill="#0055A4">
+                                                    <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM112 256l160 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-160 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64l160 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-160 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64l160 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-160 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
+                                                </svg>
+                                                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#0055A4;">Récapitulatif de votre message</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- BLOC RÉCAP -->
+                                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f7f8fa;border-radius:8px;border-left:3px solid #0055A4;margin-bottom:28px;">
+                                        <tr>
+                                            <td style="padding:18px 20px;">
+
+                                                <!-- Ligne : Sujet -->
+                                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:12px;">
+                                                    <tr>
+                                                        <td valign="top" width="80" style="font-size:12px;font-weight:700;color:#6b7280;padding-top:1px;">Sujet</td>
+                                                        <td style="font-size:14px;color:#1a1a2e;line-height:1.5;">{{ sujet }}</td>
+                                                    </tr>
+                                                </table>
+
+                                                <!-- Séparateur interne -->
+                                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                                    <tr><td style="border-top:1px solid #e5e7eb;padding-bottom:12px;"></td></tr>
+                                                </table>
+
+                                                <!-- Ligne : Message -->
+                                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:12px;">
+                                                    <tr>
+                                                        <td valign="top" width="80" style="font-size:12px;font-weight:700;color:#6b7280;padding-top:1px;">Message</td>
+                                                        <td style="font-size:14px;color:#1a1a2e;line-height:1.65;white-space:pre-wrap;">{{ message|nl2br }}</td>
+                                                    </tr>
+                                                </table>
+
+                                                <!-- Séparateur interne -->
+                                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                                    <tr><td style="border-top:1px solid #e5e7eb;padding-bottom:12px;"></td></tr>
+                                                </table>
+
+                                                <!-- Ligne : Date -->
+                                                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                                    <tr>
+                                                        <td valign="middle" width="80" style="font-size:12px;font-weight:700;color:#6b7280;">Envoyé le</td>
+                                                        <td valign="middle" style="font-size:13px;color:#6b7280;">
+                                                            <!-- Icône clock FA (SVG inline) -->
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="11" height="11" style="vertical-align:middle;margin-right:4px;" fill="#9ca3af">
+                                                                <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                                                            </svg>
+                                                            {{ sentAt|date('d/m/Y à H:i') }}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- BLOC CONTACT DIRECT -->
+                                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#eef3fb;border-radius:8px;margin-bottom:28px;">
+                                        <tr>
+                                            <td style="padding:16px 20px;">
+                                                <p style="margin:0 0 10px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#0055A4;">Nous contacter directement</p>
+
+                                                <!-- Téléphone -->
+                                                <table cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:8px;">
+                                                    <tr>
+                                                        <td valign="middle" style="padding-right:8px;">
+                                                            <!-- Icône phone FA (SVG inline) -->
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="13" height="13" fill="#0055A4">
+                                                                <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C11.7 30.9 0 46.1 0 64C0 311.4 200.6 512 448 512c17.9 0 33.1-11.7 37.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/>
+                                                            </svg>
+                                                        </td>
+                                                        <td style="font-size:13px;color:#3a3a4a;">
+                                                            <a href="tel:+33637194574" style="color:#0055A4;text-decoration:none;font-weight:600;">06 37 19 45 74</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                                <!-- Email -->
+                                                <table cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:8px;">
+                                                    <tr>
+                                                        <td valign="middle" style="padding-right:8px;">
+                                                            <!-- Icône envelope FA (SVG inline) -->
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="13" height="13" fill="#0055A4">
+                                                                <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+                                                            </svg>
+                                                        </td>
+                                                        <td style="font-size:13px;color:#3a3a4a;">
+                                                            <a href="mailto:dc.consult@orange.fr" style="color:#0055A4;text-decoration:none;font-weight:600;">dc.consult@orange.fr</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+                                                <!-- Horaires -->
+                                                <table cellpadding="0" cellspacing="0" role="presentation">
+                                                    <tr>
+                                                        <td valign="middle" style="padding-right:8px;">
+                                                            <!-- Icône calendar FA (SVG inline) -->
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="13" height="13" fill="#9ca3af">
+                                                                <path d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16l0 32zm128 0c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16l0 32zm144-16l-32 0c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16z"/>
+                                                            </svg>
+                                                        </td>
+                                                        <td style="font-size:12px;color:#6b7280;">Lundi – Vendredi, 8h00 – 18h00</td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- SIGNATURE -->
+                                    <p style="margin:0 0 32px;font-size:14px;line-height:1.6;color:#3a3a4a;">
+                                        Cordialement,<br>
+                                        <strong style="color:#1a1a2e;">L'équipe DC Consult</strong>
+                                    </p>
+
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- PIED DE PAGE -->
+                <tr>
+                    <td align="center" style="padding:20px 0 8px;">
+                        <p style="margin:0 0 6px;font-size:11px;color:#9ca3af;">
+                            Cet email est un accusé de réception automatique - merci de ne pas y répondre directement.
+                        </p>
+                        <p style="margin:0;font-size:11px;color:#c4c9d4;">
+                            &copy; {{ "now"|date("Y") }} DC Consult - Bureau d'études techniques
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

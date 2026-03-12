@@ -10,6 +10,7 @@ import './styles/app.css';
 import './styles/auth.css';
 import './styles/projets-admin.css';
 import './styles/projets.css';
+import './styles/contact.css';
 import './js/projets.js';
 import './js/admin-documents.js';
 import './js/admin-users.js';
@@ -58,6 +59,40 @@ const initAppUi = () => {
                     bsCollapse?.hide?.();
                 }
             });
+        });
+    }
+
+    // ── Gestion du sidebar drawer mobile (pages espace/admin) - Ne pas supprimer ────
+    const sidebarToggler = document.getElementById('sidebarToggler');
+    const sidebar        = document.querySelector('.dc-sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if (sidebarToggler && sidebar) {
+        const openSidebar = () => {
+            sidebar.classList.add('show');
+            if (sidebarOverlay) sidebarOverlay.classList.add('show');
+            sidebarToggler.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeSidebar = () => {
+            sidebar.classList.remove('show');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+            sidebarToggler.setAttribute('aria-expanded', 'false');
+        };
+
+        sidebarToggler.addEventListener('click', () => {
+            const isOpen = sidebar.classList.contains('show');
+            isOpen ? closeSidebar() : openSidebar();
+        });
+
+        // Fermer via l'overlay (clic en dehors de la sidebar)
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Fermer la sidebar quand on clique sur un lien de navigation
+        sidebar.querySelectorAll('.dc-sidebar__link').forEach(link => {
+            link.addEventListener('click', closeSidebar);
         });
     }
 };

@@ -303,6 +303,9 @@
     font-size: 0.875rem;
     color: var(--color-text);
     margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -346,7 +349,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ZONE DE DEPOT — hauteur fixe 130px alignee avec les miniatures
+   ZONE DE DEPOT — hauteur fixe 130px alignée avec les miniatures
    ═══════════════════════════════════════════════════════════════ */
 
 .pj-dropzone {

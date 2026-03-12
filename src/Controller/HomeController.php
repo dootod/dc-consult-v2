@@ -3,11 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Projet;
+use App\Form\ContactType;
 use App\Repository\ProjetRepository;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -28,10 +33,6 @@ final class HomeController extends AbstractController
 
     // ── LISTE PROJETS ─────────────────────────────────────────────────────────
 
-    /**
-     * Page principale "Nos projets" — affiche les N premiers projets.
-     * La pagination "Voir plus" est gérée via XHR sur app_projets_load_more.
-     */
     #[Route('/projets', name: 'app_projets')]
     public function projets(ProjetRepository $projetRepository): Response
     {
@@ -39,17 +40,13 @@ final class HomeController extends AbstractController
         $projets = $projetRepository->findPageWithImages(0, self::PROJETS_PER_PAGE);
 
         return $this->render('projets/index.html.twig', [
-            'projets'      => $projets,
-            'total'        => $total,
-            'loaded'       => count($projets),
-            'per_page'     => self::PROJETS_PER_PAGE,
+            'projets'  => $projets,
+            'total'    => $total,
+            'loaded'   => count($projets),
+            'per_page' => self::PROJETS_PER_PAGE,
         ]);
     }
 
-    /**
-     * Endpoint XHR "Voir plus" — retourne le fragment HTML des projets suivants.
-     * Accepte uniquement les requêtes XMLHttpRequest pour éviter l'accès direct.
-     */
     #[Route('/projets/voir-plus', name: 'app_projets_load_more', methods: ['GET'])]
     public function projetsLoadMore(Request $request, ProjetRepository $projetRepository): Response
     {
@@ -71,10 +68,6 @@ final class HomeController extends AbstractController
 
     // ── DETAIL PROJET ─────────────────────────────────────────────────────────
 
-    /**
-     * Page de détail d'un projet — accessible publiquement.
-     * Utilise le ParamConverter Doctrine pour charger l'entité via l'ID.
-     */
     #[Route('/projets/{id}', name: 'app_projet_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function projetShow(Projet $projet): Response
     {
@@ -97,9 +90,77 @@ final class HomeController extends AbstractController
         return $this->render('home/logiciels.html.twig');
     }
 
-    #[Route('/contact', name: 'app_contact')]
-    public function contact(): Response
-    {
-        return $this->render('contact/index.html.twig');
+    // ── CONTACT ───────────────────────────────────────────────────────────────
+
+    /**
+     * Deux emails envoyés à chaque soumission valide :
+     *  1. dc.consult@orange.fr  — notification interne (emails/contact.html.twig)
+     *  2. Expéditeur            — accusé de réception  (emails/contact_accuse_reception.html.twig)
+     *
+     * NOTE : 'email' est réservé par TemplatedEmail → on utilise 'senderEmail'.
+     */
+    #[Route('/contact', name: 'app_contact', methods: ['GET', 'POST'])]
+    public function contact(
+        Request            $request,
+        MailerInterface    $mailer,
+        RateLimiterFactory $contactFormLimiter,
+    ): Response {
+        $form = $this->createForm(ContactType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // ── Rate limiting : 5 soumissions / 10 min par IP (OWASP A04) ──
+            $limiter = $contactFormLimiter->create($request->getClientIp());
+            if (!$limiter->consume(1)->isAccepted()) {
+                $this->addFlash('danger', 'Trop de messages envoyés. Veuillez patienter quelques minutes avant de réessayer.');
+                return $this->redirectToRoute('app_contact');
+            }
+
+            $data   = $form->getData();
+            $sentAt = new \DateTimeImmutable();
+
+            // Contexte partagé entre les deux templates email
+            $context = [
+                'nom'         => $data['nom'],
+                'prenom'      => $data['prenom'],
+                'senderEmail' => $data['email'],   // 'email' est réservé par TemplatedEmail
+                'telephone'   => $data['telephone'] ?? null,
+                'sujet'       => $data['sujet'],
+                'message'     => $data['message'],
+                'sentAt'      => $sentAt,
+            ];
+
+            try {
+                // ── 1. Notification interne à DC Consult ─────────────────────
+                $mailer->send(
+                    (new TemplatedEmail())
+                        ->to(new Address('dc.consult@orange.fr', 'DC Consult'))
+                        ->replyTo(new Address($data['email'], $data['prenom'] . ' ' . $data['nom']))
+                        ->subject('[Contact] ' . $data['sujet'])
+                        ->htmlTemplate('emails/contact.html.twig')
+                        ->context($context)
+                );
+
+                // ── 2. Accusé de réception à l'expéditeur ────────────────────
+                $mailer->send(
+                    (new TemplatedEmail())
+                        ->to(new Address($data['email'], $data['prenom'] . ' ' . $data['nom']))
+                        ->subject('Votre message a bien été reçu – DC Consult')
+                        ->htmlTemplate('emails/contact_accuse_reception.html.twig')
+                        ->context($context)
+                );
+
+                $this->addFlash('success', 'Votre message a bien été envoyé ! Un accusé de réception vous a été adressé par email.');
+                return $this->redirectToRoute('app_contact');
+
+            } catch (TransportExceptionInterface $e) {
+                $this->addFlash('danger', 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer ou nous contacter directement par email.');
+            }
+        }
+
+        return $this->render('contact/index.html.twig', [
+            'form' => $form,
+        ]);
     }
 }
