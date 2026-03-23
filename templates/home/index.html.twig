@@ -1,9 +1,654 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Page d'accueil{% endblock %}
+{% block title %}Accueil — Bureau d'études techniques{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <link rel="stylesheet" href="{{ asset('styles/home.css') }}">
+{% endblock %}
 
 {% block body %}
 
-<h1>Page d'accueil</h1>
+{# ════════════════════════════════════════════════════════════════
+   HERO
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-hero" aria-label="Présentation DC Consult">
 
+    {# Fond animé #}
+    <div class="home-hero__bg" aria-hidden="true">
+        <div class="home-hero__grid"></div>
+        <div class="home-hero__orb home-hero__orb--1"></div>
+        <div class="home-hero__orb home-hero__orb--2"></div>
+        <div class="home-hero__orb home-hero__orb--3"></div>
+    </div>
+
+    {# Floating chips techniques #}
+    <div class="home-hero__chips" aria-hidden="true">
+        <span class="home-hero__chip home-hero__chip--1"><i class="fa-solid fa-cubes"></i> Tekla Structures</span>
+        <span class="home-hero__chip home-hero__chip--2"><i class="fa-solid fa-compass-drafting"></i> DAO / CAO</span>
+        <span class="home-hero__chip home-hero__chip--3"><i class="fa-solid fa-ruler-combined"></i> Métrés précis</span>
+        <span class="home-hero__chip home-hero__chip--4"><i class="fa-solid fa-hard-hat"></i> Suivi chantier</span>
+    </div>
+
+    <div class="container home-hero__content">
+
+        <div class="home-hero__eyebrow">
+            <span class="home-hero__eyebrow-dot"></span>
+            Bureau d'études techniques — Structures métalliques
+        </div>
+
+        <h1 class="home-hero__title">
+            Le bureau d'étude au
+            <span class="home-hero__title-highlight">service de vos structures</span>
+        </h1>
+
+        <p class="home-hero__desc">
+            De la conception à la réalisation, DC&nbsp;Consult vous accompagne dans tous
+            vos projets de structures métalliques avec expertise, précision et proximité.
+        </p>
+
+        <div class="home-hero__ctas">
+            <a href="{{ path('app_contact') }}" class="home-btn home-btn--primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                Démarrer un projet
+            </a>
+            <a href="{{ path('app_projets') }}" class="home-btn home-btn--ghost">
+                <i class="fa-solid fa-folder-open"></i>
+                Voir nos réalisations
+            </a>
+        </div>
+
+        <div class="home-hero__stats">
+            <div class="home-hero__stat">
+                <span class="home-hero__stat-value" data-count="2024">2024</span>
+                <span class="home-hero__stat-label">Fondée en</span>
+            </div>
+            <div class="home-hero__stat-sep" aria-hidden="true"></div>
+            <div class="home-hero__stat">
+                <span class="home-hero__stat-value" data-count="100">100<span>%</span></span>
+                <span class="home-hero__stat-label">Sur mesure</span>
+            </div>
+            <div class="home-hero__stat-sep" aria-hidden="true"></div>
+            <div class="home-hero__stat">
+                <span class="home-hero__stat-value"><i class="fa-solid fa-location-dot" style="font-size:1.1rem;"></i></span>
+                <span class="home-hero__stat-label">Évry-Courcouronnes</span>
+            </div>
+        </div>
+
+    </div>
+
+    {# Scroll indicator #}
+    <a href="#qui-sommes-nous" class="home-hero__scroll" aria-label="Défiler vers le bas">
+        <span></span>
+    </a>
+
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   QUI SOMMES-NOUS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-about" id="qui-sommes-nous" aria-label="À propos de DC Consult">
+    <div class="container">
+        <div class="home-about__inner">
+
+            {# Colonne visuelle #}
+            <div class="home-about__visual" aria-hidden="true">
+                <div class="home-about__visual-card home-about__visual-card--main">
+                    <div class="home-about__visual-icon">
+                        <i class="fa-solid fa-helmet-safety"></i>
+                    </div>
+                    <div class="home-about__visual-lines">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    {# Blueprint décoratif SVG #}
+                    <svg class="home-about__blueprint" viewBox="0 0 200 160" fill="none"
+                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect x="10" y="10" width="180" height="140" rx="3"
+                              stroke="rgba(255,255,255,0.15)" stroke-width="1" fill="none"/>
+                        <line x1="10" y1="50" x2="190" y2="50"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="10" y1="90" x2="190" y2="90"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="10" y1="130" x2="190" y2="130"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="50" y1="10" x2="50" y2="150"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="100" y1="10" x2="100" y2="150"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="150" y1="10" x2="150" y2="150"
+                              stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <rect x="30" y="65" width="80" height="55" rx="2"
+                              stroke="rgba(255,255,255,0.4)" stroke-width="1.5" fill="none"/>
+                        <line x1="30" y1="95" x2="110" y2="95"
+                              stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+                        <line x1="70" y1="65" x2="70" y2="120"
+                              stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+                        <circle cx="30" cy="65" r="3" fill="rgba(255,255,255,0.5)"/>
+                        <circle cx="110" cy="65" r="3" fill="rgba(255,255,255,0.5)"/>
+                        <circle cx="30" cy="120" r="3" fill="rgba(255,255,255,0.5)"/>
+                        <circle cx="110" cy="120" r="3" fill="rgba(255,255,255,0.5)"/>
+                        <text x="155" y="95" fill="rgba(255,255,255,0.35)"
+                              font-size="9" font-family="monospace">DC</text>
+                        <text x="148" y="107" fill="rgba(255,255,255,0.35)"
+                              font-size="9" font-family="monospace">2024</text>
+                    </svg>
+                </div>
+
+                <!-- {# Floating badges #}
+                <div class="home-about__badge home-about__badge--tl">
+                    <i class="fa-solid fa-check-circle"></i>
+                    Bureau certifié
+                </div> -->
+                <div class="home-about__badge home-about__badge--br">
+                    <i class="fa-solid fa-bolt"></i>
+                    Réactivité garantie
+                </div>
+            </div>
+
+            {# Colonne texte #}
+            <div class="home-about__text">
+
+                <div class="home-section-eyebrow">
+                    <span class="home-section-eyebrow__bar"></span>
+                    Qui sommes-nous
+                </div>
+
+                <h2 class="home-section-title">
+                    Un bureau d'études<br>de confiance depuis&nbsp;2024
+                </h2>
+
+                <p class="home-about__desc">
+                    Créée en 2024 et basée à <strong>Évry-Courcouronnes</strong>, DC&nbsp;Consult
+                    intervient en tant que bureau d'études techniques dans le domaine des
+                    <strong>structures métalliques</strong>. Nous concevons et modélisons des
+                    solutions sur mesure, en assurant un accompagnement complet tout au long
+                    de la réalisation de vos projets.
+                </p>
+
+                <ul class="home-about__values">
+                    <li>
+                        <span class="home-about__values-icon"><i class="fa-solid fa-bullseye"></i></span>
+                        <div>
+                            <strong>Précision technique</strong>
+                            <span>Chaque calcul, chaque modèle, chaque détail est traité avec rigueur.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="home-about__values-icon"><i class="fa-solid fa-handshake"></i></span>
+                        <div>
+                            <strong>Accompagnement humain</strong>
+                            <span>Un interlocuteur unique du bureau jusqu'au chantier.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="home-about__values-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                        <div>
+                            <strong>Respect des délais</strong>
+                            <span>Nous livrons dans les temps pour ne pas bloquer votre planning.</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <a href="{{ path('app_contact') }}" class="home-btn home-btn--primary">
+                    <i class="fa-solid fa-envelope"></i>
+                    Nous contacter
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   SERVICES
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-services" id="services" aria-label="Nos services">
+    <div class="home-services__bg" aria-hidden="true"></div>
+    <div class="container">
+
+        <div class="home-section-header">
+            <div class="home-section-eyebrow">
+                <span class="home-section-eyebrow__bar"></span>
+                Nos expertises
+            </div>
+            <h2 class="home-section-title home-section-title--center">
+                Ce que nous faisons
+            </h2>
+            <p class="home-section-subtitle">
+                Trois expertises complémentaires pour couvrir l'intégralité
+                de votre projet de structure métallique.
+            </p>
+        </div>
+
+        <div class="home-services__grid">
+
+            {# Service 1 #}
+            <div class="home-service-card" data-index="01">
+                <div class="home-service-card__number" aria-hidden="true">01</div>
+                <div class="home-service-card__icon-wrap">
+                    <div class="home-service-card__icon">
+                        <i class="fa-solid fa-drafting-compass"></i>
+                    </div>
+                </div>
+                <h3 class="home-service-card__title">Conception de structures métalliques</h3>
+                <p class="home-service-card__desc">
+                    Dimensionnement, calcul de résistance et conception de plans d'exécution
+                    pour charpentes métalliques, passerelles, ossatures et ouvrages sur mesure.
+                </p>
+                <ul class="home-service-card__list">
+                    <li><i class="fa-solid fa-check"></i> Plans d'exécution détaillés</li>
+                    <li><i class="fa-solid fa-check"></i> Notes de calcul</li>
+                    <li><i class="fa-solid fa-check"></i> Dossiers techniques complets</li>
+                </ul>
+                <div class="home-service-card__footer">
+                    <a href="{{ path('app_contact') }}" class="home-service-card__cta">
+                        En savoir plus <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            {# Service 2 — mis en avant #}
+            <div class="home-service-card home-service-card--featured" data-index="02">
+                <div class="home-service-card__featured-label">Notre spécialité</div>
+                <div class="home-service-card__number" aria-hidden="true">02</div>
+                <div class="home-service-card__icon-wrap">
+                    <div class="home-service-card__icon">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+                </div>
+                <h3 class="home-service-card__title">Modélisation 3D sur Tekla Structures</h3>
+                <p class="home-service-card__desc">
+                    Création de maquettes numériques BIM complètes sous Tekla Structures,
+                    permettant une coordination parfaite entre tous les corps de métier.
+                </p>
+                <ul class="home-service-card__list">
+                    <li><i class="fa-solid fa-check"></i> Maquette BIM niveau LOD 350+</li>
+                    <li><i class="fa-solid fa-check"></i> Extraction automatique des plans</li>
+                    <li><i class="fa-solid fa-check"></i> Détection des conflits</li>
+                </ul>
+                <div class="home-service-card__footer">
+                    <a href="{{ path('app_contact') }}" class="home-service-card__cta">
+                        En savoir plus <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            {# Service 3 #}
+            <div class="home-service-card" data-index="03">
+                <div class="home-service-card__number" aria-hidden="true">03</div>
+                <div class="home-service-card__icon-wrap">
+                    <div class="home-service-card__icon">
+                        <i class="fa-solid fa-person-digging"></i>
+                    </div>
+                </div>
+                <h3 class="home-service-card__title">Visite chantier &amp; prise de cotes</h3>
+                <p class="home-service-card__desc">
+                    Déplacement sur site pour la prise de mesures précises, le suivi de
+                    l'avancement des travaux et la vérification de la conformité des ouvrages.
+                </p>
+                <ul class="home-service-card__list">
+                    <li><i class="fa-solid fa-check"></i> Relevé dimensionnel complet</li>
+                    <li><i class="fa-solid fa-check"></i> Rapport de visite illustré</li>
+                    <li><i class="fa-solid fa-check"></i> Suivi et levée de réserves</li>
+                </ul>
+                <div class="home-service-card__footer">
+                    <a href="{{ path('app_contact') }}" class="home-service-card__cta">
+                        En savoir plus <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   PROCESSUS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-process" id="processus" aria-label="Notre processus de travail">
+    <div class="container">
+
+        <div class="home-section-header">
+            <div class="home-section-eyebrow">
+                <span class="home-section-eyebrow__bar"></span>
+                Comment ça se passe
+            </div>
+            <h2 class="home-section-title home-section-title--center">
+                Notre processus en 4 étapes
+            </h2>
+        </div>
+
+        <div class="home-process__steps">
+
+            <div class="home-process__line" aria-hidden="true"></div>
+
+            <div class="home-process__step">
+                <div class="home-process__step-bubble">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="home-process__step-num" aria-hidden="true">01</div>
+                <h3 class="home-process__step-title">Prise de contact</h3>
+                <p class="home-process__step-desc">
+                    Échangeons sur vos besoins, contraintes techniques et délais pour
+                    cadrer ensemble le projet.
+                </p>
+            </div>
+
+            <div class="home-process__step">
+                <div class="home-process__step-bubble">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div class="home-process__step-num" aria-hidden="true">02</div>
+                <h3 class="home-process__step-title">Étude &amp; devis</h3>
+                <p class="home-process__step-desc">
+                    Analyse technique du dossier et remise d'une offre détaillée
+                    sous 48h ouvrées.
+                </p>
+            </div>
+
+            <div class="home-process__step">
+                <div class="home-process__step-bubble">
+                    <i class="fa-solid fa-pencil-ruler"></i>
+                </div>
+                <div class="home-process__step-num" aria-hidden="true">03</div>
+                <h3 class="home-process__step-title">Conception &amp; modélisation</h3>
+                <p class="home-process__step-desc">
+                    Réalisation des plans et de la maquette 3D Tekla avec points
+                    de validation réguliers.
+                </p>
+            </div>
+
+            <div class="home-process__step">
+                <div class="home-process__step-bubble">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                </div>
+                <div class="home-process__step-num" aria-hidden="true">04</div>
+                <h3 class="home-process__step-title">Livraison &amp; suivi</h3>
+                <p class="home-process__step-desc">
+                    Remise du dossier complet et disponibilité pour toute question
+                    lors de la phase chantier.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   POURQUOI NOUS CHOISIR
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-why" aria-label="Pourquoi choisir DC Consult">
+    <div class="home-why__bg" aria-hidden="true"></div>
+    <div class="container home-why__inner">
+
+        <div class="home-why__text">
+            <div class="home-section-eyebrow home-section-eyebrow--light">
+                <span class="home-section-eyebrow__bar"></span>
+                Pourquoi nous choisir
+            </div>
+            <h2 class="home-section-title home-section-title--white">
+                L'expertise technique&nbsp;à taille humaine
+            </h2>
+            <p class="home-why__desc">
+                Pas de grand groupe anonyme. Chez DC&nbsp;Consult, vous avez un
+                interlocuteur dédié qui connaît votre projet de A à Z.
+            </p>
+            <a href="{{ path('app_projets') }}" class="home-btn home-btn--white">
+                <i class="fa-solid fa-folder-open"></i>
+                Découvrir nos projets
+            </a>
+        </div>
+
+        <div class="home-why__cards">
+
+            <div class="home-why__card">
+                <div class="home-why__card-icon">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <h3>Analyse sur mesure</h3>
+                <p>Chaque projet est unique. Nous adaptons notre approche à vos contraintes spécifiques.</p>
+            </div>
+
+            <div class="home-why__card">
+                <div class="home-why__card-icon">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                </div>
+                <h3>Technologies BIM</h3>
+                <p>Maquette numérique Tekla pour une coordination sans faille et zéro surprise sur chantier.</p>
+            </div>
+
+            <div class="home-why__card">
+                <div class="home-why__card-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>Rigueur documentaire</h3>
+                <p>Dossiers complets, notes de calcul et plans d'exécution livrés dans les règles de l'art.</p>
+            </div>
+
+            <div class="home-why__card">
+                <div class="home-why__card-icon">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <h3>Présence terrain</h3>
+                <p>Déplacements sur site pour vérifier la conformité et lever les ambiguïtés en direct.</p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   FAQ
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-faq" id="faq" aria-label="Questions fréquentes">
+    <div class="container">
+
+        <div class="home-section-header">
+            <div class="home-section-eyebrow">
+                <span class="home-section-eyebrow__bar"></span>
+                FAQ
+            </div>
+            <h2 class="home-section-title home-section-title--center">
+                Questions fréquentes
+            </h2>
+        </div>
+
+        <div class="home-faq__grid">
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Pour quel type de projets intervenez-vous ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Nous intervenons sur tout type de projets impliquant des structures métalliques :
+                        bâtiments industriels, passerelles, halls, ossatures, escaliers métalliques,
+                        verrières, auvents… Si c'est en acier, nous pouvons vous aider.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Quels logiciels utilisez-vous ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Notre outil principal est <strong>Tekla Structures</strong> pour la modélisation
+                        3D et l'extraction des plans d'exécution. Nous utilisons également AutoCAD pour
+                        les plans 2D, ainsi que des logiciels de calcul de structures courants.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Intervenez-vous partout en France ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Notre bureau est basé à Évry-Courcouronnes (91). Nous intervenons principalement
+                        en Île-de-France pour les visites chantier, mais nous réalisons des études
+                        et de la modélisation pour des clients partout en France.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Quel est votre délai de réponse pour un devis ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Nous nous engageons à vous répondre dans les <strong>48h ouvrées</strong>
+                        suivant la réception de votre demande. Pour les projets urgents,
+                        n'hésitez pas à nous appeler directement au <a href="tel:+33637194574">06 37 19 45 74</a>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Livrez-vous les fichiers natifs Tekla ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Oui, selon les termes du contrat, nous pouvons livrer le modèle Tekla
+                        natif (.tsep), les exports IFC, ainsi que tous les plans PDF et DWG.
+                        La liste des livrables est définie en amont avec vous.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-faq__item js-faq-item">
+                <button class="home-faq__question js-faq-btn" aria-expanded="false">
+                    <span>Proposez-vous un accompagnement post-livraison ?</span>
+                    <i class="fa-solid fa-chevron-down home-faq__chevron" aria-hidden="true"></i>
+                </button>
+                <div class="home-faq__answer" aria-hidden="true">
+                    <p>
+                        Absolument. Nous restons disponibles pour toute question ou modification
+                        pendant la phase chantier. Des visites de suivi peuvent également être
+                        prévues pour vérifier la bonne exécution des ouvrages.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   LOCALISATION (Map Leaflet)
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-map" id="localisation" aria-label="Localisation DC Consult">
+    <div class="container">
+
+        <div class="home-section-header">
+            <div class="home-section-eyebrow">
+                <span class="home-section-eyebrow__bar"></span>
+                Nous trouver
+            </div>
+            <h2 class="home-section-title home-section-title--center">
+                Basés à Évry-Courcouronnes
+            </h2>
+        </div>
+
+        <div class="home-map__wrapper">
+
+            <div class="home-map__info-card">
+                <div class="home-map__info-header">
+                    <div class="home-map__info-logo">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <div>
+                        <strong>DC Consult</strong>
+                        <span>Bureau d'études techniques</span>
+                    </div>
+                </div>
+
+                <ul class="home-map__info-list">
+                    <li>
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>10 Allée des Champs Élysées<br>91080 Évry-Courcouronnes</span>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-phone"></i>
+                        <a href="tel:+33637194574">06 37 19 45 74</a>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-envelope"></i>
+                        <a href="mailto:dc.consult@orange.fr">dc.consult@orange.fr</a>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Lun. – Ven. · 8h – 18h</span>
+                    </li>
+                </ul>
+
+                <a href="{{ path('app_contact') }}" class="home-btn home-btn--primary home-btn--full">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Nous écrire
+                </a>
+            </div>
+
+            <div class="home-map__leaflet" aria-label="Carte — DC Consult Évry-Courcouronnes">
+                <div id="homeMap"></div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   CTA FINAL
+   ════════════════════════════════════════════════════════════════ #}
+<section class="home-cta" aria-label="Démarrer un projet">
+    <div class="home-cta__bg" aria-hidden="true">
+        <div class="home-cta__orb home-cta__orb--1"></div>
+        <div class="home-cta__orb home-cta__orb--2"></div>
+    </div>
+    <div class="container home-cta__inner">
+        <h2 class="home-cta__title">
+            Un projet en tête&nbsp;?<br>
+            <span>Parlons-en dès maintenant.</span>
+        </h2>
+        <p class="home-cta__sub">
+            Réponse garantie sous 48h · Devis gratuit · Sans engagement
+        </p>
+        <div class="home-cta__actions">
+            <a href="{{ path('app_contact') }}" class="home-btn home-btn--white">
+                <i class="fa-solid fa-paper-plane"></i>
+                Envoyer un message
+            </a>
+            <a href="tel:+33637194574" class="home-btn home-btn--ghost-white">
+                <i class="fa-solid fa-phone"></i>
+                06 37 19 45 74
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="{{ asset('js/home.js') }}"></script>
 {% endblock %}
