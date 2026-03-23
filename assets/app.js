@@ -16,6 +16,8 @@ import './js/admin-documents.js';
 import './js/admin-users.js';
 import './js/auth.js';
 import './js/projets-admin.js';
+import './styles/home.css';
+import './js/home.js';
 
 const initAppUi = () => {
     // ── Effet shadow sur la navbar au scroll ──────────────────────
