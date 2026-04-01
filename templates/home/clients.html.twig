@@ -1,9 +1,586 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos clients{% endblock %}
+{% block title %}Nos clients - DC Consult{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/clients.css') }}">
+{% endblock %}
 
 {% block body %}
 
-<h1>Nos clients</h1>
+{# ════════════════════════════════════════════════════════════════
+   HERO
+   ════════════════════════════════════════════════════════════════ #}
+<section class="cl-hero" aria-label="Nos clients">
+    <div class="cl-hero__bg" aria-hidden="true">
+        <div class="cl-hero__grid"></div>
+        <span class="cl-hero__orb cl-hero__orb--a"></span>
+        <span class="cl-hero__orb cl-hero__orb--b"></span>
+    </div>
 
+    <div class="container cl-hero__inner">
+
+        <div class="cl-hero__badge">
+            <span class="cl-hero__badge-dot"></span>
+            Ils nous font confiance
+        </div>
+
+        <h1 class="cl-hero__title">
+            Nos&nbsp;<em>clients</em><br>
+            <span class="cl-hero__title-line"></span>
+            depuis&nbsp;2024
+        </h1>
+
+        <p class="cl-hero__desc">
+            Des groupes nationaux aux PME locales, DC&nbsp;Consult accompagne
+            les acteurs majeurs de la construction métallique en Île-de-France
+            et partout en France.
+        </p>
+
+        <div class="cl-hero__counters" aria-label="Chiffres clés">
+            <div class="cl-hero__counter">
+                <span class="cl-hero__counter-val" data-target="10">0</span>
+                <span class="cl-hero__counter-label">Clients actifs</span>
+            </div>
+            <div class="cl-hero__counter-sep" aria-hidden="true"></div>
+            <div class="cl-hero__counter">
+                <span class="cl-hero__counter-val" data-target="5">0</span>
+                <span class="cl-hero__counter-label">Groupes nationaux</span>
+            </div>
+            <div class="cl-hero__counter-sep" aria-hidden="true"></div>
+            <div class="cl-hero__counter">
+                <span class="cl-hero__counter-val" data-target="100">0</span>
+                <span class="cl-hero__counter-label js-pct">% Satisfaction</span>
+            </div>
+        </div>
+
+    </div>
+
+    {# Ruban défilant de noms clients #}
+    <div class="cl-ticker" aria-hidden="true">
+        <div class="cl-ticker__track">
+            <span>Groupe Treuil</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Cesam Construction</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Groupe Legendre</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>OSB Entreprise</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>CBC Services</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Chantiers Modernes</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Bateg</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Razel-bec</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>ERCT Construction</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>SARL Pérouze</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>SAS Chauvet</span>
+            <span class="cl-ticker__sep">◆</span>
+            {# Répétition pour l'effet infini #}
+            <span>Groupe Treuil</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Cesam Construction</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Groupe Legendre</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>OSB Entreprise</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>CBC Services</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Chantiers Modernes</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Bateg</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>Razel-bec</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>ERCT Construction</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>SARL Pérouze</span>
+            <span class="cl-ticker__sep">◆</span>
+            <span>SAS Chauvet</span>
+            <span class="cl-ticker__sep">◆</span>
+        </div>
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   GRILLE CLIENTS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="cl-grid-section" id="clients" aria-label="Liste de nos clients">
+    <div class="container">
+
+        {# ── Filtres par catégorie ── #}
+        <div class="cl-filters" role="group" aria-label="Filtrer par catégorie">
+            <button class="cl-filter is-active" data-filter="all">
+                <i class="fa-solid fa-layer-group"></i>
+                Tous
+            </button>
+            <button class="cl-filter" data-filter="grands-groupes">
+                <i class="fa-solid fa-building-columns"></i>
+                Grands groupes
+            </button>
+            <button class="cl-filter" data-filter="entreprises">
+                <i class="fa-solid fa-hard-hat"></i>
+                Entreprises BTP
+            </button>
+            <button class="cl-filter" data-filter="metallerie">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                Serrurerie & Métallerie
+            </button>
+        </div>
+
+        {# ── Grille de cartes clients ── #}
+        <div class="cl-grid js-cl-grid">
+
+            {# 1 - Groupe Treuil / Cesam Construction #}
+            <article class="cl-card js-cl-card" data-cat="grands-groupes" data-index="0">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-industry"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Groupe Treuil</div>
+                        <h2 class="cl-card__name">Cesam Construction</h2>
+                        <p class="cl-card__desc">
+                            Filiale spécialisée du Groupe Treuil, intervenant sur des chantiers
+                            de construction complexes et d'envergure nationale.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Gros œuvre</span>
+                            <span class="cl-tag">Structures</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-building-columns"></i>
+                            Grand groupe
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 2 - Groupe Legendre #}
+            <article class="cl-card js-cl-card" data-cat="grands-groupes" data-index="1">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-city"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Groupe Legendre</div>
+                        <h2 class="cl-card__name">Groupe Legendre</h2>
+                        <p class="cl-card__desc">
+                            Acteur majeur de la construction et de la promotion immobilière,
+                            présent sur l'ensemble du territoire français.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Promotion</span>
+                            <span class="cl-tag">Construction</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <div class="cl-card__actions">
+                            <a href="https://www.groupe-legendre.com" target="_blank" rel="noopener noreferrer"
+                               class="cl-card__link" aria-label="Visiter le site du Groupe Legendre">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Visiter le site
+                            </a>
+                        </div>
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-building-columns"></i>
+                            Grand groupe
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 3 - OSB Entreprise #}
+            <article class="cl-card js-cl-card" data-cat="entreprises" data-index="2">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-helmet-safety"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">OSB - Office Services Bâtiment</div>
+                        <h2 class="cl-card__name">OSB Entreprise</h2>
+                        <p class="cl-card__desc">
+                            Entreprise générale de bâtiment spécialisée dans les travaux
+                            secondaires et de finition pour les marchés publics et privés.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Bâtiment</span>
+                            <span class="cl-tag">Marchés publics</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-hard-hat"></i>
+                            Entreprise BTP
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 4 - CBC Services / Groupe Vinci #}
+            <article class="cl-card js-cl-card cl-card--featured" data-cat="grands-groupes" data-index="3">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Groupe Vinci Construction</div>
+                        <h2 class="cl-card__name">CBC Services</h2>
+                        <p class="cl-card__desc">
+                            Entité du leader mondial de la construction, intervenant sur
+                            des projets d'infrastructure d'ampleur nationale et internationale.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Infrastructure</span>
+                            <span class="cl-tag">Grand travaux</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <div class="cl-card__actions">
+                            <a href="https://www.vinci-construction.com" target="_blank" rel="noopener noreferrer"
+                               class="cl-card__link" aria-label="Visiter le site de Vinci Construction">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Visiter le site
+                            </a>
+                        </div>
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-building-columns"></i>
+                            Grand groupe
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+                <div class="cl-card__featured-badge">Partenaire clé</div>
+            </article>
+
+            {# 5 - Chantiers Modernes (CMC) #}
+            <article class="cl-card js-cl-card" data-cat="entreprises" data-index="4">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-warehouse"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">CMC</div>
+                        <h2 class="cl-card__name">Chantiers Modernes</h2>
+                        <p class="cl-card__desc">
+                            Entreprise générale de construction reconnue pour ses réalisations
+                            dans les domaines résidentiel, tertiaire et industriel.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Résidentiel</span>
+                            <span class="cl-tag">Tertiaire</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-hard-hat"></i>
+                            Entreprise BTP
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 6 - Bateg #}
+            <article class="cl-card js-cl-card" data-cat="entreprises" data-index="5">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group"></div>
+                        <h2 class="cl-card__name">Bateg</h2>
+                        <p class="cl-card__desc">
+                            Entreprise de bâtiment et de génie civil intervenant sur des
+                            chantiers complexes nécessitant une grande expertise technique.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Génie civil</span>
+                            <span class="cl-tag">BTP</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-hard-hat"></i>
+                            Entreprise BTP
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 7 - Razel-bec / Groupe Fayat #}
+            <article class="cl-card js-cl-card cl-card--featured" data-cat="grands-groupes" data-index="6">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-bridge"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Groupe Fayat</div>
+                        <h2 class="cl-card__name">Razel-bec</h2>
+                        <p class="cl-card__desc">
+                            Filiale du Groupe Fayat, spécialiste du génie civil et des
+                            travaux d'infrastructure (routes, tunnels, ponts, barrages).
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Infrastructure</span>
+                            <span class="cl-tag">Génie civil</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <div class="cl-card__actions">
+                            <a href="https://www.razel.fr" target="_blank" rel="noopener noreferrer"
+                               class="cl-card__link" aria-label="Visiter le site de Razel-bec">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Visiter le site
+                            </a>
+                        </div>
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-building-columns"></i>
+                            Grand groupe
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+                <div class="cl-card__featured-badge">Partenaire clé</div>
+            </article>
+
+            {# 8 - ERCT Construction / SN ERCT #}
+            <article class="cl-card js-cl-card" data-cat="entreprises" data-index="7">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-person-digging"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">SN ERCT</div>
+                        <h2 class="cl-card__name">ERCT Construction</h2>
+                        <p class="cl-card__desc">
+                            Entreprise de construction spécialisée dans les travaux de
+                            structure et de réhabilitation de bâtiments.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Structure</span>
+                            <span class="cl-tag">Réhabilitation</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-hard-hat"></i>
+                            Entreprise BTP
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 9 - SARL Pérouze #}
+            <article class="cl-card js-cl-card" data-cat="metallerie" data-index="8">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Serrurerie - Métallier</div>
+                        <h2 class="cl-card__name">SARL Pérouze</h2>
+                        <p class="cl-card__desc">
+                            Artisan métallier et serrurier proposant des ouvrages sur mesure :
+                            escaliers, garde-corps, portails et structures décoratives.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Métallerie</span>
+                            <span class="cl-tag">Sur mesure</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <div class="cl-card__actions">
+                            <a href="https://annuaire-entreprises.data.gouv.fr" target="_blank" rel="noopener noreferrer"
+                               class="cl-card__link" aria-label="Voir SARL Pérouze dans l'annuaire">
+                                <i class="fa-solid fa-book-open"></i>
+                                Annuaire
+                            </a>
+                        </div>
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                            Métallerie
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+            {# 10 - SAS Chauvet #}
+            <article class="cl-card js-cl-card" data-cat="metallerie" data-index="9">
+                <div class="cl-card__inner">
+                    <div class="cl-card__logo-wrap" aria-hidden="true">
+                        <div class="cl-card__logo-icon">
+                            <i class="fa-solid fa-gear"></i>
+                        </div>
+                    </div>
+                    <div class="cl-card__body">
+                        <div class="cl-card__group">Serrurerie - Métallier</div>
+                        <h2 class="cl-card__name">SAS Chauvet</h2>
+                        <p class="cl-card__desc">
+                            Entreprise de serrurerie-métallerie intervenant sur la fabrication
+                            et la pose d'ouvrages métalliques pour le bâtiment.
+                        </p>
+                        <div class="cl-card__tags">
+                            <span class="cl-tag">Serrurerie</span>
+                            <span class="cl-tag">Fabrication</span>
+                        </div>
+                    </div>
+                    <div class="cl-card__footer">
+                        <div class="cl-card__actions">
+                            <a href="#" class="cl-card__link" aria-label="Visiter le site de SAS Chauvet">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Visiter le site
+                            </a>
+                        </div>
+                        <span class="cl-card__cat">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                            Métallerie
+                        </span>
+                    </div>
+                </div>
+                <div class="cl-card__glow" aria-hidden="true"></div>
+            </article>
+
+        </div>
+
+        {# Message empty state filtrage #}
+        <div class="cl-empty js-cl-empty" aria-live="polite" hidden>
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <p>Aucun client dans cette catégorie.</p>
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   BANDE DE CONFIANCE
+   ════════════════════════════════════════════════════════════════ #}
+<section class="cl-trust" aria-label="Pourquoi ils nous choisissent">
+    <div class="cl-trust__bg" aria-hidden="true"></div>
+    <div class="container cl-trust__inner">
+
+        <div class="cl-trust__header">
+            <div class="cl-eyebrow">
+                <span class="cl-eyebrow__bar"></span>
+                Pourquoi ils nous choisissent
+            </div>
+            <h2 class="cl-trust__title">
+                Des structures métalliques<br>pensées pour les pros
+            </h2>
+        </div>
+
+        <div class="cl-trust__pillars">
+
+            <div class="cl-pillar">
+                <div class="cl-pillar__num" aria-hidden="true">01</div>
+                <div class="cl-pillar__icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+                <h3 class="cl-pillar__title">Réactivité</h3>
+                <p class="cl-pillar__desc">
+                    Réponse sous 48h, livrables dans les délais contractuels.
+                    Nous savons que le planning d'un chantier ne souffre aucun retard.
+                </p>
+            </div>
+
+            <div class="cl-pillar">
+                <div class="cl-pillar__num" aria-hidden="true">02</div>
+                <div class="cl-pillar__icon"><i class="fa-solid fa-cube"></i></div>
+                <h3 class="cl-pillar__title">Expertise BIM</h3>
+                <p class="cl-pillar__desc">
+                    Maquettes Tekla Structures complètes, coordination parfaite
+                    entre tous les corps de métier, zéro surprise sur chantier.
+                </p>
+            </div>
+
+            <div class="cl-pillar">
+                <div class="cl-pillar__num" aria-hidden="true">03</div>
+                <div class="cl-pillar__icon"><i class="fa-solid fa-handshake-simple"></i></div>
+                <h3 class="cl-pillar__title">Interlocuteur unique</h3>
+                <p class="cl-pillar__desc">
+                    Un seul référent technique de la conception à la réception,
+                    qui connaît votre projet dans ses moindres détails.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   CTA FINAL
+   ════════════════════════════════════════════════════════════════ #}
+<section class="cl-cta" aria-label="Rejoindre nos clients">
+    <div class="cl-cta__bg" aria-hidden="true">
+        <span class="cl-cta__orb cl-cta__orb--1"></span>
+        <span class="cl-cta__orb cl-cta__orb--2"></span>
+    </div>
+    <div class="container cl-cta__inner">
+
+        <div class="cl-cta__label">
+            <i class="fa-solid fa-star"></i>
+            Rejoignez notre liste de références
+        </div>
+
+        <h2 class="cl-cta__title">
+            Vous aussi,<br>faites confiance à DC&nbsp;Consult
+        </h2>
+        <p class="cl-cta__desc">
+            Discutons de votre projet de structure métallique.
+            Devis gratuit, réponse sous 48h.
+        </p>
+
+        <div class="cl-cta__actions">
+            <a href="{{ path('app_contact') }}" class="cl-btn cl-btn--white">
+                <i class="fa-solid fa-paper-plane"></i>
+                Nous contacter
+            </a>
+            <a href="{{ path('app_projets') }}" class="cl-btn cl-btn--ghost">
+                <i class="fa-solid fa-folder-open"></i>
+                Voir nos projets
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/clients.js') }}"></script>
 {% endblock %}

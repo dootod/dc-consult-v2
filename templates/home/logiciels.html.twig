@@ -1,9 +1,528 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Logiciels{% endblock %}
+{% block title %}Nos logiciels - DC Consult{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/logiciels.css') }}">
+{% endblock %}
 
 {% block body %}
 
-<h1>Logiciels</h1>
+{# ════════════════════════════════════════════════════════════════
+   HERO
+   ════════════════════════════════════════════════════════════════ #}
+<section class="lg-hero" aria-label="Nos logiciels">
+    <div class="lg-hero__bg" aria-hidden="true">
+        <div class="lg-hero__grid"></div>
+        <span class="lg-hero__orb lg-hero__orb--a"></span>
+        <span class="lg-hero__orb lg-hero__orb--b"></span>
+        <span class="lg-hero__orb lg-hero__orb--c"></span>
+        {# Formes géométriques flottantes #}
+        <div class="lg-hero__shapes" aria-hidden="true">
+            <span class="lg-hero__shape lg-hero__shape--1"></span>
+            <span class="lg-hero__shape lg-hero__shape--2"></span>
+            <span class="lg-hero__shape lg-hero__shape--3"></span>
+        </div>
+    </div>
 
+    <div class="container lg-hero__inner">
+
+        <div class="lg-hero__badge">
+            <span class="lg-hero__badge-dot"></span>
+            Outils professionnels
+        </div>
+
+        <h1 class="lg-hero__title">
+            Nos&nbsp;<em>logiciels</em>
+            <span class="lg-hero__title-line"></span>
+        </h1>
+
+        <p class="lg-hero__desc">
+            De la modélisation BIM au calcul de structures, nous maîtrisons les outils
+            de référence de l'industrie pour garantir précision, fiabilité et performance
+            sur chaque projet.
+        </p>
+
+        <div class="lg-hero__counters" aria-label="Chiffres clés">
+            <div class="lg-hero__counter">
+                <span class="lg-hero__counter-val" data-target="3">0</span>
+                <span class="lg-hero__counter-label">Logiciels maîtrisés</span>
+            </div>
+            <div class="lg-hero__counter-sep" aria-hidden="true"></div>
+            <div class="lg-hero__counter">
+                <span class="lg-hero__counter-val" data-target="100">0</span>
+                <span class="lg-hero__counter-label js-pct">% BIM natif</span>
+            </div>
+            <div class="lg-hero__counter-sep" aria-hidden="true"></div>
+            <div class="lg-hero__counter">
+                <span class="lg-hero__counter-val" data-target="0">0</span>
+                <span class="lg-hero__counter-label">Erreurs de clash</span>
+            </div>
+        </div>
+
+    </div>
+
+    {# Ruban défilant de mots-clés techniques #}
+    <div class="lg-ticker" aria-hidden="true">
+        <div class="lg-ticker__track">
+            <span>Tekla Structures</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Modélisation BIM</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Robot Structural Analysis</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Calcul aux Eurocodes</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>DraftSight</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Plans d'exécution</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>IFC / DWG / DXF</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Clash Detection</span>
+            <span class="lg-ticker__sep">◆</span>
+            {# Répétition pour l'effet infini #}
+            <span>Tekla Structures</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Modélisation BIM</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Robot Structural Analysis</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Calcul aux Eurocodes</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>DraftSight</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Plans d'exécution</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>IFC / DWG / DXF</span>
+            <span class="lg-ticker__sep">◆</span>
+            <span>Clash Detection</span>
+            <span class="lg-ticker__sep">◆</span>
+        </div>
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   SHOWCASE - LOGICIELS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="lg-showcase" id="logiciels" aria-label="Détail de nos logiciels">
+    <div class="container">
+
+        {# ── Tekla Structures ── #}
+        <article class="lg-soft js-lg-soft" data-index="0">
+            <div class="lg-soft__visual">
+                <div class="lg-soft__card-3d js-tilt">
+                    <div class="lg-soft__card-face">
+                        <div class="lg-soft__card-icon">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <div class="lg-soft__card-wireframe" aria-hidden="true">
+                            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 20 L180 70 L180 140 L100 190 L20 140 L20 70 Z" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                                <path d="M100 20 L100 190" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+                                <path d="M20 70 L180 70" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+                                <path d="M20 140 L180 140" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+                                <path d="M60 45 L140 45 L160 105 L100 150 L40 105 Z" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+                            </svg>
+                        </div>
+                        <span class="lg-soft__card-label">BIM 3D</span>
+                    </div>
+                </div>
+                <div class="lg-soft__floating-tags" aria-hidden="true">
+                    <span class="lg-soft__ftag lg-soft__ftag--1">IFC</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--2">.tekla</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--3">LOD 400</span>
+                </div>
+            </div>
+            <div class="lg-soft__content">
+                <div class="lg-soft__eyebrow">
+                    <span class="lg-soft__eyebrow-bar"></span>
+                    Modélisation &amp; BIM
+                </div>
+                <h2 class="lg-soft__name">Tekla Structures</h2>
+                <p class="lg-soft__editor">par Trimble</p>
+                <p class="lg-soft__desc">
+                    Logiciel de référence pour la modélisation 3D de structures métalliques et béton.
+                    Tekla Structures nous permet de créer des maquettes BIM d'une précision millimétrique,
+                    intégrant chaque boulon, chaque platine et chaque cordon de soudure.
+                </p>
+                <ul class="lg-soft__features">
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Maquette BIM LOD 400 - chaque pièce modélisée au détail près
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Export IFC natif pour la coordination inter-lots
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Génération automatique des plans de fabrication et montage
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Clash detection intégrée pour zéro surprise sur chantier
+                    </li>
+                </ul>
+                <div class="lg-soft__tags">
+                    <span class="lg-soft__tag">Charpente métallique</span>
+                    <span class="lg-soft__tag">BIM</span>
+                    <span class="lg-soft__tag">Détails d'assemblage</span>
+                </div>
+            </div>
+        </article>
+
+        {# ── Robot Structural Analysis ── #}
+        <article class="lg-soft js-lg-soft lg-soft--reverse" data-index="1">
+            <div class="lg-soft__visual">
+                <div class="lg-soft__card-3d js-tilt">
+                    <div class="lg-soft__card-face lg-soft__card-face--green">
+                        <div class="lg-soft__card-icon">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div class="lg-soft__card-wireframe" aria-hidden="true">
+                            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="30" y1="170" x2="100" y2="40" stroke="currentColor" stroke-width="1.2" opacity="0.4"/>
+                                <line x1="170" y1="170" x2="100" y2="40" stroke="currentColor" stroke-width="1.2" opacity="0.4"/>
+                                <line x1="30" y1="170" x2="170" y2="170" stroke="currentColor" stroke-width="1.2" opacity="0.4"/>
+                                <line x1="65" y1="105" x2="135" y2="105" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+                                <line x1="65" y1="105" x2="30" y2="170" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+                                <line x1="135" y1="105" x2="170" y2="170" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+                                <line x1="100" y1="10" x2="100" y2="35" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+                                <polygon points="93,30 107,30 100,40" fill="currentColor" opacity="0.5"/>
+                                <circle cx="100" cy="40" r="4" fill="currentColor" opacity="0.5"/>
+                                <circle cx="30" cy="170" r="4" fill="currentColor" opacity="0.5"/>
+                                <circle cx="170" cy="170" r="4" fill="currentColor" opacity="0.5"/>
+                            </svg>
+                        </div>
+                        <span class="lg-soft__card-label">FEA</span>
+                    </div>
+                </div>
+                <div class="lg-soft__floating-tags" aria-hidden="true">
+                    <span class="lg-soft__ftag lg-soft__ftag--1">EC3</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--2">CM66</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--3">NF EN</span>
+                </div>
+            </div>
+            <div class="lg-soft__content">
+                <div class="lg-soft__eyebrow">
+                    <span class="lg-soft__eyebrow-bar"></span>
+                    Calcul de structures
+                </div>
+                <h2 class="lg-soft__name">Robot Structural Analysis</h2>
+                <p class="lg-soft__editor">par Autodesk</p>
+                <p class="lg-soft__desc">
+                    Outil d'analyse par éléments finis indispensable pour le dimensionnement
+                    et la vérification réglementaire de nos structures. Robot nous assure que chaque
+                    profilé, chaque assemblage et chaque fondation répond aux exigences des Eurocodes.
+                </p>
+                <ul class="lg-soft__features">
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Calcul aux Eurocodes (EC3, EC2, EC8) et normes françaises
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Analyse statique, dynamique et sismique
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Vérification automatique des sections et assemblages
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Notes de calcul complètes pour les bureaux de contrôle
+                    </li>
+                </ul>
+                <div class="lg-soft__tags">
+                    <span class="lg-soft__tag">Eurocodes</span>
+                    <span class="lg-soft__tag">Sismique</span>
+                    <span class="lg-soft__tag">Éléments finis</span>
+                </div>
+            </div>
+        </article>
+
+        {# ── DraftSight ── #}
+        <article class="lg-soft js-lg-soft" data-index="2">
+            <div class="lg-soft__visual">
+                <div class="lg-soft__card-3d js-tilt">
+                    <div class="lg-soft__card-face lg-soft__card-face--amber">
+                        <div class="lg-soft__card-icon">
+                            <i class="fa-solid fa-drafting-compass"></i>
+                        </div>
+                        <div class="lg-soft__card-wireframe" aria-hidden="true">
+                            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="30" y="30" width="140" height="140" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                                <rect x="50" y="50" width="60" height="40" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+                                <rect x="130" y="60" width="25" height="80" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+                                <line x1="50" y1="120" x2="110" y2="120" stroke="currentColor" stroke-width="0.8" opacity="0.3" stroke-dasharray="4 2"/>
+                                <line x1="50" y1="140" x2="90" y2="140" stroke="currentColor" stroke-width="0.8" opacity="0.3" stroke-dasharray="4 2"/>
+                                <line x1="50" y1="25" x2="110" y2="25" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>
+                                <line x1="50" y1="22" x2="50" y2="28" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>
+                                <line x1="110" y1="22" x2="110" y2="28" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>
+                            </svg>
+                        </div>
+                        <span class="lg-soft__card-label">CAO 2D</span>
+                    </div>
+                </div>
+                <div class="lg-soft__floating-tags" aria-hidden="true">
+                    <span class="lg-soft__ftag lg-soft__ftag--1">DWG</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--2">DXF</span>
+                    <span class="lg-soft__ftag lg-soft__ftag--3">PDF</span>
+                </div>
+            </div>
+            <div class="lg-soft__content">
+                <div class="lg-soft__eyebrow">
+                    <span class="lg-soft__eyebrow-bar"></span>
+                    Dessin technique 2D
+                </div>
+                <h2 class="lg-soft__name">DraftSight</h2>
+                <p class="lg-soft__editor">par Dassault Systèmes</p>
+                <p class="lg-soft__desc">
+                    Solution de CAO 2D professionnelle et compatible DWG native. DraftSight est
+                    notre outil de choix pour la production de plans d'exécution, les détails
+                    d'assemblage et la mise en page de documents techniques normalisés.
+                </p>
+                <ul class="lg-soft__features">
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Compatibilité DWG/DXF native - échanges fluides
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Plans d'exécution normalisés et cotés
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Détails d'assemblage et nomenclatures
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-check"></i>
+                        Export PDF haute résolution pour diffusion chantier
+                    </li>
+                </ul>
+                <div class="lg-soft__tags">
+                    <span class="lg-soft__tag">Plans 2D</span>
+                    <span class="lg-soft__tag">DWG natif</span>
+                    <span class="lg-soft__tag">Mise en plan</span>
+                </div>
+            </div>
+        </article>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   WORKFLOW - PIPELINE DE PRODUCTION
+   ════════════════════════════════════════════════════════════════ #}
+<section class="lg-workflow" aria-label="Notre flux de travail">
+    <div class="lg-workflow__bg" aria-hidden="true"></div>
+    <div class="container lg-workflow__inner">
+
+        <div class="lg-workflow__header">
+            <div class="lg-eyebrow">
+                <span class="lg-eyebrow__bar"></span>
+                Flux de production
+            </div>
+            <h2 class="lg-workflow__title">
+                Un pipeline intégré,<br>de la conception au chantier
+            </h2>
+            <p class="lg-workflow__subtitle">
+                Nos trois logiciels s'articulent dans un workflow fluide
+                pour garantir cohérence et traçabilité à chaque étape.
+            </p>
+        </div>
+
+        <div class="lg-pipeline js-pipeline">
+
+            {# Étape 1 #}
+            <div class="lg-step js-lg-step" data-step="1">
+                <div class="lg-step__number" aria-hidden="true">01</div>
+                <div class="lg-step__icon">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div class="lg-step__connector" aria-hidden="true">
+                    <span class="lg-step__connector-line"></span>
+                    <span class="lg-step__connector-dot"></span>
+                </div>
+                <h3 class="lg-step__title">Calcul &amp; Dimensionnement</h3>
+                <p class="lg-step__tool">Robot Structural Analysis</p>
+                <p class="lg-step__desc">
+                    Analyse structurelle, vérification aux Eurocodes et validation
+                    des hypothèses de charges avant toute modélisation.
+                </p>
+            </div>
+
+            {# Étape 2 #}
+            <div class="lg-step js-lg-step" data-step="2">
+                <div class="lg-step__number" aria-hidden="true">02</div>
+                <div class="lg-step__icon">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <div class="lg-step__connector" aria-hidden="true">
+                    <span class="lg-step__connector-line"></span>
+                    <span class="lg-step__connector-dot"></span>
+                </div>
+                <h3 class="lg-step__title">Modélisation BIM 3D</h3>
+                <p class="lg-step__tool">Tekla Structures</p>
+                <p class="lg-step__desc">
+                    Création de la maquette numérique complète avec chaque
+                    assemblage, chaque boulon, export IFC pour coordination.
+                </p>
+            </div>
+
+            {# Étape 3 #}
+            <div class="lg-step js-lg-step" data-step="3">
+                <div class="lg-step__number" aria-hidden="true">03</div>
+                <div class="lg-step__icon">
+                    <i class="fa-solid fa-drafting-compass"></i>
+                </div>
+                <h3 class="lg-step__title">Plans d'exécution</h3>
+                <p class="lg-step__tool">DraftSight</p>
+                <p class="lg-step__desc">
+                    Production des plans détaillés, nomenclatures et documents
+                    normalisés prêts pour la fabrication et le montage sur chantier.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   AVANTAGES - POURQUOI CES OUTILS
+   ════════════════════════════════════════════════════════════════ #}
+<section class="lg-benefits" aria-label="Avantages de nos outils">
+    <div class="container">
+
+        <div class="lg-benefits__header">
+            <div class="lg-eyebrow">
+                <span class="lg-eyebrow__bar"></span>
+                L'avantage DC Consult
+            </div>
+            <h2 class="lg-benefits__title">
+                Pourquoi ces logiciels<br>font la différence
+            </h2>
+        </div>
+
+        <div class="lg-benefits__grid">
+
+            <div class="lg-benefit js-lg-benefit" data-index="0">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3 class="lg-benefit__title">Précision millimétrique</h3>
+                <p class="lg-benefit__desc">
+                    Tekla modélise chaque pièce au détail près. Les erreurs de fabrication
+                    et d'assemblage sur chantier sont éliminées dès la phase de conception.
+                </p>
+            </div>
+
+            <div class="lg-benefit js-lg-benefit" data-index="1">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 class="lg-benefit__title">Conformité garantie</h3>
+                <p class="lg-benefit__desc">
+                    Robot vérifie chaque profilé selon les Eurocodes en vigueur.
+                    Les notes de calcul sont validées par les bureaux de contrôle sans réserves.
+                </p>
+            </div>
+
+            <div class="lg-benefit js-lg-benefit" data-index="2">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
+                <h3 class="lg-benefit__title">Interopérabilité totale</h3>
+                <p class="lg-benefit__desc">
+                    IFC, DWG, DXF - nos outils communiquent nativement entre eux
+                    et avec vos propres logiciels de synthèse et coordination.
+                </p>
+            </div>
+
+            <div class="lg-benefit js-lg-benefit" data-index="3">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <h3 class="lg-benefit__title">Gain de temps</h3>
+                <p class="lg-benefit__desc">
+                    L'automatisation de Tekla et Robot réduit les tâches répétitives.
+                    Plans, nomenclatures et notes de calcul sont générés en un clic.
+                </p>
+            </div>
+
+            <div class="lg-benefit js-lg-benefit" data-index="4">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <h3 class="lg-benefit__title">Visualisation claire</h3>
+                <p class="lg-benefit__desc">
+                    La maquette 3D permet à tous les intervenants de visualiser
+                    le projet avant le premier coup de pioche - moins de doutes, plus de confiance.
+                </p>
+            </div>
+
+            <div class="lg-benefit js-lg-benefit" data-index="5">
+                <div class="lg-benefit__icon-wrap">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+                <h3 class="lg-benefit__title">Livrables complets</h3>
+                <p class="lg-benefit__desc">
+                    Maquette BIM, plans d'exécution cotés, nomenclatures, notes de calcul -
+                    un dossier technique complet livré clé en main.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+{# ════════════════════════════════════════════════════════════════
+   CTA FINAL
+   ════════════════════════════════════════════════════════════════ #}
+<section class="lg-cta" aria-label="Nous contacter">
+    <div class="lg-cta__bg" aria-hidden="true">
+        <span class="lg-cta__orb lg-cta__orb--1"></span>
+        <span class="lg-cta__orb lg-cta__orb--2"></span>
+    </div>
+    <div class="container lg-cta__inner">
+
+        <div class="lg-cta__label">
+            <i class="fa-solid fa-star"></i>
+            Des outils au service de vos projets
+        </div>
+
+        <h2 class="lg-cta__title">
+            Confiez-nous votre prochain<br>projet de structure
+        </h2>
+        <p class="lg-cta__desc">
+            Notre maîtrise de Tekla, Robot et DraftSight est à votre service.
+            Devis gratuit, réponse sous 48h.
+        </p>
+
+        <div class="lg-cta__actions">
+            <a href="{{ path('app_contact') }}" class="lg-btn lg-btn--white">
+                <i class="fa-solid fa-paper-plane"></i>
+                Nous contacter
+            </a>
+            <a href="{{ path('app_projets') }}" class="lg-btn lg-btn--ghost">
+                <i class="fa-solid fa-folder-open"></i>
+                Voir nos projets
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/logiciels.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,170 @@
+{#
+ * Footer pages publiques (vitrine)
+ * Inclus dans templates/base.html.twig
+ * Avant la balise </body>
+ #}
+<footer class="fp-footer" role="contentinfo" aria-label="Pied de page DC Consult">
+
+    <div class="fp-footer__body">
+        <div class="container">
+            <div class="fp-footer__cols">
+
+                {# ── Colonne Brand ── #}
+                <div class="fp-brand">
+                    <a href="{{ path('app_home') }}" class="fp-brand__logo" aria-label="DC Consult - Accueil">
+                        <img src="{{ asset('images/logo.png') }}" alt="DC Consult">
+                    </a>
+
+                    <p class="fp-brand__tagline">
+                        Bureau d'études techniques spécialisé dans les structures
+                        métalliques. Conception, modélisation BIM et suivi chantier
+                        depuis Évry-Courcouronnes.
+                    </p>
+
+                    <div class="fp-brand__contacts">
+                        <a href="tel:+33637194574" class="fp-brand__contact">
+                            <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                            06 37 19 45 74
+                        </a>
+                        <a href="mailto:dc.consult@orange.fr" class="fp-brand__contact">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                            dc.consult@orange.fr
+                        </a>
+                        <span class="fp-brand__contact">
+                            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                            10 Allée des Champs Élysées, 91080 Évry
+                        </span>
+                    </div>
+
+                    <div class="fp-brand__status" aria-label="Statut : disponible">
+                        <span class="fp-brand__status-dot" aria-hidden="true"></span>
+                        Disponible · Lun - Ven
+                    </div>
+                </div>
+
+                {# ── Navigation ── #}
+                <nav class="fp-nav" aria-label="Navigation principale">
+                    <div class="fp-nav__title">Navigation</div>
+                    <a href="{{ path('app_home') }}" class="fp-nav__link">
+                        <i class="fa-solid fa-house" aria-hidden="true"></i>
+                        Accueil
+                    </a>
+                    <a href="{{ path('app_projets') }}" class="fp-nav__link">
+                        <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                        Nos projets
+                    </a>
+                    <a href="{{ path('app_clients') }}" class="fp-nav__link">
+                        <i class="fa-solid fa-handshake" aria-hidden="true"></i>
+                        Nos clients
+                    </a>
+                    <a href="{{ path('app_logiciels') }}" class="fp-nav__link">
+                        <i class="fa-solid fa-cube" aria-hidden="true"></i>
+                        Logiciels
+                    </a>
+                    <a href="{{ path('app_contact') }}" class="fp-nav__link">
+                        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                        Contact
+                    </a>
+                </nav>
+
+                {# ── Espace client ── #}
+                <nav class="fp-nav" aria-label="Espace client">
+                    <div class="fp-nav__title">Espace client</div>
+                    {% if app.user %}
+                        <a href="{{ is_granted('ROLE_ADMIN') ? path('app_dashboard_admin') : path('app_dashboard') }}" class="fp-nav__link">
+                            <i class="fa-solid fa-gauge" aria-hidden="true"></i>
+                            Mon tableau de bord
+                        </a>
+                        <a href="{{ path('app_mes_documents') }}" class="fp-nav__link">
+                            <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                            Mes documents
+                        </a>
+                        <a href="{{ path('app_compte') }}" class="fp-nav__link">
+                            <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+                            Mon compte
+                        </a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_gestion_utilisateurs') }}" class="fp-nav__link">
+                                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                Utilisateurs
+                            </a>
+                            <a href="{{ path('app_gestion_projets') }}" class="fp-nav__link">
+                                <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                                Gestion projets
+                            </a>
+                            <a href="{{ path('app_gestion_documents') }}" class="fp-nav__link">
+                                <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+                                Gestion documents
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ path('app_connexion') }}" class="fp-nav__link">
+                            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                            Se connecter
+                        </a>
+                        <a href="{{ path('app_inscription') }}" class="fp-nav__link">
+                            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                            Créer un compte
+                        </a>
+                    {% endif %}
+                </nav>
+
+                {# ── Colonne CTA + Horaires ── #}
+                <div class="fp-cta-col">
+                    <div class="fp-cta-col__title">Démarrer un projet</div>
+
+                    <p class="fp-cta-col__desc">
+                        Un projet de structure métallique ? Contactez-nous pour un devis gratuit.
+                        Réponse garantie sous 48h ouvrées.
+                    </p>
+
+                    <a href="{{ path('app_contact') }}" class="fp-cta-btn">
+                        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                        Nous écrire
+                    </a>
+
+                    <div class="fp-hours" aria-label="Horaires d'ouverture">
+                        <div class="fp-hours__row">
+                            <span class="fp-hours__day">Lun. - Ven.</span>
+                            <span class="fp-hours__time">8h - 18h</span>
+                        </div>
+                        <div class="fp-hours__row">
+                            <span class="fp-hours__day">Sam. - Dim.</span>
+                            <span class="fp-hours__time fp-hours__time--closed">Fermé</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="fp-footer__divider" role="separator" aria-hidden="true"></div>
+
+    <div class="container">
+        <div class="fp-footer__bottom">
+
+            <p class="fp-copyright">
+                Fais avec
+                <i class="fp-copyright__heart fa-solid fa-heart" aria-hidden="true"></i>
+                par <strong><a href="https://dootod.github.io/portfolio/" class="fp-brand__contact" target="_blank">DUMONT Thomas</a></strong>
+            </p>
+
+            <p class="fp-copyright">
+                &copy; {{ "now"|date("Y") }}&nbsp;
+                <strong>DC Consult</strong>
+                &nbsp;- Tous droits réservés
+            </p>
+
+            <nav class="fp-legal" aria-label="Liens légaux">
+                <a href="{{ path('app_mentions_legales') }}" class="fp-legal__link">Mentions légales</a>
+                <span class="fp-legal__sep" aria-hidden="true">·</span>
+                <a href="{{ asset('documents/cgv.pdf') }}" target="_blank" class="fp-legal__link">CGV</a>
+            </nav>
+
+        </div>
+    </div>
+
+    <div class="fp-footer__bar" aria-hidden="true"></div>
+
+</footer>

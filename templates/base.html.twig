@@ -190,6 +190,8 @@
 {# AssetMapper — charge app.js et app.css automatiquement #}
 {{ importmap('app') }}
 
+{{ include('components/_footer_public.html.twig') }}
+
 {# Masquer le loader dès que le DOM est rendu #}
 <script>
     (function hideLoader() {
