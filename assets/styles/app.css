@@ -587,6 +587,8 @@ button.dc-navbar__btn-logout {
     flex: 1;
     min-width: 0;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ── Mobile : drawer sidebar ── */
@@ -895,4 +897,9 @@ button.dc-navbar__btn-logout {
 #sidebarToggler:hover {
     color: var(--color-white) !important;
     opacity: 0.9;
+}
+
+.dc-main {
+    display: flex;
+    flex-direction: column;
 }

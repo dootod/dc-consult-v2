@@ -22,6 +22,7 @@ import './styles/clients.css';
 import './js/clients.js';
 import './styles/logiciels.css';
 import './js/logiciels.js';
+import './styles/footer_public.css';
 
 const initAppUi = () => {
     // ── Effet shadow sur la navbar au scroll ──────────────────────
