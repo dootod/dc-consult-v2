@@ -169,16 +169,4 @@ final class HomeController extends AbstractController
     {
         return $this->render('home/mentions_legales.html.twig');
     }
-
-    #[Route('/cgv', name: 'app_cgv')]
-    public function cgv(): Response
-    {
-        return $this->render('home/cgv.html.twig');
-    }
-
-    #[Route('/politique-de-confidentialite', name: 'app_politique_confidentialite')]
-    public function politiqueConfidentialite(): Response
-    {
-        return $this->render('home/politique_confidentialite.html.twig');
-    }
 }
